@@ -75,18 +75,19 @@ namespace NeighborDiscovery.Nodes
 
         public void MyListeningAt5(int continuousSlots)
         {
-            int cnt = 0;
-            for (int i = 0; i < T; i+= m)
+            int[] slots = new int[m];
+            for (int i = 0; i < m; i++)
             {
-                int from = i + cnt;
-                int to = from + continuousSlots;
-                while (from < to)
-                {
-                    listeningSlots.Add(from);
-                    from++;
-                }
-                cnt += continuousSlots;
+                slots[i] = i;
             }
+            Shuffle shuffle = new Shuffle(m);
+            shuffle.KnuthShuffle(slots);
+
+            for (int i = 0; i < m; i++)
+            {
+                listeningSlots.Add(i * m + slots[i]);
+            }
+
         }
 
 
