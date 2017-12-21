@@ -12,33 +12,33 @@ namespace UIConsole
     {
         public static void Test1(int numberOfElements)
         {
-            Stopwatch clock = new Stopwatch();
-            SortedDictionary<int, int> dic = new SortedDictionary<int, int>();
+            var clock = new Stopwatch();
+            var dic = new SortedDictionary<int, int>();
 
-            for (int i = 0; i < numberOfElements; i++)
+            for (var i = 0; i < numberOfElements; i++)
             {
                 dic.Add(i, i);
             }
 
             clock.Start();
-            for (int i = 0; i < numberOfElements; i++)
+            for (var i = 0; i < numberOfElements; i++)
             {
-                int key = i;
-                int element = dic[key];
+                var key = i;
+                var element = dic[key];
                 dic.Remove(key);
             }
             Console.WriteLine(clock.ElapsedMilliseconds);
 
-            for (int i = 0; i < numberOfElements; i++)
+            for (var i = 0; i < numberOfElements; i++)
             {
                 dic.Add(i, i);
             }
 
             clock.Restart();
-            for (int i = 0; i < numberOfElements; i++)
+            for (var i = 0; i < numberOfElements; i++)
             {
-                int key = dic.Keys.First();
-                int element = dic[key];
+                var key = dic.Keys.First();
+                var element = dic[key];
                 dic.Remove(key);
             }
             Console.WriteLine(clock.ElapsedMilliseconds);
@@ -47,36 +47,36 @@ namespace UIConsole
 
         public static void Test2(int numberOfElements)
         {
-            Stopwatch clock = new Stopwatch();
-            SortedDictionary<int, int> dic = new SortedDictionary<int, int>();
-            Shuffle r = new Shuffle(numberOfElements);
-            int[] array = new int[numberOfElements];
+            var clock = new Stopwatch();
+            var dic = new SortedDictionary<int, int>();
+            var r = new Shuffle(numberOfElements);
+            var array = new int[numberOfElements];
             array = r.RandomSubSet(numberOfElements);
 
-            for (int i = 0; i < numberOfElements; i++)
+            for (var i = 0; i < numberOfElements; i++)
             {
                 dic.Add(array[i], array[i]);
             }
 
             clock.Start();
-            for (int i = 0; i < numberOfElements; i++)
+            for (var i = 0; i < numberOfElements; i++)
             {
-                int key = i;
-                int element = dic[key];
+                var key = i;
+                var element = dic[key];
                 dic.Remove(key);
             }
             Console.WriteLine(clock.ElapsedMilliseconds);
 
-            for (int i = 0; i < numberOfElements; i++)
+            for (var i = 0; i < numberOfElements; i++)
             {
                 dic.Add(array[i], array[i]);
             }
 
             clock.Restart();
-            for (int i = 0; i < numberOfElements; i++)
+            for (var i = 0; i < numberOfElements; i++)
             {
-                int key = dic.Keys.First();
-                int element = dic[key];
+                var key = dic.Keys.First();
+                var element = dic[key];
                 dic.Remove(key);
             }
             Console.WriteLine(clock.ElapsedMilliseconds);

@@ -16,7 +16,7 @@ namespace NeighborDiscovery.Networks
             nodes = new List<Network2DNode>();
             this.gotInRange = gotInRange;
             neighbors = new List<Network2DNode>[networkSize];
-            for (int i = 0; i < networkSize; i++)
+            for (var i = 0; i < networkSize; i++)
             {
                 neighbors[i] = new List<Network2DNode>();
             }
@@ -36,7 +36,7 @@ namespace NeighborDiscovery.Networks
 
             public int Degree { get; set; }
 
-            public int StartUpTime { get { return Device.StartUpTime; } }
+            public int StartUpTime => Device.StartUpTime;
 
             public Network2DNode(IDiscovery device, double xPos, double yPos, int commRange)
             {
@@ -59,16 +59,13 @@ namespace NeighborDiscovery.Networks
         private int[,] gotInRange;
         private List<Network2DNode>[] neighbors;
         
-        public int NetworkSize {
-            get { return nodes.Count; }
-        }
+        public int NetworkSize => nodes.Count;
         public int NumberOfLinks { get; private set; }
         public int NumberOfSymmetricNeighbors { get; private set; }
 
         private HashSet<double> dutyCycles;
-        public int DifDutyCyclesCount {
-            get { return dutyCycles.Count; } }
-        public bool IsAsymmetric { get { return DifDutyCyclesCount > 1; } }
+        public int DifDutyCyclesCount => dutyCycles.Count;
+        public bool IsAsymmetric => DifDutyCyclesCount > 1;
 
         public void BuildNetwork(double fixAsymmetricCase)
         {
@@ -112,10 +109,10 @@ namespace NeighborDiscovery.Networks
         private void BuildNeighborsList(double symmetricPercentageAllowed)
         {
             
-            for (int i = 0; i < NetworkSize; i++)
+            for (var i = 0; i < NetworkSize; i++)
             {
                 var node1 = nodes[i];
-                for (int j = i+1; j < NetworkSize; j++)
+                for (var j = i+1; j < NetworkSize; j++)
                 {
                     var node2 = nodes[j];
                     if (node1.IsNeighborOf(node2))

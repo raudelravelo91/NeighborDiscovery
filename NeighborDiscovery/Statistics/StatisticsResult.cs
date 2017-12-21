@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -42,20 +43,21 @@ namespace NeighborDiscovery.Statistics
             tests.Add(test);
         }
 
-        public void BuildAverageFractionOfDiscovey()
+        public void BuildAverageFractionOfDiscovey(int maxLatency)
         {
-            int highestLatency = tests.Max(test => test.MaxLatency);
-            averageFractionOfDiscovery = new double[highestLatency +1];
+            //var highestLatency = tests.Max(test => test.MaxLatency);
+            averageFractionOfDiscovery = new double[maxLatency + 1];
 
             foreach (var testResult in tests)
             {
-                foreach (var pair in testResult.GetCummulativeFractionOfDiscovery(highestLatency))
+                foreach (var pair in testResult.GetCummulativeFractionOfDiscovery(maxLatency))
                 {
-                    averageFractionOfDiscovery[pair.Key] += pair.Value;
+                    var index = (pair.Key < maxLatency)?pair.Key:maxLatency;
+                    averageFractionOfDiscovery[index] += pair.Value;
                 }
             }
 
-            for (int i = 0; i < averageFractionOfDiscovery.Length; i++)
+            for (var i = 0; i < averageFractionOfDiscovery.Length; i++)
             {
                 averageFractionOfDiscovery[i] /= tests.Count;
             }
@@ -63,7 +65,7 @@ namespace NeighborDiscovery.Statistics
 
         public double GetAverageFractionOfDiscoveryAtLatency(double latency)
         {
-            int index = (int)latency;
+            var index = (int)latency;
             if (index > averageFractionOfDiscovery.Length)//above maxLatency is always 100%
                 return averageFractionOfDiscovery[averageFractionOfDiscovery.Length - 1];
             return averageFractionOfDiscovery[index];

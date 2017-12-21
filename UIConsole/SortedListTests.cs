@@ -15,19 +15,19 @@ namespace UIConsole
         /// </summary>
         public static void Test1(int numberOfElements)
         {
-            Stopwatch clock = new Stopwatch();
+            var clock = new Stopwatch();
 
-            SortedList<int, int> sortedListO = new SortedList<int, int>();
-            SortedList<int, int> sortedListR = new SortedList<int, int>();
-            Shuffle r = new Shuffle(numberOfElements);
-            int[] array = new int[numberOfElements];
-            for (int i = 0; i < array.Length; i++)
+            var sortedListO = new SortedList<int, int>();
+            var sortedListR = new SortedList<int, int>();
+            var r = new Shuffle(numberOfElements);
+            var array = new int[numberOfElements];
+            for (var i = 0; i < array.Length; i++)
             {
                 array[i] = i;
             }
 
             clock.Start();
-            for (int i = 0; i < array.Length; i++)
+            for (var i = 0; i < array.Length; i++)
             {
                 sortedListO.Add(array[i], array[i]);
             }
@@ -37,7 +37,7 @@ namespace UIConsole
             array = r.RandomSubSet(numberOfElements);
 
             clock.Restart();
-            for (int i = 0; i < array.Length; i++)
+            for (var i = 0; i < array.Length; i++)
             {
                 sortedListR.Add(array[i], array[i]);
             }

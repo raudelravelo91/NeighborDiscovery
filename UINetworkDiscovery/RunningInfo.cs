@@ -30,14 +30,10 @@ namespace UINetworkDiscovery
             TotalAlgorithmsRan = Math.Max(TotalAlgorithmsRan, running);
         }
 
-        public bool IsRunning {
-            get { return running > 0; }
-        }
-        
+        public bool IsRunning => running > 0;
 
-        public int RunningAlgorithms {
-            get { return running; }
-        }
+
+        public int RunningAlgorithms => running;
 
         public int TotalAlgorithmsRan { get; private set; }
 

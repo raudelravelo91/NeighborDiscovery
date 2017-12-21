@@ -93,13 +93,13 @@ namespace UINetworkDiscovery
             }
             IsReading = true;
             Worker.ReportProgress(0);
-            string fileName = e.Argument.ToString();
+            var fileName = e.Argument.ToString();
             var reader = new NetworkGenerator();
             var networks = reader.CreateFromFile(fileName, NodeFactoryFunc).ToList();
             var environment = new FullDiscoveryEnvironment();
-            StatisticsResult statisticResults = new StatisticsResult(Type);
+            var statisticResults = new StatisticsResult(Type);
             IsReading = false;
-            int cnt = 0;
+            var cnt = 0;
             foreach (var n in networks)
             {
                 if (Worker.CancellationPending == true)
@@ -117,7 +117,8 @@ namespace UINetworkDiscovery
                 cnt++;
                 Worker.ReportProgress(cnt*100/networks.Count);
             }
-            statisticResults.BuildAverageFractionOfDiscovey();
+            int latencyLimit = 1000;
+            statisticResults.BuildAverageFractionOfDiscovey(latencyLimit);
             lock(MainWindow.RunningInfo)
             {
                 MainWindow.RunningInfo.RemoveRunningAlgorithm(false);

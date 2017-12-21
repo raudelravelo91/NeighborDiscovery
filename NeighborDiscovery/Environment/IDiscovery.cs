@@ -11,7 +11,7 @@ namespace NeighborDiscovery.Environment
         /// <summary>
         /// the Discovery Device's ID
         /// </summary>
-        int ID { get;}
+        int Id { get;}
 
         /// <summary>
         /// The Discovery Device's HyperPeriod
@@ -20,7 +20,7 @@ namespace NeighborDiscovery.Environment
 
         int StartUpTime { get; }
 
-        /// </summary>
+        /// 
         /// <returns>The Discovery Device's next transmission</returns>
         /// //It is supposed that a calling to this method modifies the internal state of a Discovery Device
         Transmission NextTransmission();

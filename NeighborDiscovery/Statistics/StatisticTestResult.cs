@@ -13,7 +13,7 @@ namespace NeighborDiscovery.Statistics
         public int MaxLatency { get; private set; }
         public int NumberOfWakesUp { get; set; }
         public int NumberOfContactMade { get; set; }
-        public double AverageDiscoveryLatency { get { return 1.0 * sumOfLatency / TotalDiscoveries; }  }
+        public double AverageDiscoveryLatency => 1.0 * sumOfLatency / TotalDiscoveries;
         public int TotalDiscoveries { get; private set; }
         private Dictionary<int, int> discoveryByLatency { get; set; }
         private long sumOfLatency;
@@ -45,10 +45,10 @@ namespace NeighborDiscovery.Statistics
                 yield return new KeyValuePair<int, double>(0, 1);
             else
             {
-                int max = discoveryByLatency.Max(x => x.Key);
-                int latency = 0;
+                var max = discoveryByLatency.Max(x => x.Key);
+                var latency = 0;
                 double lastFractionValue = 0;
-                int cumul = 0;
+                var cumul = 0;
                 var values = discoveryByLatency.OrderBy(x => x.Key).ToArray();
                 foreach (var pair in values)
                 {
@@ -62,7 +62,7 @@ namespace NeighborDiscovery.Statistics
                     yield return new KeyValuePair<int, double>(latency, lastFractionValue);
                     latency++;
                 }
-                while (latency <= latencyLimit)
+                while (latency < latencyLimit)
                 {
                     yield return new KeyValuePair<int, double>(latency, 1.0);
                     latency++;
@@ -76,8 +76,7 @@ namespace NeighborDiscovery.Statistics
         }
         
 
-        public bool IsDone { get { return TotalDiscoveries == ExpectedDiscoveries; } }
-        
+        public bool IsDone => TotalDiscoveries == ExpectedDiscoveries;
     }
 
     

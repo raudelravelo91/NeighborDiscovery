@@ -64,7 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Environment\TwoNodesEnvironment.cs" />
-    <Compile Include="Environment\TwoNodesEnvironmentTMLL.cs" />
+    <Compile Include="Environment\TwoNodesEnvironmentTmll.cs" />
     <Compile Include="Environment\IAccDiscovery.cs" />
     <Compile Include="Environment\FullDiscoveryEnvironment.cs" />
     <Compile Include="NeighborDiscovery.cs" />

@@ -20,7 +20,7 @@ namespace NeighborDiscovery.Nodes
         {
             m = channelOccupancyRate;
             setDutyCycle(duty, m);
-            internalTimeSlot = 0;
+            InternalTimeSlot = 0;
         }
         /// <summary>
         /// calling this method modifies the internal state of the node
@@ -29,9 +29,9 @@ namespace NeighborDiscovery.Nodes
 
         public override Transmission NextTransmission()
         {
-            int realSlot = ToRealTimeSlot(internalTimeSlot);
+            var realSlot = ToRealTimeSlot(InternalTimeSlot);
             var trans = new Transmission(realSlot, this);
-            internalTimeSlot += m;
+            InternalTimeSlot += m;
             return trans;
         }
 
@@ -42,16 +42,16 @@ namespace NeighborDiscovery.Nodes
         /// <returns>the transmission</returns>
         public override Transmission FirstTransmissionAfter(int realTimeSlot)
         {
-            int slot = FromRealTimeSlot(realTimeSlot);
-            if (slot < internalTimeSlot)
+            var slot = FromRealTimeSlot(realTimeSlot);
+            if (slot < InternalTimeSlot)
                 throw new Exception("Transmission already given");
             if (IsTransmitting(slot))
             {
-                internalTimeSlot = slot;
+                InternalTimeSlot = slot;
             }
             else//not transmitting => (slot % m) != 0
             {
-                internalTimeSlot = slot + (m - (slot % m));
+                InternalTimeSlot = slot + (m - (slot % m));
             }
             return NextTransmission();
         }
@@ -63,7 +63,7 @@ namespace NeighborDiscovery.Nodes
         /// <returns></returns>
         public override bool IsListening(int realTimeSlot)
         {
-            int slot = FromRealTimeSlot(realTimeSlot);
+            var slot = FromRealTimeSlot(realTimeSlot);
             if (slot < 0)
                 return false;
 
@@ -82,7 +82,7 @@ namespace NeighborDiscovery.Nodes
         /// <returns></returns>
         public override bool IsTransmitting(int realTimeSlot)
         {
-            int slot = FromRealTimeSlot(realTimeSlot);
+            var slot = FromRealTimeSlot(realTimeSlot);
             if (slot < 0)
                 return false;
             return slot % m == 0;
@@ -118,7 +118,7 @@ namespace NeighborDiscovery.Nodes
                 default:
                     break;
             }
-            desiredDutyCycle = duty;
+            DesiredDutyCycle = duty;
             numberOfTransmisions = n;
             T = n * m;
             buildSchedule();
@@ -126,7 +126,7 @@ namespace NeighborDiscovery.Nodes
 
         public void setDutyCycle(int duty, int m)
         {
-            desiredDutyCycle = duty;
+            DesiredDutyCycle = duty;
             n = getNByM(duty, m);
             numberOfTransmisions = n;
             T = n * m;
@@ -135,7 +135,7 @@ namespace NeighborDiscovery.Nodes
 
         private int getNByM(int duty, int m)
         {
-            int n = 1;
+            var n = 1;
             while ((m * 1.0) / (n * m) * 100 > duty)
             {
                 n++;
@@ -159,7 +159,7 @@ namespace NeighborDiscovery.Nodes
 
         public override IDiscovery Clone()
         {
-            return new GNihao(ID, (int)desiredDutyCycle, CommunicationRange, m, StartUpTime, false);
+            return new GNihao(Id, (int)DesiredDutyCycle, CommunicationRange, m, StartUpTime, false);
         }
     }
 }

@@ -18,40 +18,40 @@ namespace NeighborDiscovery.Nodes
         public UConnectNode(int id, double dutyCyclePercentage, int communicationRange, int startUpTime) :base(id, dutyCyclePercentage, communicationRange, startUpTime)
         {
             listening = -1;
-            internalTimeSlot = 0;
+            InternalTimeSlot = 0;
 
         }
 
         public override Transmission NextTransmission()
         {
-            var trans = new Transmission(ToRealTimeSlot(internalTimeSlot), this);
+            var trans = new Transmission(ToRealTimeSlot(InternalTimeSlot), this);
             //calculate next
-            if (internalTimeSlot % T < P / 2)
+            if (InternalTimeSlot % T < P / 2)
             {
-                internalTimeSlot++;
+                InternalTimeSlot++;
             }
-            else internalTimeSlot += (P - internalTimeSlot % P);
+            else InternalTimeSlot += (P - InternalTimeSlot % P);
 
             return trans;
         }
 
         public override Transmission FirstTransmissionAfter(int realTimeSlot)
         {
-            int slot = FromRealTimeSlot(realTimeSlot);
+            var slot = FromRealTimeSlot(realTimeSlot);
             if (IsTransmitting(slot))
             {
-                internalTimeSlot = slot;
+                InternalTimeSlot = slot;
             }
             else
             {
-                internalTimeSlot = slot + (P - slot%P);
+                InternalTimeSlot = slot + (P - slot%P);
             }
             return NextTransmission();
         }
 
         public override bool IsListening(int realTimeSlot)
         {
-            int slot = FromRealTimeSlot(realTimeSlot);
+            var slot = FromRealTimeSlot(realTimeSlot);
             return slot % P == 0 || slot % T <= P / 2;
         }
 
@@ -94,7 +94,7 @@ namespace NeighborDiscovery.Nodes
                 }
             }
             T = P * P;
-            desiredDutyCycle = duty;
+            DesiredDutyCycle = duty;
         }
 
         public override double GetDutyCycle()
@@ -104,7 +104,7 @@ namespace NeighborDiscovery.Nodes
 
         public override IDiscovery Clone()
         {
-            return new UConnectNode(ID, desiredDutyCycle,CommunicationRange, StartUpTime);
+            return new UConnectNode(Id, DesiredDutyCycle,CommunicationRange, StartUpTime);
         }
     }
 }

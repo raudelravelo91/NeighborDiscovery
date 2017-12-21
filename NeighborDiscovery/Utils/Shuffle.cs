@@ -22,12 +22,12 @@ namespace NeighborDiscovery.Utils
 
         public int[] RandomSubSet(int subsetSize)
         {
-            int[] permutation = new int[MaxSize];//contains numbers from 1 to MaxSize
-            for (int i = 0; i < MaxSize; i++)
+            var permutation = new int[MaxSize];//contains numbers from 1 to MaxSize
+            for (var i = 0; i < MaxSize; i++)
                 permutation[i] = i + 1;
             KnuthShuffle(permutation);
-            int[] answer = new int[subsetSize];
-            for (int i = 0; i < subsetSize; i++)
+            var answer = new int[subsetSize];
+            for (var i = 0; i < subsetSize; i++)
             {
                 answer[i] = permutation[i];
             }
@@ -36,20 +36,20 @@ namespace NeighborDiscovery.Utils
 
         public void KnuthShuffle(int[] permutation)
         {
-            int n = permutation.Length;
+            var n = permutation.Length;
             
-            for (int i = 0; i <= n - 2; i++)
+            for (var i = 0; i <= n - 2; i++)
             {
-                int j = random.Next(n - i); /* A random integer such that 0 ≤ j < n-i*/
+                var j = random.Next(n - i); /* A random integer such that 0 ≤ j < n-i*/
                 Swap(ref permutation[i], ref permutation[i + j]);   /* Swap an existing element [i+j] to position [i] */
             }
         }
 
         public int[] RandomShuffle(int subsetSize)
         {
-            int[] answer = new int[subsetSize];
-            int cnt = 0;
-            int next = 0;
+            var answer = new int[subsetSize];
+            var cnt = 0;
+            var next = 0;
             while (cnt < answer.Length)
             {
                 next = random.Next(subsetSize);
@@ -66,7 +66,7 @@ namespace NeighborDiscovery.Utils
 
         private void ClearDic(int[] numbers)
         {
-            for (int i = 0; i < numbers.Length; i++)
+            for (var i = 0; i < numbers.Length; i++)
             {
                 dic[numbers[i]] = false;
             }
@@ -74,7 +74,7 @@ namespace NeighborDiscovery.Utils
 
         private void Swap(ref int v1, ref int v2)
         {
-            int temp = v1;
+            var temp = v1;
             v1 = v2;
             v2 = temp;
         }

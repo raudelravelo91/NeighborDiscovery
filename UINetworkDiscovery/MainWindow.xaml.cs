@@ -189,7 +189,7 @@ namespace UINetworkDiscovery
 
         public bool GetDutyCycle(out double[] duties)
         {
-            List<double> dutyList = new List<double>();
+            var dutyList = new List<double>();
             if (cb05p.IsChecked != null && cb05p.IsChecked == true)
                 dutyList.Add(0.5);
             if (cb1p.IsChecked != null && cb1p.IsChecked == true)
@@ -243,8 +243,8 @@ namespace UINetworkDiscovery
             tbMinCommRange.Text = "20";
             tbMaxCommRange.Text = "100";
             tbPosRange.Text = "50";
-            tbStartUpLimit.Text = "400";
-            tbGotInRangeLimit.Text = "800";
+            tbStartUpLimit.Text = "200";
+            tbGotInRangeLimit.Text = "400";
         }
 
         private void btGenerate_Click(object sender, RoutedEventArgs e)
@@ -322,7 +322,7 @@ namespace UINetworkDiscovery
                 if (File.Exists(fileName))
                 {
                     NetworkGenerator.PercentageToFix = double.Parse(tbFixAsymmetricNetwork.Text);
-                    bool selectedAlgs = cbDisco.IsChecked.Value || cbUConnect.IsChecked.Value || cbSearchlight.IsChecked.Value || cbBirthday.IsChecked.Value || cbStripedSearchlight.IsChecked.Value || cbTestAlgorithm.IsChecked.Value || cbGNihao.IsChecked.Value || cbAccGossipGNihao.IsChecked.Value || cbAccGossipPNihao.IsChecked.Value;
+                    var selectedAlgs = cbDisco.IsChecked.Value || cbUConnect.IsChecked.Value || cbSearchlight.IsChecked.Value || cbBirthday.IsChecked.Value || cbStripedSearchlight.IsChecked.Value || cbTestAlgorithm.IsChecked.Value || cbGNihao.IsChecked.Value || cbAccGossipGNihao.IsChecked.Value || cbAccGossipPNihao.IsChecked.Value;
 
                     if (selectedAlgs)
                     {
@@ -392,7 +392,7 @@ namespace UINetworkDiscovery
 
         private void Plot(StatisticsResult result)
         {
-            int max = result.GetMaxLatency();
+            var max = result.GetMaxLatency();
             var type = result.NodeType;
             OxyColor oxyColor;
             MarkerType markerType;
@@ -514,8 +514,8 @@ namespace UINetworkDiscovery
             }
             
             
-            List<DataPoint> Points = new List<DataPoint>();
-            int x = 0;
+            var Points = new List<DataPoint>();
+            var x = 0;
             double y = 0;
             while (x <= result.GetMaxLatency() && (y = result.GetAverageFractionOfDiscoveryAtLatency(x)) < 1)
             {
@@ -526,7 +526,7 @@ namespace UINetworkDiscovery
             //var serie = new FunctionSeries(result.GetAverageFractionOfDiscoveryAtLatency, 1, max, max, type.ToString());
             //model.Series.Add(serie);
 
-            LineSeries lineserie = new LineSeries
+            var lineserie = new LineSeries
             {
                 Title = type.ToString(),
                 ItemsSource = Points,
@@ -563,8 +563,8 @@ namespace UINetworkDiscovery
 
         private void tbXAxes_KeyUp(object sender, KeyEventArgs e)
         {
-            string s = tbXAxes.Text;
-            int xStep = 5;
+            var s = tbXAxes.Text;
+            var xStep = 5;
             if (s.Contains('/'))
             {
                 var split = s.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
@@ -584,8 +584,8 @@ namespace UINetworkDiscovery
 
         private void tbYAxes_KeyUp(object sender, KeyEventArgs e)
         {
-            string s = tbYAxes.Text;
-            int yStep = 5;
+            var s = tbYAxes.Text;
+            var yStep = 5;
             if (s.Contains('/'))
             {
                 var split = s.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
@@ -618,7 +618,7 @@ namespace UINetworkDiscovery
                 if (File.Exists(fileName))
                 {
                     NetworkGenerator.PercentageToFix = double.Parse(tbFixAsymmetricNetwork.Text);
-                    bool selectedAlgs = cbDisco.IsChecked.Value || cbUConnect.IsChecked.Value || cbSearchlight.IsChecked.Value || cbBirthday.IsChecked.Value || cbStripedSearchlight.IsChecked.Value || cbTestAlgorithm.IsChecked.Value || cbGNihao.IsChecked.Value || cbAccGossipGNihao.IsChecked.Value;
+                    var selectedAlgs = cbDisco.IsChecked.Value || cbUConnect.IsChecked.Value || cbSearchlight.IsChecked.Value || cbBirthday.IsChecked.Value || cbStripedSearchlight.IsChecked.Value || cbTestAlgorithm.IsChecked.Value || cbGNihao.IsChecked.Value || cbAccGossipGNihao.IsChecked.Value;
 
                     if (selectedAlgs)
                     {
@@ -653,11 +653,12 @@ namespace UINetworkDiscovery
                             {
                                 var node1 = new UConnectNode(0, duties[0], 0, 0);
                                 var node2 = new UConnectNode(0, duties[duties.Length - 1], 0, 0);
-                                var environment = new TwoNodesEnvironmentTMLL(node1, node2);
-                                var test = environment.RunSimulation();
-                                StatisticsResult result = new StatisticsResult(NodeType.UConnect);
+                                var environment = new TwoNodesEnvironmentTmll(node1, node2);
+                                var latencyLimit = node1.T + 1;
+                                var test = environment.RunSimulation(latencyLimit);
+                                var result = new StatisticsResult(NodeType.UConnect);
                                 result.AddStatisticTest(test);
-                                result.BuildAverageFractionOfDiscovey();
+                                result.BuildAverageFractionOfDiscovey(latencyLimit);
                                 worker_RunWorkerCompleted(this, new RunWorkerCompletedEventArgs(result, null, false));
                             }
                         }
@@ -718,14 +719,14 @@ namespace UINetworkDiscovery
                             double[] duties;
                             if (GetDutyCycle(out duties))
                             {
-                                var node1 = new GNihao(1, (int)duties[0], 0, 40, 0, false);
-                                var node2 = new GNihao(2, (int)duties[duties.Length-1], 0, 40, 0, false);
-                                var environment = new TwoNodesEnvironmentTMLL(node1, node2);
-
-                                var test = environment.RunSimulation();
-                                StatisticsResult result = new StatisticsResult(NodeType.GNihao);
+                                var node1 = new GNihao(1, (int)duties[0], 0, 20, 0, false);
+                                var node2 = new GNihao(2, (int)duties[duties.Length-1], 0, 20, 0, false);
+                                var environment = new TwoNodesEnvironmentTmll(node1, node2);
+                                var latencyLimit = node1.T + 1;
+                                var test = environment.RunSimulation(latencyLimit);
+                                var result = new StatisticsResult(NodeType.GNihao);
                                 result.AddStatisticTest(test);
-                                result.BuildAverageFractionOfDiscovey();
+                                result.BuildAverageFractionOfDiscovey(latencyLimit);
                                 worker_RunWorkerCompleted(this, new RunWorkerCompletedEventArgs(result, null, false));
                             }
                         }

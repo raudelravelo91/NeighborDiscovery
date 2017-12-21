@@ -47,7 +47,7 @@ namespace NeighborDiscovery.Environment
 
         private int LimitByDutyCycle(Node node)
         {
-            double duty = (node.GetDutyCycle() * 100);
+            var duty = (node.GetDutyCycle() * 100);
             if (duty < 1)
                 return 2000000;
             else return 1000000;
@@ -56,9 +56,9 @@ namespace NeighborDiscovery.Environment
         public StatisticTestResult RunSimulation(Func<double, double, bool> checker, bool skew = false)
         {
             GenerateTransmissions();
-            int fromLimit = 4000;
-            int offSetLimit = 200;
-            double clockSkew = (skew) ? 0.5 : 0;
+            var fromLimit = 4000;
+            var offSetLimit = 200;
+            var clockSkew = (skew) ? 0.5 : 0;
 
             if (NodeType.Equals(NodeType.UConnect))
             {
@@ -76,16 +76,16 @@ namespace NeighborDiscovery.Environment
                 offSetLimit = 200;
             }
 
-            StatisticTestResult result = new StatisticTestResult(offSetLimit * fromLimit);
+            var result = new StatisticTestResult(offSetLimit * fromLimit);
 
-            for (int offSet = 0; offSet < offSetLimit; offSet++)
+            for (var offSet = 0; offSet < offSetLimit; offSet++)
             {
-                for (int from = offSet; from < offSet + fromLimit; from++)
+                for (var from = offSet; from < offSet + fromLimit; from++)
                 {
-                    int cnt1 = 0;
-                    int cnt2 = 0;
+                    var cnt1 = 0;
+                    var cnt2 = 0;
 
-                    double node1Trans = clockSkew + node1Transmissions[0];
+                    var node1Trans = clockSkew + node1Transmissions[0];
                     //if (skew) node1Trans += clockSkew;
                     while (node1Trans < from)
                     {
@@ -115,7 +115,7 @@ namespace NeighborDiscovery.Environment
                         //if (skew) node1Trans += clockSkew;
                         node2Trans = offSet + node2Transmissions[cnt2];
                     }
-                    int latency = (int)node2Trans - from + 1;
+                    var latency = (int)node2Trans - from + 1;
                     //Console.WriteLine();
                     result.AddDiscovery(latency);
                 }

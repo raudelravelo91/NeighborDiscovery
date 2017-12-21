@@ -10,22 +10,22 @@ namespace NeighborDiscovery.Nodes
 {
     public abstract class Node:IDiscovery
     {
-        public int ID { get; protected set; }
+        public int Id { get; protected set; }
         public int CommunicationRange { get; private set; }
         public int T { get; protected set; }
-        public int NumberOfNeighbors { get { return neighbors.Count; } }
+        public int NumberOfNeighbors => Neighbors.Count;
 
         public int StartUpTime { get; private set; }
 
-        protected double desiredDutyCycle;//use to store the desired duty cycle. To get the real duty cycle call getDutyCycle()
-        protected int internalTimeSlot;
-        protected Dictionary<IDiscovery, ContactInfo> neighbors;
+        protected double DesiredDutyCycle;//use to store the desired duty cycle. To get the real duty cycle call getDutyCycle()
+        protected int InternalTimeSlot;
+        protected Dictionary<IDiscovery, ContactInfo> Neighbors;
 
-        public Node(int id, double dutyCyclePercentage, int communicationRange, int startUpTime)
+        protected Node(int id, double dutyCyclePercentage, int communicationRange, int startUpTime)
         {
-            neighbors = new Dictionary<IDiscovery, ContactInfo>();
-            ID = id;
-            internalTimeSlot = 0;
+            Neighbors = new Dictionary<IDiscovery, ContactInfo>();
+            Id = id;
+            InternalTimeSlot = 0;
             CommunicationRange = communicationRange;
             StartUpTime = startUpTime;
             SetDutyCycle(dutyCyclePercentage);
@@ -45,7 +45,7 @@ namespace NeighborDiscovery.Nodes
         {
             if (dutyCyclePercentage < 1 || dutyCyclePercentage > 10)
                 throw new ArgumentException("Invalid Duty Cycle");
-            desiredDutyCycle = dutyCyclePercentage;
+            DesiredDutyCycle = dutyCyclePercentage;
         }
 
         /// <summary>
@@ -69,41 +69,38 @@ namespace NeighborDiscovery.Nodes
 
         public virtual IEnumerable<Tuple<IDiscovery, ContactInfo>> NeighborsDiscovered()
         {
-            return neighbors.Select(x => new Tuple<IDiscovery, ContactInfo>(x.Key, x.Value));
+            return Neighbors.Select(x => new Tuple<IDiscovery, ContactInfo>(x.Key, x.Value));
         }
 
         public virtual bool WasDiscovered(IDiscovery neighbor)
         {
-            return neighbors.ContainsKey(neighbor);
+            return Neighbors.ContainsKey(neighbor);
         }
 
         public virtual bool ListenTo(Transmission transmission, out List<IDiscovery> discoveredNodes)
         {
             discoveredNodes = new List<IDiscovery>();
-            if (transmission != null)
-            {
-                if (IsListening(transmission.Slot))
-                {
-                    if (!WasDiscovered(transmission.Sender))
-                    {
-                        neighbors.Add(transmission.Sender, new ContactInfo(transmission.Slot));
-                        discoveredNodes.Add(transmission.Sender);
-                    }
-                    else
-                    {
-                        neighbors[transmission.Sender].Update(transmission.Slot);
-                    }
-                    return true;
-                }
-            }
-            else throw new ArgumentException("Null transmission received.");
+            if (transmission == null)
+                throw new ArgumentException("Null transmission received.");
 
-            return false;
+            if (!IsListening(transmission.Slot))
+                return false;
+
+            if (!WasDiscovered(transmission.Sender))
+            {
+                Neighbors.Add(transmission.Sender, new ContactInfo(transmission.Slot));
+                discoveredNodes.Add(transmission.Sender);
+            }
+            else
+            {
+                Neighbors[transmission.Sender].Update(transmission.Slot);
+            }
+            return true;
         }
 
         public override string ToString()
         {
-            return "NodeId: " + ID + " Duty: " + Math.Round(GetDutyCycle(),2);
+            return "NodeId: " + Id + " Duty: " + Math.Round(GetDutyCycle(),2);
         }
 
         public virtual IDiscovery Clone()
@@ -113,7 +110,7 @@ namespace NeighborDiscovery.Nodes
 
         public virtual void Reset(int startUpTime)
         {
-            internalTimeSlot = 0;
+            InternalTimeSlot = 0;
             StartUpTime = startUpTime;
         }
 

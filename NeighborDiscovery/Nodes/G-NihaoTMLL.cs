@@ -12,18 +12,19 @@ namespace NeighborDiscovery.Nodes
 {
     public class GNihao: Node
     {
-        protected int m;
-        protected int n;
-        protected int numberOfTransmisions;
-        protected HashSet<int> listeningSlots;
+        protected int M;
+        protected int N;
+        protected int NumberOfTransmisions;
+        protected HashSet<int> ListeningSlots;
 
         public GNihao(int id, int duty, int communicationRange,  int channelOccupancyRate, int startUpTime, bool randomInitialState = false): base(id, (double)duty, communicationRange, startUpTime)
         {
-            m = channelOccupancyRate;
-            setDutyCycle(duty, m);
-            internalTimeSlot = 0;
-            listeningSlots = new HashSet<int>();
-            MyListeningAt5(1);
+            M = channelOccupancyRate;
+            SetDutyCycle(duty, M);
+            InternalTimeSlot = 0;
+            ListeningSlots = new HashSet<int>();
+            //MyListeningAt5(1);
+            MyListeningOneHalfAt5(1);
         }
         /// <summary>
         /// calling this method modifies the internal state of the node
@@ -32,29 +33,29 @@ namespace NeighborDiscovery.Nodes
 
         public override Transmission NextTransmission()
         {
-            int realSlot = ToRealTimeSlot(internalTimeSlot);
+            var realSlot = ToRealTimeSlot(InternalTimeSlot);
             var trans = new Transmission(realSlot, this);
-            internalTimeSlot += m;
+            InternalTimeSlot += M;
             return trans;
         }
 
         /// <summary>
         /// calculates the first transmission that is going to be trasmited at a slot greater than or equal than the given slot
         /// </summary>
-        /// <param name="slot"></param>
+        /// <param name="realTimeSlot"></param>
         /// <returns>the transmission</returns>
         public override Transmission FirstTransmissionAfter(int realTimeSlot)
         {
-            int slot = FromRealTimeSlot(realTimeSlot);
-            if (slot < internalTimeSlot)
+            var slot = FromRealTimeSlot(realTimeSlot);
+            if (slot < InternalTimeSlot)
                 throw new Exception("Transmission already given");
             if (IsTransmitting(slot))
             {
-                internalTimeSlot = slot;
+                InternalTimeSlot = slot;
             }
             else//not transmitting => (slot % m) != 0
             {
-                internalTimeSlot = slot + (m - (slot % m));
+                InternalTimeSlot = slot + (M - (slot % M));
             }
             return NextTransmission();
         }
@@ -62,30 +63,51 @@ namespace NeighborDiscovery.Nodes
         /// <summary>
         /// parameter pos is cero based and represents the slot where you want to know if the node was/is/will be listening
         /// </summary>
-        /// <param name="slot"></param>
+        /// <param name="realTimeSlot"></param>
         /// <returns></returns>
         public override bool IsListening(int realTimeSlot)
         {
-            int slot = FromRealTimeSlot(realTimeSlot);
+            var slot = FromRealTimeSlot(realTimeSlot);
             if (slot < 0)
                 return false;
-            return listeningSlots.Contains(slot % T);
+            return ListeningSlots.Contains(slot % T);
             //return slot % T < m;//original G-Nihao
         }
 
         public void MyListeningAt5(int continuousSlots)
         {
-            int[] slots = new int[m];
-            for (int i = 0; i < m; i++)
+            var slots = new int[M];
+            for (var i = 0; i < M; i++)
             {
                 slots[i] = i;
             }
-            Shuffle shuffle = new Shuffle(m);
+            var shuffle = new Shuffle(M);
             shuffle.KnuthShuffle(slots);
 
-            for (int i = 0; i < m; i++)
+            for (var i = 0; i < M; i++)
             {
-                listeningSlots.Add(i * m + slots[i]);
+                ListeningSlots.Add(i * M + slots[i]);
+                //ListeningSlots.Add(slots[i]);
+            }
+
+        }
+
+        public void MyListeningOneHalfAt5(int continuousSlots)
+        {
+            var newM = M / 2;
+            var slots = new int[newM];
+            for (var i = 0; i < newM; i++)
+            {
+                slots[i] = i;
+            }
+            //var shuffle = new Shuffle(newM);
+            //shuffle.KnuthShuffle(slots);
+
+            for (var i = 0; i < newM; i++)
+            {
+                //ListeningSlots.Add(i * M + slots[i%newM]);
+                ListeningSlots.Add(slots[i]);
+                ListeningSlots.Add(newM*M + slots[i]);
             }
 
         }
@@ -94,64 +116,64 @@ namespace NeighborDiscovery.Nodes
         /// <summary>
         /// parameter pos is cero based and represents the slot where you want to know if the node was/is/will be transmitting
         /// </summary>
-        /// <param name="slot"></param>
+        /// <param name="realTimeSlot"></param>
         /// <returns></returns>
         public override bool IsTransmitting(int realTimeSlot)
         {
-            int slot = FromRealTimeSlot(realTimeSlot);
+            var slot = FromRealTimeSlot(realTimeSlot);
             if (slot < 0)
                 return false;
-            return slot % m == 0;
+            return slot % M == 0;
         }
 
-        public double channelUsage()
+        public double ChannelUsage()
         {
-            return 1.0 * numberOfTransmisions/T;
+            return 1.0 * NumberOfTransmisions/T;
         }
 
         public override double GetDutyCycle()
         {
-            return m * 1.0 / (n * m);
+            return M * 1.0 / (N * M);
         }
 
-        public void setDutyCycle(int duty)
+        public void SetDutyCycle(int duty)
         {
             switch (duty)
             {
                 case 1:
-                    m = 100;
-                    n = 100;
+                    M = 100;
+                    N = 100;
                     break;
                 case 5:
-                    m = 20;
-                    n = 20;
+                    M = 20;
+                    N = 20;
                     break;
                 case 10:
-                    m = 10;
-                    n = 10;
+                    M = 10;
+                    N = 10;
                     break;
 
                 default:
                     break;
             }
-            desiredDutyCycle = duty;
-            numberOfTransmisions = n;
-            T = n * m;
-            buildSchedule();
+            DesiredDutyCycle = duty;
+            NumberOfTransmisions = N;
+            T = N * M;
+            BuildSchedule();
         }
 
-        public void setDutyCycle(int duty, int m)
+        public void SetDutyCycle(int duty, int m)
         {
-            desiredDutyCycle = duty;
-            n = getNByM(duty, m);
-            numberOfTransmisions = n;
-            T = n * m;
-            buildSchedule();
+            DesiredDutyCycle = duty;
+            N = GetNbyM(duty, m);
+            NumberOfTransmisions = N;
+            T = N * m;
+            BuildSchedule();
         }
 
-        private int getNByM(int duty, int m)
+        private int GetNbyM(int duty, int m)
         {
-            int n = 1;
+            var n = 1;
             while ((m * 1.0) / (n * m) * 100 > duty)
             {
                 n++;
@@ -159,7 +181,7 @@ namespace NeighborDiscovery.Nodes
             return n;
         }
 
-        private void buildSchedule()
+        private void BuildSchedule()
         {
             //listen = new bool[T];
             //transmit = new bool[T];
@@ -175,7 +197,7 @@ namespace NeighborDiscovery.Nodes
 
         public override IDiscovery Clone()
         {
-            return new GNihao(ID, (int)desiredDutyCycle, CommunicationRange, m, StartUpTime, false);
+            return new GNihao(Id, (int)DesiredDutyCycle, CommunicationRange, M, StartUpTime, false);
         }
     }
 }
