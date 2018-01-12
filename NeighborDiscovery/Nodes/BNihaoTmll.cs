@@ -10,16 +10,16 @@ using NeighborDiscovery.Nodes;
 
 namespace NeighborDiscovery.Nodes
 {
-    public class PNihao : Node
+    public class BNihao : Node
     {
-        protected int m;
-        protected int n;
-        protected int numberOfTransmisions;
+        protected int M;
+        protected int N;
+        protected int NumberOfTransmisions;
 
-        public PNihao(int id, int duty, int communicationRange, int channelOccupancyRate, int startUpTime ,bool randomInitialState = false) : base(id, (double)duty, communicationRange, startUpTime)
+        public BNihao(int id, int duty, int communicationRange, int channelOccupancyRate, int startUpTime) : base(id, (double)duty, communicationRange, startUpTime)
         {
-            m = channelOccupancyRate;
-            setDutyCycle(duty, m);
+            M = channelOccupancyRate;
+            SetDutyCycle(duty);
             InternalTimeSlot = 0;
         }
         /// <summary>
@@ -31,7 +31,7 @@ namespace NeighborDiscovery.Nodes
         {
             var realSlot = ToRealTimeSlot(InternalTimeSlot);
             var trans = new Transmission(realSlot, this);
-            InternalTimeSlot += m;
+            InternalTimeSlot += M;
             return trans;
         }
 
@@ -44,14 +44,14 @@ namespace NeighborDiscovery.Nodes
         {
             var slot = FromRealTimeSlot(realTimeSlot);
             if (slot < InternalTimeSlot)
-                throw new Exception("Transmission already given");
+                throw new Exception("Transmission already given, restart the node if needed.");
             if (IsTransmitting(slot))
             {
                 InternalTimeSlot = slot;
             }
             else//not transmitting => (slot % m) != 0
             {
-                InternalTimeSlot = slot + (m - (slot % m));
+                InternalTimeSlot = slot + (M - (slot % M));
             }
             return NextTransmission();
         }
@@ -66,7 +66,7 @@ namespace NeighborDiscovery.Nodes
             var slot = FromRealTimeSlot(realTimeSlot);
             if (slot < 0)
                 return false;
-            return (slot % T) < m/2 || ((slot % T) >= (T/2 + m/2) && (slot % T) < (T/2 + m));
+            return (slot % T) < M;
         }
 
         /// <summary>
@@ -79,17 +79,17 @@ namespace NeighborDiscovery.Nodes
             var slot = FromRealTimeSlot(realTimeSlot);
             if (slot < 0)
                 return false;
-            return slot % m == 0;
+            return slot % M == 0;
         }
 
         public double channelUsage()
         {
-            return 1.0 * numberOfTransmisions / T;
+            return 1.0 * NumberOfTransmisions / T;
         }
 
         public override double GetDutyCycle()
         {
-            return m * 1.0 / (n * m);
+            return M * 1.0 / (N * M);
         }
 
         public void setDutyCycle(int duty)
@@ -97,32 +97,34 @@ namespace NeighborDiscovery.Nodes
             switch (duty)
             {
                 case 1:
-                    m = 100;
-                    n = 100;
+                    M = 100;
+                    N = 100;
                     break;
                 case 5:
-                    m = 20;
-                    n = 20;
+                    M = 20;
+                    N = 20;
                     break;
                 case 10:
-                    m = 10;
-                    n = 10;
+                    M = 10;
+                    N = 10;
                     break;
 
                 default:
                     break;
             }
             DesiredDutyCycle = duty;
-            numberOfTransmisions = n;
-            T = n * m;
+            NumberOfTransmisions = N;
+            T = N * M;
         }
 
-        public void setDutyCycle(int duty, int m)
+        public void SetDutyCycle(int duty, int newM = -1)
         {
+            if(newM > 0)
+                M = newM;
             DesiredDutyCycle = duty;
-            n = getNByM(duty, m);
-            numberOfTransmisions = n;
-            T = n * m;
+            N = getNByM(duty, M);
+            NumberOfTransmisions = N;
+            T = N * M;
         }
 
         private int getNByM(int duty, int m)
@@ -142,7 +144,7 @@ namespace NeighborDiscovery.Nodes
 
         public override IDiscovery Clone()
         {
-            return new PNihao(Id, (int)DesiredDutyCycle, CommunicationRange, m, StartUpTime, false);
+            return new BNihao(Id, (int)DesiredDutyCycle, CommunicationRange, M, StartUpTime);
         }
     }
 }

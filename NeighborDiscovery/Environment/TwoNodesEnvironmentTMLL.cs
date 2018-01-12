@@ -10,8 +10,8 @@ namespace NeighborDiscovery.Environment
 {
     public class TwoNodesEnvironmentTmll
     {
-        public IDiscovery Node1 { get; private set; }
-        public IDiscovery Node2 { get; private set; }
+        public IDiscovery Node1 { get; }
+        public IDiscovery Node2 { get; }
 
         public TwoNodesEnvironmentTmll(IDiscovery node1, IDiscovery node2)
         {

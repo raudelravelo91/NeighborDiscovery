@@ -159,7 +159,7 @@ namespace NeighborDiscovery.Nodes
 
         public override IDiscovery Clone()
         {
-            return new GNihao(Id, (int)DesiredDutyCycle, CommunicationRange, m, StartUpTime, false);
+            return new BNihaoR(Id, (int)DesiredDutyCycle, CommunicationRange, m, StartUpTime, false);
         }
     }
 }

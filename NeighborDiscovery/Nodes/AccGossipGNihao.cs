@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace NeighborDiscovery.Nodes
 {
-    public class AccGossipGNihao : GNihao
+    public class AccGossipGNihao : BNihaoR
     {
         public AccGossipGNihao(int id, int duty, int communicationRange, int channelOccupancyRate, int startUpTime, bool randomInitialState = false) : base(id, duty, communicationRange, channelOccupancyRate, startUpTime, randomInitialState)
         {

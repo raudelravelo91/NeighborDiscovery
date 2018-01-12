@@ -20,7 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -49,9 +49,8 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Priority Queue, Version=4.0.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\OptimizedPriorityQueue.4.0.4\lib\net45\Priority Queue.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Priority Queue, Version=4.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\OptimizedPriorityQueue.4.1.1\lib\net45\Priority Queue.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -63,11 +62,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Environment\TwoNodesEnvironment.cs" />
     <Compile Include="Environment\TwoNodesEnvironmentTmll.cs" />
     <Compile Include="Environment\IAccDiscovery.cs" />
     <Compile Include="Environment\FullDiscoveryEnvironment.cs" />
-    <Compile Include="NeighborDiscovery.cs" />
     <Compile Include="Networks\Network2D.cs" />
     <Compile Include="Networks\NetworkGenerator.cs" />
     <Compile Include="Nodes\AccGossipGNihao.cs" />
@@ -78,11 +75,11 @@
     <Compile Include="Nodes\DiscoAcc.cs" />
     <Compile Include="Nodes\DiscoNode.cs" />
     <Compile Include="Environment\IDiscovery.cs" />
-    <Compile Include="Nodes\G-NihaoTMLL.cs" />
+    <Compile Include="Nodes\B-NihaoRandomizedTmll.cs" />
     <Compile Include="Nodes\HelloNode.cs" />
     <Compile Include="Nodes\NeighborInfo.cs" />
     <Compile Include="Nodes\Node.cs" />
-    <Compile Include="Nodes\P-NihaoTMLL.cs" />
+    <Compile Include="Nodes\BNihaoTmll.cs" />
     <Compile Include="Nodes\StripedSearchlightNode.cs" />
     <Compile Include="Nodes\T-Nihao.cs" />
     <Compile Include="Nodes\TestAlgorithm.cs" />
@@ -95,7 +92,7 @@
     <Compile Include="Nodes\UConnectNode.cs" />
     <Compile Include="Utils\NodeParameters.cs" />
     <Compile Include="Utils\Shuffle.cs" />
-    <Compile Include="Utils\NodeFactory.cs" />
+    <Compile Include="Utils\Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

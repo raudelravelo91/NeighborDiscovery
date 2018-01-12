@@ -15,9 +15,8 @@ namespace NeighborDiscovery.Environment
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="slot"></param>
-        /// <returns></returns>
-        List<int> GetTransmissionSlotsBefore(int T0, int Tn);
+        /// <returns>the list of trasmission in the given range</returns>
+        List<int> GetTransInRange(int t0, int tn);
 
         /// <summary>
         /// The period size of the new budget, ex...if the new budget is 5% Tn = 20 and the alg has 1 more transmission to send every 20 slots

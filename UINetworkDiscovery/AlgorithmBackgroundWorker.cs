@@ -68,18 +68,19 @@ namespace UINetworkDiscovery
                 //    n = NodeFactory.CreateNode(Type, new NodeParameters(Type, basicParameters.Id, basicParameters.DutyCyclePercentage, basicParameters.CommunicationRange));
                 //    break;
                 case NodeType.GNihao:
-                    n = new GNihao(basicParameters.Id, basicParameters.DutyCyclePercentage, basicParameters.CommunicationRange, 20, basicParameters.StartUpTime, false);
+                    n = new BNihaoR(basicParameters.Id, basicParameters.DutyCyclePercentage, basicParameters.CommunicationRange, 20, basicParameters.StartUpTime);
                     break;
-                case NodeType.PNihao:
-                    n = new PNihao(basicParameters.Id, basicParameters.DutyCyclePercentage, basicParameters.CommunicationRange, 20, basicParameters.StartUpTime, false);
+                case NodeType.BNihao:
+                    n = new BNihao(basicParameters.Id, basicParameters.DutyCyclePercentage, basicParameters.CommunicationRange, 20, basicParameters.StartUpTime);
                     break;
                 case NodeType.AccGossipGNihao:
-                    n = new AccGossipGNihao(basicParameters.Id, basicParameters.DutyCyclePercentage, basicParameters.CommunicationRange, 20, basicParameters.StartUpTime ,false);
+                    n = new AccGossipGNihao(basicParameters.Id, basicParameters.DutyCyclePercentage, basicParameters.CommunicationRange, 20, basicParameters.StartUpTime);
                     break;
+                
+                //case NodeType.AccGossipPNihao:
+                    //n = new AccGossipPNihao(basicParameters.Id, basicParameters.DutyCyclePercentage, basicParameters.CommunicationRange, 20, basicParameters.StartUpTime, false);
+                    //break;
                 default:
-                case NodeType.AccGossipPNihao:
-                    n = new AccGossipPNihao(basicParameters.Id, basicParameters.DutyCyclePercentage, basicParameters.CommunicationRange, 20, basicParameters.StartUpTime, false);
-                    break;
                     throw new Exception("Can not create the given type of node");
             }
             return n;
@@ -117,7 +118,7 @@ namespace UINetworkDiscovery
                 cnt++;
                 Worker.ReportProgress(cnt*100/networks.Count);
             }
-            int latencyLimit = 1000;
+            var latencyLimit = 1000;
             statisticResults.BuildAverageFractionOfDiscovey(latencyLimit);
             lock(MainWindow.RunningInfo)
             {

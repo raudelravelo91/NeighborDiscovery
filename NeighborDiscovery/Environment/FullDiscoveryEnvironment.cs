@@ -15,29 +15,20 @@ namespace NeighborDiscovery.Environment
     {
         private void TransmitToNeighbors(Transmission transmission, Network2D network, StatisticTestResult statisticTest, int trackNodeId)
         {
-            var listLen = network.NeighborsOf(transmission.Sender.Id).Count;
-            
-            for (var neighborIndex = 0; neighborIndex < listLen; neighborIndex++)
+            foreach(var receiver in network.NeighborsOf(transmission.Sender.Id))
             {
                 var sender = transmission.Sender;
-                var receiver = network.NeighborsOf(transmission.Sender.Id)[neighborIndex];
                 var gotInRange = network.GotInRangeWith(sender.Id, receiver.Id);
-                
-                var discoveries = new List<IDiscovery>();
-                if (transmission.Slot >= gotInRange && receiver.ListenTo(transmission, out discoveries))
-                {
-                    //add statistics about listended transmissions (if you want :)
 
-                    foreach (var node in discoveries)
-                    {
-                        gotInRange = network.GotInRangeWith(node.Id, receiver.Id);
-                        var discoveryLatency = transmission.Slot - gotInRange + 1;
-                        if (discoveryLatency > 500)
-                        {
-                            var debug = 0;
-                        }
-                        statisticTest.AddDiscovery(discoveryLatency);
-                    }
+                List<IDiscovery> discoveries;//when 
+                if (transmission.Slot < gotInRange || !receiver.ListenTo(transmission, out discoveries))
+                    continue;
+                //add statistics about listended transmissions here (if you want :)
+                foreach (var node in discoveries)
+                {
+                    gotInRange = network.GotInRangeWith(node.Id, receiver.Id);
+                    var discoveryLatency = transmission.Slot - gotInRange + 1;
+                    statisticTest.AddDiscovery(discoveryLatency);
                 }
             }
         }
@@ -52,14 +43,13 @@ namespace NeighborDiscovery.Environment
                 var firstTransm = network.GetDevice(i).NextTransmission();
                 minQ.Enqueue(firstTransm, firstTransm.Slot);
             }
-            var timeSlot = 0;
             var nextTransmissionRound = new List<Transmission>();
 
             while (statisticTest.TotalDiscoveries < discoveriesExpected)
             {
                 if (minQ.Count != network.NetworkSize)
                     throw new Exception("The number of transmission in the priority queue does not match the number of nodes in the network.");
-                timeSlot = minQ.First.Slot;
+                var timeSlot = minQ.First.Slot;
                 var cnt = 0;
                 nextTransmissionRound.Clear();//setting up the next transmission round
                 while (minQ.Count > 0 && timeSlot == minQ.First.Slot)
@@ -70,23 +60,23 @@ namespace NeighborDiscovery.Environment
                 }
 
                 //transmiting and updating values
-                for (var i = 0; i < nextTransmissionRound.Count; i++)
+                foreach (var transmission in nextTransmissionRound)
                 {
-                    var transmission = nextTransmissionRound[i];
                     TransmitToNeighbors(transmission, network, statisticTest, tranckNodeId);
                     statisticTest.NumberOfWakesUp++;
                 }
 
                 //add to the minQ the nextTransmission round for those nodes that have transmitted in this round
-                for (var i = 0; i < nextTransmissionRound.Count; i++)
+                foreach (var t in nextTransmissionRound)
                 {
-                    var nextTransm = nextTransmissionRound[i].Sender.NextTransmission();
+                    var nextTransm = t.Sender.NextTransmission();
                     minQ.Enqueue(nextTransm, nextTransm.Slot);
                 }
             }
             if (statisticTest.TotalDiscoveries > statisticTest.ExpectedDiscoveries)
             {
                 Console.WriteLine(statisticTest.MaxLatency);
+                throw new Exception("total dicoveries greater than expected discoveries");
             }
             return statisticTest;
         }

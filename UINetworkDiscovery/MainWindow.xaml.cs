@@ -476,7 +476,7 @@ namespace UINetworkDiscovery
                 case NodeType.GNihao:
                     markerType = MarkerType.Circle;
                     oxyColor = OxyColors.Black;
-                    if (ModelContainsAlgorithm(NodeType.PNihao))
+                    if (ModelContainsAlgorithm(NodeType.BNihao))
                     {
                         oxyColor = OxyColors.DarkGray;
                     }
@@ -719,8 +719,8 @@ namespace UINetworkDiscovery
                             double[] duties;
                             if (GetDutyCycle(out duties))
                             {
-                                var node1 = new GNihao(1, (int)duties[0], 0, 20, 0, false);
-                                var node2 = new GNihao(2, (int)duties[duties.Length-1], 0, 20, 0, false);
+                                var node1 = new BNihaoR(1, (int)duties[0], 0, 20, 0, false);
+                                var node2 = new BNihaoR(2, (int)duties[duties.Length-1], 0, 20, 0, false);
                                 var environment = new TwoNodesEnvironmentTmll(node1, node2);
                                 var latencyLimit = node1.T + 1;
                                 var test = environment.RunSimulation(latencyLimit);
