@@ -8,24 +8,24 @@ namespace NeighborDiscovery.Environment
 {
     public class ContactInfo
     {
-        public int FirstDiscovered { get; private set; }
+        public int FirstContact { get; private set; }
 
-        public int LastMet { get; private set; }
+        public int LastContact { get; private set; }
 
         public ContactInfo(int discovered)
         {
-            FirstDiscovered = discovered;
-            LastMet = discovered;
+            FirstContact = discovered;
+            LastContact = discovered;
         }
 
         public void Update(int lastMet)
         {
-            LastMet = lastMet;
+            LastContact = lastMet;
         }
 
         public override string ToString()
         {
-            return "[" + FirstDiscovered + ":" + LastMet + "]";
+            return "[" + FirstContact + ":" + LastContact + "]" + "[Fst.C/Lst.C]";
         }
     }
 }

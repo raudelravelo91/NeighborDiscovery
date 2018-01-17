@@ -10,9 +10,9 @@ namespace NeighborDiscovery.Environment
     public class Transmission
     {
         public int Slot { get; protected set; }
-        public IDiscovery Sender { get; protected set; }
+        public DiscoverableDevice Sender { get; protected set; }
 
-        public Transmission(int timeSlot, IDiscovery sender)
+        public Transmission(int timeSlot, DiscoverableDevice sender)
         {
             Slot = timeSlot;
             Sender = sender;
@@ -24,18 +24,18 @@ namespace NeighborDiscovery.Environment
         }
     }
 
-    //public class UConnectTransmission : Transmission<IDiscovery>
+    //public class UConnectTransmission : Transmission<DiscoverableDevice>
     //{
     //    public int P { get; protected set; }
-    //    public UConnectTransmission(int timeSlot, IDiscovery node, int p) : base(timeSlot, node)
+    //    public UConnectTransmission(int timeSlot, DiscoverableDevice node, int p) : base(timeSlot, node)
     //    {
     //        P = p;
     //    }
     //}
 
-    //public class GNihaoTransmission : Transmission<IDiscovery>
+    //public class GNihaoTransmission : Transmission<DiscoverableDevice>
     //{
-    //    public GNihaoTransmission(int timeSlot, IDiscovery node) : base(timeSlot, node)
+    //    public GNihaoTransmission(int timeSlot, DiscoverableDevice node) : base(timeSlot, node)
     //    {
 
     //    }

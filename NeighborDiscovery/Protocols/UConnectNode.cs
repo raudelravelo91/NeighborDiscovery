@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using NeighborDiscovery.Environment;
 using NeighborDiscovery.Utils;
 
-namespace NeighborDiscovery.Nodes
+namespace NeighborDiscovery.Protocols
 {
     public class UConnectNode : Node
     {
@@ -35,7 +35,7 @@ namespace NeighborDiscovery.Nodes
             return trans;
         }
 
-        public override Transmission FirstTransmissionAfter(int realTimeSlot)
+        public override Transmission GetFirstTransmissionAfter(int realTimeSlot)
         {
             var slot = FromRealTimeSlot(realTimeSlot);
             if (IsTransmitting(slot))
@@ -102,7 +102,7 @@ namespace NeighborDiscovery.Nodes
             return (3.0 * P + 1) / (2 * P * P);
         }
 
-        public override IDiscovery Clone()
+        public override DiscoverableDevice Clone()
         {
             return new UConnectNode(Id, DesiredDutyCycle,CommunicationRange, StartUpTime);
         }

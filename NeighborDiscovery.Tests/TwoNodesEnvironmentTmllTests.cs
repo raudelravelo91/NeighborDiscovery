@@ -13,8 +13,8 @@ namespace NeighborDiscovery.Tests
         public void SameOffSetAndSameStartUpSlot()
         {
             //Arrange
-            IDiscovery node1 = new BNihao(0, 10, 100, 10, 1);
-            IDiscovery node2 = new BNihao(1, 10, 100, 10, 1);
+            DiscoverableDevice node1 = new BNihao(0, 10, 100, 10, 1);
+            DiscoverableDevice node2 = new BNihao(1, 10, 100, 10, 1);
             var env = new TwoNodesEnvironmentTmll(node1, node2);
             
             //Act

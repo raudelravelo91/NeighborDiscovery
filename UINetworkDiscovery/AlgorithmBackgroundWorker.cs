@@ -95,7 +95,7 @@ namespace UINetworkDiscovery
             IsReading = true;
             Worker.ReportProgress(0);
             var fileName = e.Argument.ToString();
-            var reader = new NetworkGenerator();
+            var reader = new RandomGenerator();
             var networks = reader.CreateFromFile(fileName, NodeFactoryFunc).ToList();
             var environment = new FullDiscoveryEnvironment();
             var statisticResults = new StatisticsResult(Type);

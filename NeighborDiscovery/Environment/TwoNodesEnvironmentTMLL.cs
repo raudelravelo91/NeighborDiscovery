@@ -10,10 +10,10 @@ namespace NeighborDiscovery.Environment
 {
     public class TwoNodesEnvironmentTmll
     {
-        public IDiscovery Node1 { get; }
-        public IDiscovery Node2 { get; }
+        public DiscoverableDevice Node1 { get; }
+        public DiscoverableDevice Node2 { get; }
 
-        public TwoNodesEnvironmentTmll(IDiscovery node1, IDiscovery node2)
+        public TwoNodesEnvironmentTmll(DiscoverableDevice node1, DiscoverableDevice node2)
         {
             Node1 = node1;
             Node2 = node2;
@@ -54,9 +54,9 @@ namespace NeighborDiscovery.Environment
             return new Tuple<int, int>(latencyToListenNode1, latencyToListenNode2);
         }
 
-        private int LatencyToListen(IDiscovery nodeTrasmitter, IDiscovery nodeListener, int gotInRange, int latencyLimit)
+        private int LatencyToListen(DiscoverableDevice nodeTrasmitter, DiscoverableDevice nodeListener, int gotInRange, int latencyLimit)
         {
-            var curNodeTransmission = nodeTrasmitter.FirstTransmissionAfter(gotInRange).Slot;
+            var curNodeTransmission = nodeTrasmitter.GetFirstTransmissionAfter(gotInRange).Slot;
             var latencyToListen = curNodeTransmission - gotInRange + 1;
 
             while (!nodeListener.IsListening(curNodeTransmission))
@@ -72,15 +72,21 @@ namespace NeighborDiscovery.Environment
             return latencyToListen;
         }
 
-        public Tuple<int, int> RunTwoNodesSimulation(IDiscovery node1, IDiscovery node2, int offSet, int gotInRange, int latencyLimit)
+        public Tuple<int, int> RunTwoNodesSimulation(DiscoverableDevice node1, DiscoverableDevice node2, int offSet, int gotInRange, int latencyLimit)
         {
-            node1.Reset(0);
-            node2.Reset(offSet);
+            ResetNodes(node1, node2, offSet);
             var latency1 = LatencyToListen(node1, node2, gotInRange, latencyLimit);
-            node1.Reset(0);
-            node2.Reset(offSet);
+            ResetNodes(node2, node1, offSet);
             var latency2 = LatencyToListen(node2, node1, gotInRange, latencyLimit);
             return new Tuple<int, int>(latency1, latency2);
+        }
+
+        private void ResetNodes(DiscoverableDevice node1, DiscoverableDevice node2, int offSet)
+        {
+            node1.Reset();
+            node1.StartUpTime = 0;
+            node2.Reset();
+            node2.StartUpTime = offSet;
         }
 
         /// <summary>

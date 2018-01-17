@@ -257,7 +257,7 @@ namespace UINetworkDiscovery
                     double[] duties;
                     if (GetDutyCycle(out duties))
                     {
-                        NetworkGenerator.GenerateTestCasesToFile(this.fileName, numberOfTests, startUpLimit, posRange, networkSize, minCRange, maxCRange, duties, gotInRange);
+                        RandomGenerator.GenerateTestCasesToFile(this.fileName, numberOfTests, startUpLimit, posRange, networkSize, minCRange, maxCRange, duties, gotInRange);
                     }
                     else MessageBox.Show("At least 1 Duty Cycle must be checked", "Duty Cycle Info", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
@@ -321,7 +321,7 @@ namespace UINetworkDiscovery
             {
                 if (File.Exists(fileName))
                 {
-                    NetworkGenerator.PercentageToFix = double.Parse(tbFixAsymmetricNetwork.Text);
+                    RandomGenerator.PercentageToFix = double.Parse(tbFixAsymmetricNetwork.Text);
                     var selectedAlgs = cbDisco.IsChecked.Value || cbUConnect.IsChecked.Value || cbSearchlight.IsChecked.Value || cbBirthday.IsChecked.Value || cbStripedSearchlight.IsChecked.Value || cbTestAlgorithm.IsChecked.Value || cbGNihao.IsChecked.Value || cbAccGossipGNihao.IsChecked.Value || cbAccGossipPNihao.IsChecked.Value;
 
                     if (selectedAlgs)
@@ -617,7 +617,7 @@ namespace UINetworkDiscovery
             {
                 if (File.Exists(fileName))
                 {
-                    NetworkGenerator.PercentageToFix = double.Parse(tbFixAsymmetricNetwork.Text);
+                    RandomGenerator.PercentageToFix = double.Parse(tbFixAsymmetricNetwork.Text);
                     var selectedAlgs = cbDisco.IsChecked.Value || cbUConnect.IsChecked.Value || cbSearchlight.IsChecked.Value || cbBirthday.IsChecked.Value || cbStripedSearchlight.IsChecked.Value || cbTestAlgorithm.IsChecked.Value || cbGNihao.IsChecked.Value || cbAccGossipGNihao.IsChecked.Value;
 
                     if (selectedAlgs)

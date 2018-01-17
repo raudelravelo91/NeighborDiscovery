@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NeighborDiscovery.Nodes
+namespace NeighborDiscovery.Protocols
 {
     public class AccGossipGNihao : BNihaoR
     {
@@ -14,9 +14,9 @@ namespace NeighborDiscovery.Nodes
 
         }
 
-        public override bool ListenTo(Transmission transmission, out List<IDiscovery> discoveredNodes)
+        public override bool ListenTo(Transmission transmission, out List<DiscoverableDevice> discoveredNodes)
         {
-            discoveredNodes = new List<IDiscovery>();
+            discoveredNodes = new List<DiscoverableDevice>();
             if (transmission == null)
                 throw new Exception("Null transmission received.");
             if (IsListening(transmission.Slot))
@@ -29,7 +29,7 @@ namespace NeighborDiscovery.Nodes
                 else
                 {
                     //update
-                    if (transmission.Slot > Neighbors[transmission.Sender].LastMet)
+                    if (transmission.Slot > Neighbors[transmission.Sender].LastContact)
                     {
                         Neighbors[transmission.Sender].Update(transmission.Slot);
                     }
@@ -38,8 +38,8 @@ namespace NeighborDiscovery.Nodes
                 foreach (var twoHopTuple in transmission.Sender.NeighborsDiscovered())
                 {
                     var twoHopNeighbor = twoHopTuple.Item1;//two hop neighbor
-                    var lastMet = twoHopTuple.Item2.LastMet;
-                    var firstDiscovered = twoHopTuple.Item2.FirstDiscovered;
+                    var lastMet = twoHopTuple.Item2.LastContact;
+                    var firstDiscovered = twoHopTuple.Item2.FirstContact;
                     if (!WasDiscovered(twoHopNeighbor) && firstDiscovered < transmission.Slot)//I havn't discovered this 2-hop neighbor
                     {
                         //look up for me
@@ -48,7 +48,7 @@ namespace NeighborDiscovery.Nodes
                             var threeHopNeighbor = threeHopTuple.Item1;
                             if (threeHopNeighbor.Equals(this))//he already discovered me
                             {
-                                var discoveredMe = threeHopTuple.Item2.FirstDiscovered;
+                                var discoveredMe = threeHopTuple.Item2.FirstContact;
                                 if (discoveredMe < lastMet)
                                 {
                                     Neighbors[twoHopNeighbor] = new ContactInfo(transmission.Slot);
@@ -61,7 +61,7 @@ namespace NeighborDiscovery.Nodes
                     else if(firstDiscovered < transmission.Slot)
                     {
                         //update
-                        if (lastMet > Neighbors[twoHopNeighbor].LastMet)
+                        if (lastMet > Neighbors[twoHopNeighbor].LastContact)
                         {
                             Neighbors[twoHopNeighbor].Update(lastMet);
                         }

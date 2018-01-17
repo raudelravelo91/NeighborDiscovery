@@ -8,18 +8,18 @@ using NeighborDiscovery.Environment;
 using NeighborDiscovery.Nodes;
 
 
-namespace NeighborDiscovery.Nodes
+namespace NeighborDiscovery.Protocols
 {
-    public class TNihao : Node
+    public class BNihao : Node
     {
-        protected int m;
-        protected int n;
-        protected int numberOfTransmisions;
+        protected int M;
+        protected int N;
+        protected int NumberOfTransmisions;
 
-        public TNihao(int id, int duty, int communicationRange, int channelOccupancyRate, int startUpTime, bool randomInitialState = false) : base(id, (double)duty, communicationRange, startUpTime)
+        public BNihao(int id, int duty, int communicationRange, int channelOccupancyRate, int startUpTime) : base(id, (double)duty, communicationRange, startUpTime)
         {
-            m = channelOccupancyRate;
-            setDutyCycle(duty, m);
+            M = channelOccupancyRate;
+            SetDutyCycle(duty);
             InternalTimeSlot = 0;
         }
         /// <summary>
@@ -31,7 +31,7 @@ namespace NeighborDiscovery.Nodes
         {
             var realSlot = ToRealTimeSlot(InternalTimeSlot);
             var trans = new Transmission(realSlot, this);
-            InternalTimeSlot += m;
+            InternalTimeSlot += M;
             return trans;
         }
 
@@ -40,24 +40,24 @@ namespace NeighborDiscovery.Nodes
         /// </summary>
         /// <param name="slot"></param>
         /// <returns>the transmission</returns>
-        public override Transmission FirstTransmissionAfter(int realTimeSlot)
+        public override Transmission GetFirstTransmissionAfter(int realTimeSlot)
         {
             var slot = FromRealTimeSlot(realTimeSlot);
             if (slot < InternalTimeSlot)
-                throw new Exception("Transmission already given");
+                throw new Exception("Transmission already given, restart the node if needed.");
             if (IsTransmitting(slot))
             {
                 InternalTimeSlot = slot;
             }
             else//not transmitting => (slot % m) != 0
             {
-                InternalTimeSlot = slot + (m - (slot % m));
+                InternalTimeSlot = slot + (M - (slot % M));
             }
             return NextTransmission();
         }
 
         /// <summary>
-        /// parameter pos is cero based and represents the slot where you want to know if the node was/is/will be listening
+        /// parameter realTimeSlot is cero based and represents the slot where you want to know if the node was/is/will be listening
         /// </summary>
         /// <param name="slot"></param>
         /// <returns></returns>
@@ -66,17 +66,11 @@ namespace NeighborDiscovery.Nodes
             var slot = FromRealTimeSlot(realTimeSlot);
             if (slot < 0)
                 return false;
-
-            return isInRange(slot, 0, 9) || isInRange(slot, 110, 119) || isInRange(slot, 220, 229) || isInRange(slot, 330, 339);
-        }
-
-        private bool isInRange(int slot, int l, int r)
-        {
-            return slot >= l && slot <= r;
+            return (slot % T) < M;
         }
 
         /// <summary>
-        /// parameter pos is cero based and represents the slot where you want to know if the node was/is/will be transmitting
+        /// parameter realTimeSlot is cero based and represents the slot where you want to know if the node was/is/will be transmitting
         /// </summary>
         /// <param name="slot"></param>
         /// <returns></returns>
@@ -85,17 +79,17 @@ namespace NeighborDiscovery.Nodes
             var slot = FromRealTimeSlot(realTimeSlot);
             if (slot < 0)
                 return false;
-            return slot % m == 0;
+            return slot % M == 0;
         }
 
         public double channelUsage()
         {
-            return 1.0 * numberOfTransmisions / T;
+            return 1.0 * NumberOfTransmisions / T;
         }
 
         public override double GetDutyCycle()
         {
-            return m * 1.0 / (n * m);
+            return M * 1.0 / (N * M);
         }
 
         public void setDutyCycle(int duty)
@@ -103,34 +97,34 @@ namespace NeighborDiscovery.Nodes
             switch (duty)
             {
                 case 1:
-                    m = 100;
-                    n = 100;
+                    M = 100;
+                    N = 100;
                     break;
                 case 5:
-                    m = 20;
-                    n = 20;
+                    M = 20;
+                    N = 20;
                     break;
                 case 10:
-                    m = 10;
-                    n = 10;
+                    M = 10;
+                    N = 10;
                     break;
 
                 default:
                     break;
             }
             DesiredDutyCycle = duty;
-            numberOfTransmisions = n;
-            T = n * m;
-            buildSchedule();
+            NumberOfTransmisions = N;
+            T = N * M;
         }
 
-        public void setDutyCycle(int duty, int m)
+        public void SetDutyCycle(int duty, int newM = -1)
         {
+            if(newM > 0)
+                M = newM;
             DesiredDutyCycle = duty;
-            n = getNByM(duty, m);
-            numberOfTransmisions = n;
-            T = n * m;
-            buildSchedule();
+            N = getNByM(duty, M);
+            NumberOfTransmisions = N;
+            T = N * M;
         }
 
         private int getNByM(int duty, int m)
@@ -143,23 +137,14 @@ namespace NeighborDiscovery.Nodes
             return n;
         }
 
-        private void buildSchedule()
+        public override string ToString()
         {
-            //listen = new bool[T];
-            //transmit = new bool[T];
-            //for (int i = 0; i < m; i++)
-            //{
-            //    listen[i] = true;
-            //}
-            //for (int i = 0; i < numberOfTransmisions; i++)
-            //{
-            //    transmit[i*m] = true;
-            //}
+            return "PNihao NodeId: " + Id + " Duty: " + Math.Round(GetDutyCycle(), 2);
         }
 
-        public override IDiscovery Clone()
+        public override DiscoverableDevice Clone()
         {
-            return new BNihaoR(Id, (int)DesiredDutyCycle, CommunicationRange, m, StartUpTime, false);
+            return new BNihao(Id, (int)DesiredDutyCycle, CommunicationRange, M, StartUpTime);
         }
     }
 }

@@ -8,19 +8,22 @@ using NeighborDiscovery.Environment;
 using NeighborDiscovery.Nodes;
 
 
-namespace NeighborDiscovery.Nodes
+namespace NeighborDiscovery.Protocols
 {
-    public class BNihao : Node
+    public class BNihaoR: Node
     {
         protected int M;
         protected int N;
         protected int NumberOfTransmisions;
+        protected HashSet<int> ListeningSlots;
 
-        public BNihao(int id, int duty, int communicationRange, int channelOccupancyRate, int startUpTime) : base(id, (double)duty, communicationRange, startUpTime)
+        public BNihaoR(int id, int duty, int communicationRange,  int channelOccupancyRate, int startUpTime, bool randomInitialState = false): base(id, (double)duty, communicationRange, startUpTime)
         {
             M = channelOccupancyRate;
-            SetDutyCycle(duty);
+            SetDutyCycle(duty, M);
             InternalTimeSlot = 0;
+            ListeningSlots = new HashSet<int>();
+            MyListeningAt5();
         }
         /// <summary>
         /// calling this method modifies the internal state of the node
@@ -38,13 +41,13 @@ namespace NeighborDiscovery.Nodes
         /// <summary>
         /// calculates the first transmission that is going to be trasmited at a slot greater than or equal than the given slot
         /// </summary>
-        /// <param name="slot"></param>
+        /// <param name="realTimeSlot"></param>
         /// <returns>the transmission</returns>
-        public override Transmission FirstTransmissionAfter(int realTimeSlot)
+        public override Transmission GetFirstTransmissionAfter(int realTimeSlot)
         {
             var slot = FromRealTimeSlot(realTimeSlot);
             if (slot < InternalTimeSlot)
-                throw new Exception("Transmission already given, restart the node if needed.");
+                throw new Exception("Transmission already given");
             if (IsTransmitting(slot))
             {
                 InternalTimeSlot = slot;
@@ -57,22 +60,40 @@ namespace NeighborDiscovery.Nodes
         }
 
         /// <summary>
-        /// parameter realTimeSlot is cero based and represents the slot where you want to know if the node was/is/will be listening
+        /// parameter pos is cero based and represents the slot where you want to know if the node was/is/will be listening
         /// </summary>
-        /// <param name="slot"></param>
+        /// <param name="realTimeSlot"></param>
         /// <returns></returns>
         public override bool IsListening(int realTimeSlot)
         {
             var slot = FromRealTimeSlot(realTimeSlot);
-            if (slot < 0)
-                return false;
-            return (slot % T) < M;
+            return slot >= 0 && ListeningSlots.Contains(slot % T);
+            //return slot % T < m;//original G-Nihao
         }
 
+        public void MyListeningAt5()
+        {
+            var slots = new int[M];
+            for (var i = 0; i < M; i++)
+            {
+                slots[i] = i;
+            }
+            var shuffle = new Shuffle(M);
+            shuffle.KnuthShuffle(slots);
+
+            for (var i = 0; i < M; i++)
+            {
+                ListeningSlots.Add(i * M + slots[i]);
+                //ListeningSlots.Add(slots[i]);
+            }
+
+        }
+
+
         /// <summary>
-        /// parameter realTimeSlot is cero based and represents the slot where you want to know if the node was/is/will be transmitting
+        /// parameter pos is cero based and represents the slot where you want to know if the node was/is/will be transmitting
         /// </summary>
-        /// <param name="slot"></param>
+        /// <param name="realTimeSlot"></param>
         /// <returns></returns>
         public override bool IsTransmitting(int realTimeSlot)
         {
@@ -82,9 +103,9 @@ namespace NeighborDiscovery.Nodes
             return slot % M == 0;
         }
 
-        public double channelUsage()
+        public double ChannelUsage()
         {
-            return 1.0 * NumberOfTransmisions / T;
+            return 1.0 * NumberOfTransmisions/T;
         }
 
         public override double GetDutyCycle()
@@ -92,7 +113,7 @@ namespace NeighborDiscovery.Nodes
             return M * 1.0 / (N * M);
         }
 
-        public void setDutyCycle(int duty)
+        public void SetDutyCycle(int duty)
         {
             switch (duty)
             {
@@ -115,19 +136,19 @@ namespace NeighborDiscovery.Nodes
             DesiredDutyCycle = duty;
             NumberOfTransmisions = N;
             T = N * M;
+            BuildSchedule();
         }
 
-        public void SetDutyCycle(int duty, int newM = -1)
+        public void SetDutyCycle(int duty, int m)
         {
-            if(newM > 0)
-                M = newM;
             DesiredDutyCycle = duty;
-            N = getNByM(duty, M);
+            N = GetNbyM(duty, m);
             NumberOfTransmisions = N;
-            T = N * M;
+            T = N * m;
+            BuildSchedule();
         }
 
-        private int getNByM(int duty, int m)
+        private int GetNbyM(int duty, int m)
         {
             var n = 1;
             while ((m * 1.0) / (n * m) * 100 > duty)
@@ -137,14 +158,23 @@ namespace NeighborDiscovery.Nodes
             return n;
         }
 
-        public override string ToString()
+        private void BuildSchedule()
         {
-            return "PNihao NodeId: " + Id + " Duty: " + Math.Round(GetDutyCycle(), 2);
+            //listen = new bool[T];
+            //transmit = new bool[T];
+            //for (int i = 0; i < m; i++)
+            //{
+            //    listen[i] = true;
+            //}
+            //for (int i = 0; i < numberOfTransmisions; i++)
+            //{
+            //    transmit[i*m] = true;
+            //}
         }
 
-        public override IDiscovery Clone()
+        public override DiscoverableDevice Clone()
         {
-            return new BNihao(Id, (int)DesiredDutyCycle, CommunicationRange, M, StartUpTime);
+            return new BNihaoR(Id, (int)DesiredDutyCycle, CommunicationRange, M, StartUpTime, false);
         }
     }
 }

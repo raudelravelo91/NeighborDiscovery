@@ -22,7 +22,7 @@
 //            random = new Random();
 //        }
 
-//        public override bool ListenTo(Transmission<IDiscovery> transmission, int slot)
+//        public override bool ListenTo(Transmission<DiscoverableDevice> transmission, int slot)
 //        {
 //            if (Listening() != slot)
 //                return false;

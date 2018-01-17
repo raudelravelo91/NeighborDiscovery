@@ -14,9 +14,9 @@
 
 //        }
 
-//        public override bool ListenTo(Transmission transmission, out List<IDiscovery> discoveredNodes)
+//        public override bool ListenTo(Transmission transmission, out List<DiscoverableDevice> discoveredNodes)
 //        {
-//            discoveredNodes = new List<IDiscovery>();
+//            discoveredNodes = new List<DiscoverableDevice>();
 //            if (transmission == null)
 //                throw new Exception("Null transmission received.");
 //            if (IsListening(transmission.Slot))

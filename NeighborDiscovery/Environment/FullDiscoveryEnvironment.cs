@@ -13,6 +13,8 @@ namespace NeighborDiscovery.Environment
 {
     public class FullDiscoveryEnvironment
     {
+
+
         private void TransmitToNeighbors(Transmission transmission, Network2D network, StatisticTestResult statisticTest, int trackNodeId)
         {
             foreach(var receiver in network.NeighborsOf(transmission.Sender.Id))
@@ -20,7 +22,7 @@ namespace NeighborDiscovery.Environment
                 var sender = transmission.Sender;
                 var gotInRange = network.GotInRangeWith(sender.Id, receiver.Id);
 
-                List<IDiscovery> discoveries;//when 
+                List<DiscoverableDevice> discoveries;//when 
                 if (transmission.Slot < gotInRange || !receiver.ListenTo(transmission, out discoveries))
                     continue;
                 //add statistics about listended transmissions here (if you want :)

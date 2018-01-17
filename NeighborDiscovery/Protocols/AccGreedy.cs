@@ -19,7 +19,7 @@
 //            return base.IsListening(realTimeSlot);
 //        }
 
-//        public override bool ListenTo(Transmission transmission, out List<IDiscovery> discoveredNodes)
+//        public override bool ListenTo(Transmission transmission, out List<DiscoverableDevice> discoveredNodes)
 //        {
 //            return base.ListenTo(transmission, out discoveredNodes);
 //            //update the slots
