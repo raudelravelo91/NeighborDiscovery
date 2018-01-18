@@ -1,4 +1,6 @@
-﻿namespace NeighborDiscovery.Nodes
+﻿using System;
+
+namespace NeighborDiscovery.Protocols
 {
     public class NeighborInfo
     {

@@ -10,7 +10,7 @@ using NeighborDiscovery.Networks;
 using NeighborDiscovery.Statistics;
 using NeighborDiscovery.Utils;
 using NeighborDiscovery.Environment;
-using NeighborDiscovery.Nodes;
+using NeighborDiscovery.Protocols;
 using OxyPlot;
 
 namespace UINetworkDiscovery
@@ -257,7 +257,7 @@ namespace UINetworkDiscovery
                     double[] duties;
                     if (GetDutyCycle(out duties))
                     {
-                        RandomGenerator.GenerateTestCasesToFile(this.fileName, numberOfTests, startUpLimit, posRange, networkSize, minCRange, maxCRange, duties, gotInRange);
+                        //RandomGenerator.GenerateTestCasesToFile(this.fileName, numberOfTests, startUpLimit, posRange, networkSize, minCRange, maxCRange, duties, gotInRange);
                     }
                     else MessageBox.Show("At least 1 Duty Cycle must be checked", "Duty Cycle Info", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
@@ -321,7 +321,7 @@ namespace UINetworkDiscovery
             {
                 if (File.Exists(fileName))
                 {
-                    RandomGenerator.PercentageToFix = double.Parse(tbFixAsymmetricNetwork.Text);
+                    //RandomGenerator.PercentageToFix = double.Parse(tbFixAsymmetricNetwork.Text);
                     var selectedAlgs = cbDisco.IsChecked.Value || cbUConnect.IsChecked.Value || cbSearchlight.IsChecked.Value || cbBirthday.IsChecked.Value || cbStripedSearchlight.IsChecked.Value || cbTestAlgorithm.IsChecked.Value || cbGNihao.IsChecked.Value || cbAccGossipGNihao.IsChecked.Value || cbAccGossipPNihao.IsChecked.Value;
 
                     if (selectedAlgs)
@@ -336,7 +336,7 @@ namespace UINetworkDiscovery
 
                         if (cbDisco.IsChecked == true)
                         {
-                            var parameters = new DiscoParameters(-1, -1, -1, false);
+                            //var parameters = new DiscoParameters(-1, -1, -1, false);
                             //RunningInfo.AddRunningAlgorithm();
                             workerDisco.RunWorkerAsync(fileName);
                         }
@@ -617,7 +617,7 @@ namespace UINetworkDiscovery
             {
                 if (File.Exists(fileName))
                 {
-                    RandomGenerator.PercentageToFix = double.Parse(tbFixAsymmetricNetwork.Text);
+                    //RandomGenerator.PercentageToFix = double.Parse(tbFixAsymmetricNetwork.Text);
                     var selectedAlgs = cbDisco.IsChecked.Value || cbUConnect.IsChecked.Value || cbSearchlight.IsChecked.Value || cbBirthday.IsChecked.Value || cbStripedSearchlight.IsChecked.Value || cbTestAlgorithm.IsChecked.Value || cbGNihao.IsChecked.Value || cbAccGossipGNihao.IsChecked.Value;
 
                     if (selectedAlgs)
@@ -651,15 +651,15 @@ namespace UINetworkDiscovery
                             double[] duties;
                             if (GetDutyCycle(out duties))
                             {
-                                var node1 = new UConnectNode(0, duties[0], 0, 0);
-                                var node2 = new UConnectNode(0, duties[duties.Length - 1], 0, 0);
-                                var environment = new TwoNodesEnvironmentTmll(node1, node2);
-                                var latencyLimit = node1.T + 1;
-                                var test = environment.RunSimulation(latencyLimit);
-                                var result = new StatisticsResult(NodeType.UConnect);
-                                result.AddStatisticTest(test);
-                                result.BuildAverageFractionOfDiscovey(latencyLimit);
-                                worker_RunWorkerCompleted(this, new RunWorkerCompletedEventArgs(result, null, false));
+                                //var node1 = new UConnectNode(0, duties[0], 0, 0);
+                                //var node2 = new UConnectNode(0, duties[duties.Length - 1], 0, 0);
+                                //var environment = new TwoNodesEnvironmentTmll(node1, node2);
+                                //var latencyLimit = node1.T + 1;
+                                //var test = environment.RunSimulation(latencyLimit);
+                                //var result = new StatisticsResult(NodeType.UConnect);
+                                //result.AddStatisticTest(test);
+                                //result.BuildAverageFractionOfDiscovey(latencyLimit);
+                                //worker_RunWorkerCompleted(this, new RunWorkerCompletedEventArgs(result, null, false));
                             }
                         }
                         if (cbSearchlight.IsChecked == true)
@@ -714,22 +714,22 @@ namespace UINetworkDiscovery
                             //    worker_RunWorkerCompleted(this, new RunWorkerCompletedEventArgs(result, null, false));
                             //}
                         }
-                        if (cbGNihao.IsChecked == true)
-                        {
-                            double[] duties;
-                            if (GetDutyCycle(out duties))
-                            {
-                                var node1 = new BNihaoR(1, (int)duties[0], 0, 20, 0, false);
-                                var node2 = new BNihaoR(2, (int)duties[duties.Length-1], 0, 20, 0, false);
-                                var environment = new TwoNodesEnvironmentTmll(node1, node2);
-                                var latencyLimit = node1.T + 1;
-                                var test = environment.RunSimulation(latencyLimit);
-                                var result = new StatisticsResult(NodeType.GNihao);
-                                result.AddStatisticTest(test);
-                                result.BuildAverageFractionOfDiscovey(latencyLimit);
-                                worker_RunWorkerCompleted(this, new RunWorkerCompletedEventArgs(result, null, false));
-                            }
-                        }
+                        //if (cbGNihao.IsChecked == true)
+                        //{
+                        //    double[] duties;
+                        //    if (GetDutyCycle(out duties))
+                        //    {
+                                //var node1 = new BNihaoR(1, (int)duties[0], 0, 20, 0, false);
+                                //var node2 = new BNihaoR(2, (int)duties[duties.Length-1], 0, 20, 0, false);
+                                //var environment = new TwoNodesEnvironmentTmll(node1, node2);
+                                //var latencyLimit = node1.T + 1;
+                                //var test = environment.RunSimulation(latencyLimit);
+                                //var result = new StatisticsResult(NodeType.GNihao);
+                                //result.AddStatisticTest(test);
+                                //result.BuildAverageFractionOfDiscovey(latencyLimit);
+                                //worker_RunWorkerCompleted(this, new RunWorkerCompletedEventArgs(result, null, false));
+                        //    }
+                        //}
                       
 
                     }

@@ -1,26 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NeighborDiscovery.Nodes;
 
-namespace NeighborDiscovery.Environment
+namespace NeighborDiscovery.Protocols
 {
-    public class Transmission
+    public class Transmission:ITransmission
     {
-        public int Slot { get; protected set; }
-        public DiscoverableDevice Sender { get; protected set; }
+        //public int Slot { get; protected set; }
+        public IDiscoveryProtocol Sender { get; protected set; }
 
-        public Transmission(int timeSlot, DiscoverableDevice sender)
+        public Transmission(IDiscoveryProtocol sender)
         {
-            Slot = timeSlot;
             Sender = sender;
         }
 
         public override string ToString()
         {
-            return "TimeSlot: " + Slot + " " + Sender;
+            return Sender.ToString();
         }
     }
 
@@ -130,11 +124,11 @@ namespace NeighborDiscovery.Environment
     //}
 
 
-    public class TransmissionCompararer : IComparer<Transmission>
-    {
-        public int Compare(Transmission x, Transmission y)
-        {
-            return x.Slot.CompareTo(y.Slot);
-        }
-    }
+    //public class TransmissionCompararer : IComparer<Transmission>
+    //{
+    //    public int Compare(Transmission x, Transmission y)
+    //    {
+    //        return x.Slot.CompareTo(y.Slot);
+    //    }
+    //}
 }

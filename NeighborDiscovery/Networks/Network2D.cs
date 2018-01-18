@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using NeighborDiscovery.Environment;
-using NeighborDiscovery.Nodes;
+using NeighborDiscovery.Protocols;
 
 namespace NeighborDiscovery.Networks
 {
