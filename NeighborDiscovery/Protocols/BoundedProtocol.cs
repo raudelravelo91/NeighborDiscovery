@@ -10,15 +10,13 @@ namespace NeighborDiscovery.Protocols
 {
     public abstract class BoundedProtocol:IDiscoveryProtocol
     {
-        protected double DesiredDutyCycle;//use to store the desired duty cycle. To get the real duty cycle call getDutyCycle()
         protected Dictionary<IDiscoveryProtocol, IContact> NeighborsDiscovered;
-        
         public int Id { get; protected set; }
         public int T { get; protected set; }
         public int NumberOfNeighbors => NeighborsDiscovered.Count;
         public int InternalTimeSlot { get; private set; }
 
-        protected BoundedProtocol(int id, double dutyCyclePercentage)
+        protected BoundedProtocol(int id)
         {
             NeighborsDiscovered = new Dictionary<IDiscoveryProtocol, IContact>();
             Id = id;
@@ -76,20 +74,14 @@ namespace NeighborDiscovery.Protocols
 
         public virtual void MoveNext(int slot = 1)
         {
-            if (slot < 1)
+            if (slot < 0)
              throw new Exception("The Device can not move a negative number of slots");
             InternalTimeSlot += slot;
         }
 
-        public virtual double GetDutyCycle()
-        {
-            return DesiredDutyCycle;
-        }
+        public abstract double GetDutyCycle();
 
-        public virtual void SetDutyCycle(double value)
-        {
-            DesiredDutyCycle = value;
-        }
+        public abstract void SetDutyCycle(double value);
 
         public void Reset()
         {

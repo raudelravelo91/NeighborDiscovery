@@ -37,14 +37,16 @@ namespace UINetworkDiscovery
         public MainWindow()
         {
             InitializeComponent();
-            
+
             fileName = "testcases.txt";
             Model = new PlotModel();
-            SetXAxes(800, 8);
+            SetXAxes(400, 8);
             SetYAxes(1, 10);
             var currentMargins = oxyplot.PlotMargins;
-            Model.PlotMargins = new OxyThickness(currentMargins.Left, btClear.Height, currentMargins.Right, currentMargins.Bottom);
-            oxyplot.PlotMargins = new System.Windows.Thickness(currentMargins.Left, btClear.Height, currentMargins.Right, currentMargins.Bottom);
+            Model.PlotMargins = new OxyThickness(currentMargins.Left, btClear.Height, currentMargins.Right,
+                currentMargins.Bottom);
+            oxyplot.PlotMargins = new System.Windows.Thickness(currentMargins.Left, btClear.Height,
+                currentMargins.Right, currentMargins.Bottom);
             RunningInfo = new RunningInfo();
 
             SetDefaultSettings();
@@ -83,7 +85,15 @@ namespace UINetworkDiscovery
         {
             if (x / xMajorStep > 0)
             {
-                var X = new LinearAxis(AxisPosition.Bottom, 0, x, "Discovery latency (slots)") { MajorStep = x / xMajorStep, MajorGridlineThickness = 1, MajorGridlineStyle = LineStyle.Dot, MinorTickSize = 0, TitleFontSize = 14, TickStyle = TickStyle.Inside };
+                var X = new LinearAxis(AxisPosition.Bottom, 0, x, "Discovery latency (slots)")
+                {
+                    MajorStep = x / xMajorStep,
+                    MajorGridlineThickness = 1,
+                    MajorGridlineStyle = LineStyle.Dot,
+                    MinorTickSize = 0,
+                    TitleFontSize = 14,
+                    TickStyle = TickStyle.Inside
+                };
                 if (Model.Axes.Count > 0)
                     Model.Axes[0] = X;
                 else Model.Axes.Add(X);
@@ -97,7 +107,15 @@ namespace UINetworkDiscovery
         {
             if (y / yMajorStep > 0)
             {
-                var Y = new LinearAxis(AxisPosition.Left, 0, y, "Fraction of Discoveries") { MajorStep = y / yMajorStep, MajorGridlineThickness = 1, MajorGridlineStyle = LineStyle.Dot, MinorTickSize = 0, TitleFontSize = 14, TickStyle = TickStyle.Inside };
+                var Y = new LinearAxis(AxisPosition.Left, 0, y, "Fraction of Discoveries")
+                {
+                    MajorStep = y / yMajorStep,
+                    MajorGridlineThickness = 1,
+                    MajorGridlineStyle = LineStyle.Dot,
+                    MinorTickSize = 0,
+                    TitleFontSize = 14,
+                    TickStyle = TickStyle.Inside
+                };
                 if (Model.Axes.Count > 1)
                     Model.Axes[1] = Y;
                 else Model.Axes.Add(Y);
@@ -108,10 +126,11 @@ namespace UINetworkDiscovery
 
         private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            if (((BackgroundWorker)sender).CancellationPending)
+            if (((BackgroundWorker) sender).CancellationPending)
             {
                 return;
             }
+
             //if (!btGenerate.IsEnabled)
             //{
             //    btGenerate.IsEnabled = !workerBirthday.IsReading && !workerDisco.IsReading 
@@ -147,7 +166,7 @@ namespace UINetworkDiscovery
             }
             else if (sender.Equals(workerAccGossipGNihao.Worker))
             {
-                progressBarAccGossipGNihao.Value = e.ProgressPercentage;
+                progressBarBalancedNihao.Value = e.ProgressPercentage;
             }
             else if (sender.Equals(workerAccGossipPNihao.Worker))
             {
@@ -159,9 +178,10 @@ namespace UINetworkDiscovery
         {
             if (!RunningInfo.CancelationPending)
             {
-                var results = e.Result as StatisticsResult;
-                if (results != null)
-                { Plot(results); }
+                if (e.Result is StatisticsResult results)
+                {
+                    Plot(results);
+                }
                 else throw new ArgumentException("Invalid Task type");
 
                 if (!RunningInfo.IsRunning)
@@ -174,7 +194,7 @@ namespace UINetworkDiscovery
                     testCaseIcon.Visibility = Visibility.Visible;
                 }
             }
-            else//was canceled
+            else //was canceled
             {
                 if (!RunningInfo.IsRunning)
                 {
@@ -204,32 +224,33 @@ namespace UINetworkDiscovery
             return duties.Length > 0;
         }
 
-        public bool GetTestSettings(out int numberOfTests, out int startUpLimit, out int posRange, out int networkSize, out int minCRange, out int maxCRange, out int gotInRange)
+        public bool GetTestSettings(out int numberOfTests, out int startUpLimit, out int posRange, out int networkSize,
+            out int minCRange, out int maxCRange, out int gotInRange)
         {
-            
+
             numberOfTests = startUpLimit = posRange = networkSize = minCRange = maxCRange = gotInRange = 0;
             return int.TryParse(tbNumberOfTestCases.Text, out numberOfTests) &&
-                    int.TryParse(tbStartUpLimit.Text, out startUpLimit) &&
-                    int.TryParse(tbPosRange.Text, out posRange) &&
-                    int.TryParse(tbMinCommRange.Text, out minCRange) &&
-                    int.TryParse(tbMaxCommRange.Text, out maxCRange) &&
-                    int.TryParse(tbnetworkSize.Text, out networkSize) &&
-                    int.TryParse(tbGotInRangeLimit.Text, out gotInRange);
-                    
+                   int.TryParse(tbStartUpLimit.Text, out startUpLimit) &&
+                   int.TryParse(tbPosRange.Text, out posRange) &&
+                   int.TryParse(tbMinCommRange.Text, out minCRange) &&
+                   int.TryParse(tbMaxCommRange.Text, out maxCRange) &&
+                   int.TryParse(tbnetworkSize.Text, out networkSize) &&
+                   int.TryParse(tbGotInRangeLimit.Text, out gotInRange);
+
         }
 
         private void SetDefaultSettings()
         {
             //algorithms
-            cbDisco.IsChecked = false;
-            cbUConnect.IsChecked = false;
+            cbDisco.IsChecked = true;
+            cbUConnect.IsChecked = true;
             cbSearchlight.IsChecked = false;
             cbBirthday.IsChecked = false;
             cbStripedSearchlight.IsChecked = false;
             cbTestAlgorithm.IsChecked = false;
-            cbGNihao.IsChecked = true;
-            cbAccGossipGNihao.IsChecked = true;
-            cbAccGossipPNihao.IsChecked = true;
+            cbGNihao.IsChecked = false;
+            cbBalancedNihao.IsChecked = true;
+            cbAccGossipPNihao.IsChecked = false;
             //duty cycle
             cb05p.IsChecked = false;
             cb1p.IsChecked = false;
@@ -252,17 +273,22 @@ namespace UINetworkDiscovery
             if (!RunningInfo.IsRunning)
             {
                 int numberOfTests, startUpLimit, posRange, networkSize, minCRange, maxCRange, gotInRange;
-                if (GetTestSettings(out numberOfTests, out startUpLimit, out posRange, out networkSize, out minCRange, out maxCRange, out gotInRange))
+                if (GetTestSettings(out numberOfTests, out startUpLimit, out posRange, out networkSize, out minCRange,
+                    out maxCRange, out gotInRange))
                 {
                     double[] duties;
                     if (GetDutyCycle(out duties))
                     {
                         //RandomGenerator.GenerateTestCasesToFile(this.fileName, numberOfTests, startUpLimit, posRange, networkSize, minCRange, maxCRange, duties, gotInRange);
                     }
-                    else MessageBox.Show("At least 1 Duty Cycle must be checked", "Duty Cycle Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                    else
+                        MessageBox.Show("At least 1 Duty Cycle must be checked", "Duty Cycle Info", MessageBoxButton.OK,
+                            MessageBoxImage.Information);
                 }
-                else MessageBox.Show("Invalid Tests Setting Parameters (Ex: check all are numbers)", "Tests Settings Info", MessageBoxButton.OK, MessageBoxImage.Information);
-           
+                else
+                    MessageBox.Show("Invalid Tests Setting Parameters (Ex: check all are numbers)",
+                        "Tests Settings Info", MessageBoxButton.OK, MessageBoxImage.Information);
+
                 testCaseMessage.Text = "Test Cases Generated.";
                 testCaseMessage.Visibility = Visibility.Visible;
                 testCaseIcon.Fill = Brushes.Lime;
@@ -282,13 +308,17 @@ namespace UINetworkDiscovery
 
         private void ResetAlgorithmProperties()
         {
-            //progressBarDisco.Value = 0;
-            //discoAvg.Text = "";
-            //discoCnt.Text = "";
+            progressBarDisco.Value = 0;
+            discoAvg.Text = "";
+            discoCnt.Text = "";
 
-            //progressBarUConnect.Value = 0;
-            //uconnectAvg.Text = "";
-            //uconnectCnt.Text = "";
+            progressBarUConnect.Value = 0;
+            uconnectAvg.Text = "";
+            uconnectCnt.Text = "";
+
+            progressBarBalancedNihao.Value = 0;
+            uconnectAvg.Text = "";
+            uconnectCnt.Text = "";
 
             //progressBarSearchlight.Value = 0;
             //searchlightAvg.Text = "";
@@ -311,7 +341,8 @@ namespace UINetworkDiscovery
         {
             if (RunningInfo.IsRunning)
             {
-                var result = MessageBox.Show("Do you want to cancel?", "Cancel", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                var result = MessageBox.Show("Do you want to cancel?", "Cancel", MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
                 if (result == MessageBoxResult.Yes)
                 {
                     CancellAll();
@@ -322,7 +353,11 @@ namespace UINetworkDiscovery
                 if (File.Exists(fileName))
                 {
                     //RandomGenerator.PercentageToFix = double.Parse(tbFixAsymmetricNetwork.Text);
-                    var selectedAlgs = cbDisco.IsChecked.Value || cbUConnect.IsChecked.Value || cbSearchlight.IsChecked.Value || cbBirthday.IsChecked.Value || cbStripedSearchlight.IsChecked.Value || cbTestAlgorithm.IsChecked.Value || cbGNihao.IsChecked.Value || cbAccGossipGNihao.IsChecked.Value || cbAccGossipPNihao.IsChecked.Value;
+                    var selectedAlgs = cbDisco.IsChecked.Value || cbUConnect.IsChecked.Value ||
+                                       cbSearchlight.IsChecked.Value || cbBirthday.IsChecked.Value ||
+                                       cbStripedSearchlight.IsChecked.Value || cbTestAlgorithm.IsChecked.Value ||
+                                       cbGNihao.IsChecked.Value || cbBalancedNihao.IsChecked.Value ||
+                                       cbAccGossipPNihao.IsChecked.Value;
 
                     if (selectedAlgs)
                     {
@@ -340,54 +375,66 @@ namespace UINetworkDiscovery
                             //RunningInfo.AddRunningAlgorithm();
                             workerDisco.RunWorkerAsync(fileName);
                         }
+
                         if (cbUConnect.IsChecked == true)
                         {
                             //RunningInfo.AddRunningAlgorithm();
                             workerUConnect.RunWorkerAsync(fileName);
                         }
+
                         if (cbSearchlight.IsChecked == true)
                         {
                             //RunningInfo.AddRunningAlgorithm();
                             workerSearchLight.RunWorkerAsync(fileName);
                         }
+
                         if (cbBirthday.IsChecked == true)
                         {
                             //RunningInfo.AddRunningAlgorithm();
                             workerBirthday.RunWorkerAsync(fileName);
                         }
+
                         if (cbStripedSearchlight.IsChecked == true)
                         {
                             //RunningInfo.AddRunningAlgorithm();
                             workerStripedSearchlight.RunWorkerAsync(fileName);
                         }
+
                         if (cbTestAlgorithm.IsChecked == true)
                         {
                             //RunningInfo.AddRunningAlgorithm();
                             workerTestAlgorithm.RunWorkerAsync(fileName);
                         }
+
                         if (cbGNihao.IsChecked == true)
                         {
                             workerGNihao.RunWorkerAsync(fileName);
                         }
-                        if (cbAccGossipGNihao.IsChecked == true)
+
+                        if (cbBalancedNihao.IsChecked == true)
                         {
                             workerAccGossipGNihao.RunWorkerAsync(fileName);
                         }
+
                         if (cbAccGossipPNihao.IsChecked == true)
                         {
                             workerAccGossipPNihao.RunWorkerAsync(fileName);
                         }
                     }
-                    else MessageBox.Show("No algorithm has been selected!", "Select Algorithms to Run", MessageBoxButton.OK, MessageBoxImage.Information);
+                    else
+                        MessageBox.Show("No algorithm has been selected!", "Select Algorithms to Run",
+                            MessageBoxButton.OK, MessageBoxImage.Information);
                 }
-                else MessageBox.Show("The program could not find the Tests file. You should generate the test first", "Test File Not Found", MessageBoxButton.OK, MessageBoxImage.Error);
+                else
+                    MessageBox.Show("The program could not find the Tests file. You should generate the test first",
+                        "Test File Not Found", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private bool ModelContainsAlgorithm(NodeType type)
         {
             var v = Model.Series.Where(s => s.Title.Equals(type.ToString()));
-            return (v.Count() > 0);
+            return (v.Any());
         }
 
         private void Plot(StatisticsResult result)
@@ -411,6 +458,7 @@ namespace UINetworkDiscovery
                     {
                         oxyColor = OxyColors.DarkGray;
                     }
+
                     lineStyle = LineStyle.Solid;
                     birthdayAvg.Text = result.AverageDiscoveryLatency.ToString();
                     birthdayCnt.Text = result.AverageContactByWakesUp.ToString();
@@ -419,10 +467,11 @@ namespace UINetworkDiscovery
                     //cbDisco.Content = "Disco (E: " + result.AverageContactByWakesUp * 100 + "%)" + "(Avg: " + result.AverageDiscoveryLatency + ")";
                     markerType = MarkerType.Triangle;
                     oxyColor = OxyColors.Magenta;
-                    if(ModelContainsAlgorithm(NodeType.Disco))
+                    if (ModelContainsAlgorithm(NodeType.Disco))
                     {
                         oxyColor = OxyColors.DeepPink;
                     }
+
                     lineStyle = LineStyle.Dash;
                     discoAvg.Text = result.AverageDiscoveryLatency.ToString();
                     discoCnt.Text = result.AverageContactByWakesUp.ToString();
@@ -435,6 +484,7 @@ namespace UINetworkDiscovery
                     {
                         oxyColor = OxyColors.DarkBlue;
                     }
+
                     lineStyle = LineStyle.Dot;
                     uconnectAvg.Text = result.AverageDiscoveryLatency.ToString();
                     uconnectCnt.Text = result.AverageContactByWakesUp.ToString();
@@ -447,6 +497,7 @@ namespace UINetworkDiscovery
                     {
                         oxyColor = OxyColors.Green;
                     }
+
                     lineStyle = LineStyle.DashDot;
                     searchlightAvg.Text = result.AverageDiscoveryLatency.ToString();
                     searchlightCnt.Text = result.AverageContactByWakesUp.ToString();
@@ -458,6 +509,7 @@ namespace UINetworkDiscovery
                     {
                         oxyColor = OxyColors.DarkBlue;
                     }
+
                     lineStyle = LineStyle.LongDashDotDot;
                     stripedSearchlighAvg.Text = result.AverageDiscoveryLatency.ToString();
                     stripedSearchlighCnt.Text = result.AverageContactByWakesUp.ToString();
@@ -469,17 +521,19 @@ namespace UINetworkDiscovery
                     {
                         oxyColor = OxyColors.Magenta;
                     }
+
                     lineStyle = LineStyle.LongDashDotDot;
                     testAlgAvg.Text = result.AverageDiscoveryLatency.ToString();
                     testAlgCnt.Text = result.AverageContactByWakesUp.ToString();
                     break;
-                case NodeType.GNihao:
+                case NodeType.BalancedNihao:
                     markerType = MarkerType.Circle;
                     oxyColor = OxyColors.Black;
-                    if (ModelContainsAlgorithm(NodeType.BNihao))
+                    if (ModelContainsAlgorithm(NodeType.BalancedNihao))
                     {
                         oxyColor = OxyColors.DarkGray;
                     }
+
                     lineStyle = LineStyle.Dot;
                     gNihaoAvg.Text = result.AverageDiscoveryLatency.ToString();
                     gNihaoCnt.Text = result.AverageContactByWakesUp.ToString();
@@ -491,9 +545,10 @@ namespace UINetworkDiscovery
                     {
                         oxyColor = OxyColors.DarkRed;
                     }
+
                     lineStyle = LineStyle.Dot;
                     AccGossipGNihaoAvg.Text = result.AverageDiscoveryLatency.ToString();
-                    AccGossipGNihaoCnt.Text = result.AverageContactByWakesUp.ToString();
+                    BalancedNihaoCnt.Text = result.AverageContactByWakesUp.ToString();
                     break;
                 case NodeType.AccGossipPNihao:
                     markerType = MarkerType.Circle;
@@ -502,6 +557,7 @@ namespace UINetworkDiscovery
                     {
                         oxyColor = OxyColors.DarkGreen;
                     }
+
                     lineStyle = LineStyle.Dot;
                     AccGossipPNihaoAvg.Text = result.AverageDiscoveryLatency.ToString();
                     AccGossipPNihaoCnt.Text = result.AverageContactByWakesUp.ToString();
@@ -512,16 +568,17 @@ namespace UINetworkDiscovery
                     lineStyle = LineStyle.Solid;
                     break;
             }
-            
-            
+
+
             var Points = new List<DataPoint>();
             var x = 0;
             double y = 0;
             while (x <= result.GetMaxLatency() && (y = result.GetAverageFractionOfDiscoveryAtLatency(x)) < 1)
             {
-                Points.Add(new DataPoint(x,y));
+                Points.Add(new DataPoint(x, y));
                 x++;
             }
+
             Points.Add(new DataPoint(x, y));
             //var serie = new FunctionSeries(result.GetAverageFractionOfDiscoveryAtLatency, 1, max, max, type.ToString());
             //model.Series.Add(serie);
@@ -539,17 +596,17 @@ namespace UINetworkDiscovery
                 MarkerType = markerType
             };
 
-            lock(Model)
+            lock (Model)
             {
                 Model.Series.Add(lineserie);
-                lock(oxyplot)
+                lock (oxyplot)
                 {
                     oxyplot.Model = Model;
                     oxyplot.RefreshPlot(true);
                 }
             }
 
-           
+
         }
 
         private void btClear_Click(object sender, RoutedEventArgs e)
@@ -567,7 +624,7 @@ namespace UINetworkDiscovery
             var xStep = 5;
             if (s.Contains('/'))
             {
-                var split = s.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+                var split = s.Split(new char[] {'/'}, StringSplitOptions.RemoveEmptyEntries);
                 if (split.Length > 1 && int.TryParse(split[1], out xStep))
                 {
                     s = split[0];
@@ -588,7 +645,7 @@ namespace UINetworkDiscovery
             var yStep = 5;
             if (s.Contains('/'))
             {
-                var split = s.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+                var split = s.Split(new char[] {'/'}, StringSplitOptions.RemoveEmptyEntries);
                 if (split.Length > 1 && int.TryParse(split[1], out yStep))
                 {
                     s = split[0];
@@ -603,11 +660,22 @@ namespace UINetworkDiscovery
             }
         }
 
-        private void btPlot2_Click(object sender, RoutedEventArgs e)
+        private void RunTwoNodesSimulation(BoundedProtocol node1, BoundedProtocol node2, NodeType type)
+        {
+            var environment = new TwoNodesEnvironmentTmll(node1, node2);
+            var testResult = environment.RunSimulation(node1.T);
+            var statistics = new StatisticsResult(type);
+            statistics.AddStatisticTest(testResult);
+            statistics.BuildAverageFractionOfDiscovey(node1.T);
+            worker_RunWorkerCompleted(this, new RunWorkerCompletedEventArgs(statistics, null, false));
+        }
+
+        private void btTwoNodesSimulation_Click(object sender, RoutedEventArgs e)
         {
             if (RunningInfo.IsRunning)
             {
-                var result = MessageBox.Show("Do you want to cancel?", "Cancel", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                var result = MessageBox.Show("Do you want to cancel?", "Cancel", MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
                 if (result == MessageBoxResult.Yes)
                 {
                     CancellAll();
@@ -615,127 +683,82 @@ namespace UINetworkDiscovery
             }
             else
             {
-                if (File.Exists(fileName))
+                var selectedAlgs = cbDisco.IsChecked.Value || cbUConnect.IsChecked.Value ||
+                                   cbSearchlight.IsChecked.Value || cbBirthday.IsChecked.Value ||
+                                   cbStripedSearchlight.IsChecked.Value || cbTestAlgorithm.IsChecked.Value ||
+                                   cbGNihao.IsChecked.Value || cbBalancedNihao.IsChecked.Value;
+
+                if (selectedAlgs)
                 {
-                    //RandomGenerator.PercentageToFix = double.Parse(tbFixAsymmetricNetwork.Text);
-                    var selectedAlgs = cbDisco.IsChecked.Value || cbUConnect.IsChecked.Value || cbSearchlight.IsChecked.Value || cbBirthday.IsChecked.Value || cbStripedSearchlight.IsChecked.Value || cbTestAlgorithm.IsChecked.Value || cbGNihao.IsChecked.Value || cbAccGossipGNihao.IsChecked.Value;
+                    ResetAlgorithmProperties();
+                    btPlot.Content = "Cancel";
+                    btGenerate.IsEnabled = false;
+                    testCaseMessage.Text = "Running Algorithm(s)...";
+                    testCaseMessage.Visibility = Visibility.Visible;
+                    testCaseIcon.Fill = Brushes.Yellow;
+                    testCaseIcon.Visibility = Visibility.Visible;
 
-                    if (selectedAlgs)
+                    if (cbDisco.IsChecked == true)
                     {
-                        ResetAlgorithmProperties();
-                        btPlot.Content = "Cancel";
-                        btGenerate.IsEnabled = false;
-                        testCaseMessage.Text = "Running Algorithm(s)...";
-                        testCaseMessage.Visibility = Visibility.Visible;
-                        testCaseIcon.Fill = Brushes.Yellow;
-                        testCaseIcon.Visibility = Visibility.Visible;
+                        double[] duties;
+                        if (GetDutyCycle(out duties))
+                        {
+                            var node1 = new Disco(0, duties[0]);
+                            var node2 = new Disco(1, duties[duties.Length - 1]);
+                            RunTwoNodesSimulation(node1, node2, NodeType.Disco);
+                        }
+                    }
 
-                        if (cbDisco.IsChecked == true)
+                    if (cbUConnect.IsChecked == true)
+                    {
+                        double[] duties;
+                        if (GetDutyCycle(out duties))
                         {
-                            double[] duties;
-                            if (GetDutyCycle(out duties))
-                            {
-                                //var node1 = NodeFactory.CreateNode(NodeType.Disco, new DiscoParameters(0, duties[0], 0, true));
-                                //var node2 = NodeFactory.CreateNode(NodeType.Disco, new DiscoParameters(0, duties[duties.Length - 1], 0, true));
-                                //var environment = new TwoNodesEnvironment(NodeType.Disco, node1, node2);
+                            var node1 = new UConnect(0, duties[0]);
+                            var node2 = new UConnect(1, duties[duties.Length - 1]);
+                            RunTwoNodesSimulation(node1, node2, NodeType.UConnect);
+                        }
+                    }
 
-                                //var test = environment.RunSimulation((x, y) => Math.Abs(x - y) <= 1, true);
-                                //StatisticsResult result = new StatisticsResult(NodeType.Disco);
-                                //result.AddStatisticTest(test);
-                                //result.BuildAverageFractionOfDiscovey();
-                                //worker_RunWorkerCompleted(this, new RunWorkerCompletedEventArgs(result, null, false));
-                            }
-                        }
-                        if (cbUConnect.IsChecked == true)
+                    if (cbBalancedNihao.IsChecked == true)
+                    {
+                        double[] duties;
+                        if (GetDutyCycle(out duties))
                         {
-                            double[] duties;
-                            if (GetDutyCycle(out duties))
-                            {
-                                //var node1 = new UConnectNode(0, duties[0], 0, 0);
-                                //var node2 = new UConnectNode(0, duties[duties.Length - 1], 0, 0);
-                                //var environment = new TwoNodesEnvironmentTmll(node1, node2);
-                                //var latencyLimit = node1.T + 1;
-                                //var test = environment.RunSimulation(latencyLimit);
-                                //var result = new StatisticsResult(NodeType.UConnect);
-                                //result.AddStatisticTest(test);
-                                //result.BuildAverageFractionOfDiscovey(latencyLimit);
-                                //worker_RunWorkerCompleted(this, new RunWorkerCompletedEventArgs(result, null, false));
-                            }
+                            var node1 = new BalancedNihaoTmll(0, duties[0]);
+                            var node2 = new BalancedNihaoTmll(1, duties[duties.Length - 1]);
+                            RunTwoNodesSimulation(node1, node2, NodeType.BalancedNihao);
                         }
-                        if (cbSearchlight.IsChecked == true)
-                        {
-                            //double[] duties;
-                            //if (GetDutyCycle(out duties))
-                            //{
-                            //    var node1 = NodeFactory.CreateNode(NodeType.Searchlight, new NodeParameters(NodeType.Searchlight, 0, duties[0], 0));
-                            //    var node2 = NodeFactory.CreateNode(NodeType.Searchlight, new NodeParameters(NodeType.Searchlight, 0, duties[duties.Length-1], 0));
-                            //    var environment = new TwoNodesEnvironment(NodeType.Searchlight,node1, node2);
+                    }
 
-                            //    var test = environment.RunSimulation((x, y) => x == y);
-                            //    StatisticsResult result = new StatisticsResult(NodeType.Searchlight);
-                            //    result.AddStatisticTest(test);
-                            //    result.BuildAverageFractionOfDiscovey();
-                            //    worker_RunWorkerCompleted(this, new RunWorkerCompletedEventArgs(result, null, false));
-                            //}
-                        }
-                        if (cbBirthday.IsChecked == true)
-                        {
-                            
-                        }
-                        if (cbStripedSearchlight.IsChecked == true)
-                        {
-                            //double[] duties;
-                            //if (GetDutyCycle(out duties))
-                            //{
-                            //    var node1 = NodeFactory.CreateNode(NodeType.StripedSearchlight, new NodeParameters(NodeType.Searchlight, 0, duties[0], 0));
-                            //    var node2 = NodeFactory.CreateNode(NodeType.StripedSearchlight, new NodeParameters(NodeType.Searchlight, 0, duties[duties.Length - 1], 0));
-                            //    var environment = new TwoNodesEnvironment(NodeType.StripedSearchlight, node1, node2);
-
-                            //    var test = environment.RunSimulation((x, y) => Math.Abs(x - y) <= 1, true);
-                            //    StatisticsResult result = new StatisticsResult(NodeType.StripedSearchlight);
-                            //    result.AddStatisticTest(test);
-                            //    result.BuildAverageFractionOfDiscovey();
-                            //    worker_RunWorkerCompleted(this, new RunWorkerCompletedEventArgs(result, null, false));
-                            //}
-                        }
-                        if (cbTestAlgorithm.IsChecked == true)
-                        {
-                            //double[] duties;
-                            //if (GetDutyCycle(out duties))
-                            //{
-                            //    var node1 = NodeFactory.CreateNode(NodeType.TestAlgorithm, new NodeParameters(NodeType.TestAlgorithm, 0, duties[0], 0));
-                            //    var node2 = NodeFactory.CreateNode(NodeType.TestAlgorithm, new NodeParameters(NodeType.TestAlgorithm, 0, duties[duties.Length - 1], 0));
-                            //    var environment = new TwoNodesEnvironment(NodeType.TestAlgorithm, node1, node2);
-
-                            //    var test = environment.RunSimulation((x, y) => Math.Abs(x-y) <= 1, true);
-                            //    StatisticsResult result = new StatisticsResult(NodeType.TestAlgorithm);
-                            //    result.AddStatisticTest(test);
-                            //    result.BuildAverageFractionOfDiscovey();
-                            //    worker_RunWorkerCompleted(this, new RunWorkerCompletedEventArgs(result, null, false));
-                            //}
-                        }
-                        //if (cbGNihao.IsChecked == true)
-                        //{
-                        //    double[] duties;
-                        //    if (GetDutyCycle(out duties))
-                        //    {
-                                //var node1 = new BNihaoR(1, (int)duties[0], 0, 20, 0, false);
-                                //var node2 = new BNihaoR(2, (int)duties[duties.Length-1], 0, 20, 0, false);
-                                //var environment = new TwoNodesEnvironmentTmll(node1, node2);
-                                //var latencyLimit = node1.T + 1;
-                                //var test = environment.RunSimulation(latencyLimit);
-                                //var result = new StatisticsResult(NodeType.GNihao);
-                                //result.AddStatisticTest(test);
-                                //result.BuildAverageFractionOfDiscovey(latencyLimit);
-                                //worker_RunWorkerCompleted(this, new RunWorkerCompletedEventArgs(result, null, false));
-                        //    }
-                        //}
-                      
+                    if (cbSearchlight.IsChecked == true)
+                    {
 
                     }
-                    else MessageBox.Show("No algorithm has been selected!", "Select Algorithms to Run", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    if (cbBirthday.IsChecked == true)
+                    {
+
+                    }
+
+                    if (cbStripedSearchlight.IsChecked == true)
+                    {
+
+                    }
+
+                    if (cbTestAlgorithm.IsChecked == true)
+                    {
+
+                    }
+
+                    if (cbGNihao.IsChecked == true)
+                    {
+
+                    }
                 }
-                else MessageBox.Show("The program could not find the Tests file. You should generate the test first", "Test File Not Found", MessageBoxButton.OK, MessageBoxImage.Error);
+                else
+                    MessageBox.Show("No algorithm has been selected!", "Select Algorithms to Run", MessageBoxButton.OK,
+                        MessageBoxImage.Information);
             }
         }
     }

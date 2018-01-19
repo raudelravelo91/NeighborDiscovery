@@ -9,7 +9,6 @@ namespace NeighborDiscovery.Statistics
 {
     public class StatisticTestResult
     {
-        public int ExpectedDiscoveries { get; private set; }
         public int MaxLatency { get; private set; }
         public int NumberOfWakesUp { get; set; }
         public int NumberOfContactMade { get; set; }
@@ -22,7 +21,6 @@ namespace NeighborDiscovery.Statistics
         public StatisticTestResult(int expectedDiscoveries)
         {
             //NumberOfNodes = networkSize;
-            ExpectedDiscoveries = expectedDiscoveries;
             discoveryByLatency = new Dictionary<int, int>();
             TotalDiscoveries = 0;
         }
@@ -46,7 +44,7 @@ namespace NeighborDiscovery.Statistics
             else
             {
                 var max = discoveryByLatency.Max(x => x.Key);
-                var latency = 0;
+                var latency = 1;
                 double lastFractionValue = 0;
                 var cumul = 0;
                 var values = discoveryByLatency.OrderBy(x => x.Key).ToArray();
@@ -58,7 +56,7 @@ namespace NeighborDiscovery.Statistics
                         latency++;
                     }
                     cumul += pair.Value;
-                    lastFractionValue = 1.0 * cumul / ExpectedDiscoveries;
+                    lastFractionValue = 1.0 * cumul / TotalDiscoveries;
                     yield return new KeyValuePair<int, double>(latency, lastFractionValue);
                     latency++;
                 }
@@ -74,10 +72,5 @@ namespace NeighborDiscovery.Statistics
         {
             return 1.0 * NumberOfContactMade / NumberOfWakesUp;
         }
-        
-
-        public bool IsDone => TotalDiscoveries == ExpectedDiscoveries;
     }
-
-    
 }

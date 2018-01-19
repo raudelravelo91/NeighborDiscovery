@@ -18,8 +18,8 @@ namespace NeighborDiscovery.Utils
         Hello,
         TestAlgorithm,
         GNihao,
+        BalancedNihao,
         AccGossipGNihao,
-        BNihao,
         AccGossipPNihao
     }
 }

@@ -8,11 +8,17 @@ namespace NeighborDiscovery.Protocols
     {
         public int P1 { get; private set; }
         public int P2 { get; private set; }
+        private double DesiredDutyCycle { get; set; }
 
-        public Disco(int id, double dutyCyclePercentage) : base(id, dutyCyclePercentage)
+        public Disco(int id, double dutyCyclePercentage) : base(id)
         {
             SetDutyCycle(dutyCyclePercentage);
-            T = P1 * P2;
+            SetHyperPeriod();
+        }
+
+        public override double GetDutyCycle()
+        {
+            return DesiredDutyCycle;
         }
 
         public override void SetDutyCycle(double value)
@@ -33,12 +39,21 @@ namespace NeighborDiscovery.Protocols
                 P1 = 17;
                 P2 = 23;
             }
+            else
+                throw new Exception("Could not set the given duty cycle");
+
+            DesiredDutyCycle = value;
+            
+        }
+
+        private void SetHyperPeriod()
+        {
+            T = P1 * P2;
         }
 
         public override IDiscoveryProtocol Clone()
         {
-            //todo, this is just a new node
-            return new Disco(Id, DesiredDutyCycle); //todo this is not clonning the exact internal state of the node
+            return new Disco(Id, GetDutyCycle());
         }
 
         public override string ToString()

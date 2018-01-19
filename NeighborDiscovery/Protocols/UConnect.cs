@@ -8,27 +8,35 @@ using NeighborDiscovery.Utils;
 
 namespace NeighborDiscovery.Protocols
 {
-    public class UConnect : BoundedProtocol
+    public sealed class UConnect : BoundedProtocol
     {
         public int P { get; private set; }
+        private double DesiredDutyCycle { get; set; }
 
-        public UConnect(int id, double dutyCyclePercentage) :base(id, dutyCyclePercentage)
+        public UConnect(int id, double dutyCyclePercentage) :base(id)
         {
-            DesiredDutyCycle = dutyCyclePercentage;
+            SetDutyCycle(dutyCyclePercentage);
+            SetHyperPeriod();
         }
 
-        public override void SetDutyCycle(double duty)
+        public override double GetDutyCycle()
         {
-            if (duty < 1)
+            return DesiredDutyCycle;
+        }
+
+        public override void SetDutyCycle(double value)
+        {
+            if (value < 1)
             {
-                if (duty == 0.5)
+                double TOLERANCE = 1e-1;
+                if (Math.Abs(value - 0.5) < TOLERANCE)
                 {
                     P = 307;
                 }
             }
             else
             {
-                switch ((int)duty)
+                switch ((int)value)
                 {
                     case 1:
                         P = 151;
@@ -50,18 +58,24 @@ namespace NeighborDiscovery.Protocols
                         break;
                 }
             }
-            T = P * P;
-            DesiredDutyCycle = duty;
+            DesiredDutyCycle = value;
         }
+
+        
 
         //public override double GetDutyCycle()
         //{
         //    return (3.0 * P + 1) / (2 * P * P);
         //}
 
+        private void SetHyperPeriod()
+        {
+            T = P * P;
+        }
+
         public override IDiscoveryProtocol Clone()
         {
-            return new UConnect(Id, DesiredDutyCycle);
+            return new UConnect(Id, GetDutyCycle());
         }
 
         public override string ToString()
@@ -71,7 +85,7 @@ namespace NeighborDiscovery.Protocols
 
         public override bool IsListening()
         {
-            return (InternalTimeSlot % P == 0 || InternalTimeSlot % (P * P) < (P / 2 + 1));
+            return (InternalTimeSlot % P == 0 || InternalTimeSlot % (P * P) < (P+1)/2);
         }
 
         public override bool IsTransmitting()

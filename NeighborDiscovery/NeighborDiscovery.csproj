@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="Environment\TwoNodesEnvironmentTmll.cs" />
     <Compile Include="Environment\FullDiscoveryEnvironment.cs" />
+    <Compile Include="Protocols\BalancedNihaoTmll.cs" />
     <Compile Include="Protocols\IContact.cs" />
     <Compile Include="Protocols\IDiscoveryProtocol.cs" />
     <Compile Include="Protocols\ITransmission.cs" />
