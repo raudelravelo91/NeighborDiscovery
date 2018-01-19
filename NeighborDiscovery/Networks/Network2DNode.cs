@@ -13,13 +13,13 @@ namespace NeighborDiscovery.Networks
         public MyPair Direction { get; private set; }
         
 
-        public Network2DNode(int id, double xPos, double yPos, int commRange)
+        public Network2DNode(int id, MyPair position, MyPair direction, int commRange, double speed = 0)
         {
             Node2DId = id;
-            Position = new MyPair(xPos, yPos);
+            Position = new MyPair(position.X, position.Y);
             CommunicationRange = commRange;
-            Speed = 0;
-            Direction = new MyPair(0,0);
+            Speed = speed;
+            Direction = new MyPair(direction.X, direction.Y);
         }
 
         public void SetDirection(double x, double y)

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NeighborDiscovery.Environment;
 using NeighborDiscovery.Protocols;
@@ -7,22 +8,29 @@ namespace NeighborDiscovery.Networks
 {
     public class Network2D
     {
-        private readonly List<Network2DNode> _nodes;
+        private readonly HashSet<Network2DNode> _nodes;
         public int CurrentSize => _nodes.Count;
         public int NumberOfLinks { get; private set; }
         
         public Network2D()
         {
-            _nodes = new List<Network2DNode>();
+            _nodes = new HashSet<Network2DNode>();
         }
 
-        public Network2DNode AddNode(double xPos, double yPos, int communicationRange)
+        public void RemoveNode(Network2DNode node)
         {
-            var newNode2D = new Network2DNode(_nodes.Count, xPos, yPos, communicationRange);
+            if(!_nodes.Remove(node))
+                throw new Exception("Node does not exists");
+        }
+
+        public void AddNode(Network2DNode newNode2D)
+        {
+            if(_nodes.Contains(newNode2D))
+                throw new Exception("Node already exists");
+            
             //update number of links   
-            for (int i = 0; i < _nodes.Count; i++)
+            foreach(var possibleNeighbor in _nodes)
             {
-                var possibleNeighbor = _nodes[i];
                 if (newNode2D.NodeIsInRange(possibleNeighbor))
                 {
                     NumberOfLinks++;
@@ -32,7 +40,8 @@ namespace NeighborDiscovery.Networks
                     NumberOfLinks++;
                 }
             }
-            return newNode2D;
+
+            _nodes.Add(newNode2D);
         }
 
         public IEnumerable<Network2DNode> NeighborsOf(Network2DNode node)

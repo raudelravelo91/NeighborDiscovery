@@ -7,21 +7,21 @@ using NeighborDiscovery.Utils;
 
 namespace UINetworkDiscovery
 {
-    public class UINodeParameters
+    public class UiNodeParameters
     {
         public NodeType NodeType { get; private set; }
 
-        public UINodeParameters(NodeType nodeType)
+        public UiNodeParameters(NodeType nodeType)
         {
             NodeType = nodeType;
         }
 
     }
 
-    public class UIDiscoParameters : UINodeParameters
+    public class UiDiscoParameters : UiNodeParameters
     {
         public bool Balanced { get; private set; }
-        public UIDiscoParameters(bool balanced) : base(NodeType.Disco)
+        public UiDiscoParameters(bool balanced) : base(NodeType.Disco)
         {
             Balanced = balanced;
         }

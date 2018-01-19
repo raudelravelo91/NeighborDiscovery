@@ -12,42 +12,42 @@ namespace NeighborDiscovery.Statistics
         public int MaxLatency { get; private set; }
         public int NumberOfWakesUp { get; set; }
         public int NumberOfContactMade { get; set; }
-        public double AverageDiscoveryLatency => 1.0 * sumOfLatency / TotalDiscoveries;
+        public double AverageDiscoveryLatency => 1.0 * _sumOfLatency / TotalDiscoveries;
         public int TotalDiscoveries { get; private set; }
-        private Dictionary<int, int> discoveryByLatency { get; set; }
-        private long sumOfLatency;
+        private Dictionary<int, int> DiscoveryByLatency { get; set; }
+        private long _sumOfLatency;
 
 
-        public StatisticTestResult(int expectedDiscoveries)
+        public StatisticTestResult()
         {
             //NumberOfNodes = networkSize;
-            discoveryByLatency = new Dictionary<int, int>();
+            DiscoveryByLatency = new Dictionary<int, int>();
             TotalDiscoveries = 0;
         }
 
         public void AddDiscovery(int latency)
         {
-            if (discoveryByLatency.ContainsKey(latency))
+            if (DiscoveryByLatency.ContainsKey(latency))
             {
-                discoveryByLatency[latency]++;
+                DiscoveryByLatency[latency]++;
             }
-            else discoveryByLatency[latency] = 1;
+            else DiscoveryByLatency[latency] = 1;
             TotalDiscoveries++;
             MaxLatency = Math.Max(MaxLatency, latency);
-            sumOfLatency += latency;
+            _sumOfLatency += latency;
         }
 
         public IEnumerable<KeyValuePair<int, double>> GetCummulativeFractionOfDiscovery(int latencyLimit = -1)
         {
-            if (discoveryByLatency.Count == 0)
+            if (DiscoveryByLatency.Count == 0)
                 yield return new KeyValuePair<int, double>(0, 1);
             else
             {
-                var max = discoveryByLatency.Max(x => x.Key);
+                var max = DiscoveryByLatency.Max(x => x.Key);
                 var latency = 1;
                 double lastFractionValue = 0;
                 var cumul = 0;
-                var values = discoveryByLatency.OrderBy(x => x.Key).ToArray();
+                var values = DiscoveryByLatency.OrderBy(x => x.Key).ToArray();
                 foreach (var pair in values)
                 {
                     while (latency < pair.Key)

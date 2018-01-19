@@ -21,29 +21,29 @@ namespace UINetworkDiscovery
     public partial class MainWindow : Window
     {
         public static RunningInfo RunningInfo { get; private set; }
-        private string fileName;
-        private PlotModel Model;
-        AlgorithmBackgroundWorker workerDisco;
-        AlgorithmBackgroundWorker workerUConnect;
-        AlgorithmBackgroundWorker workerSearchLight;
-        AlgorithmBackgroundWorker workerBirthday;
-        AlgorithmBackgroundWorker workerStripedSearchlight;
-        AlgorithmBackgroundWorker workerTestAlgorithm;
-        AlgorithmBackgroundWorker workerGNihao;
-        AlgorithmBackgroundWorker workerAccGossipGNihao;
-        AlgorithmBackgroundWorker workerAccGossipPNihao;
-        List<int> threads = new List<int>();
+        private readonly string _fileName;
+        private readonly PlotModel _model;
+        private readonly AlgorithmBackgroundWorker _workerDisco;
+        private readonly AlgorithmBackgroundWorker _workerUConnect;
+        private readonly AlgorithmBackgroundWorker _workerSearchLight;
+        private readonly AlgorithmBackgroundWorker _workerBirthday;
+        private readonly AlgorithmBackgroundWorker _workerStripedSearchlight;
+        private readonly AlgorithmBackgroundWorker _workerTestAlgorithm;
+        private readonly AlgorithmBackgroundWorker _workerGNihao;
+        private readonly AlgorithmBackgroundWorker _workerBalancedNihao;
+        private readonly AlgorithmBackgroundWorker _workerAccGossipPNihao;
+        private List<int> _threads = new List<int>();
 
         public MainWindow()
         {
             InitializeComponent();
 
-            fileName = "testcases.txt";
-            Model = new PlotModel();
+            _fileName = "testcases.txt";
+            _model = new PlotModel();
             SetXAxes(400, 8);
             SetYAxes(1, 10);
             var currentMargins = oxyplot.PlotMargins;
-            Model.PlotMargins = new OxyThickness(currentMargins.Left, btClear.Height, currentMargins.Right,
+            _model.PlotMargins = new OxyThickness(currentMargins.Left, btClear.Height, currentMargins.Right,
                 currentMargins.Bottom);
             oxyplot.PlotMargins = new System.Windows.Thickness(currentMargins.Left, btClear.Height,
                 currentMargins.Right, currentMargins.Bottom);
@@ -51,33 +51,33 @@ namespace UINetworkDiscovery
 
             SetDefaultSettings();
 
-            workerDisco = new AlgorithmBackgroundWorker(NodeType.Disco);
-            workerDisco.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
-            workerDisco.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
-            workerUConnect = new AlgorithmBackgroundWorker(NodeType.UConnect);
-            workerUConnect.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
-            workerUConnect.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
-            workerSearchLight = new AlgorithmBackgroundWorker(NodeType.Searchlight);
-            workerSearchLight.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
-            workerSearchLight.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
-            workerBirthday = new AlgorithmBackgroundWorker(NodeType.Birthday);
-            workerBirthday.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
-            workerBirthday.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
-            workerStripedSearchlight = new AlgorithmBackgroundWorker(NodeType.StripedSearchlight);
-            workerStripedSearchlight.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
-            workerStripedSearchlight.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
-            workerTestAlgorithm = new AlgorithmBackgroundWorker(NodeType.TestAlgorithm);
-            workerTestAlgorithm.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
-            workerTestAlgorithm.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
-            workerGNihao = new AlgorithmBackgroundWorker(NodeType.GNihao);
-            workerGNihao.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
-            workerGNihao.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
-            workerAccGossipGNihao = new AlgorithmBackgroundWorker(NodeType.AccGossipGNihao);
-            workerAccGossipGNihao.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
-            workerAccGossipGNihao.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
-            workerAccGossipPNihao = new AlgorithmBackgroundWorker(NodeType.AccGossipPNihao);
-            workerAccGossipPNihao.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
-            workerAccGossipPNihao.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
+            _workerDisco = new AlgorithmBackgroundWorker(NodeType.Disco);
+            _workerDisco.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
+            _workerDisco.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
+            _workerUConnect = new AlgorithmBackgroundWorker(NodeType.UConnect);
+            _workerUConnect.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
+            _workerUConnect.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
+            _workerSearchLight = new AlgorithmBackgroundWorker(NodeType.Searchlight);
+            _workerSearchLight.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
+            _workerSearchLight.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
+            _workerBirthday = new AlgorithmBackgroundWorker(NodeType.Birthday);
+            _workerBirthday.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
+            _workerBirthday.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
+            _workerStripedSearchlight = new AlgorithmBackgroundWorker(NodeType.StripedSearchlight);
+            _workerStripedSearchlight.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
+            _workerStripedSearchlight.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
+            _workerTestAlgorithm = new AlgorithmBackgroundWorker(NodeType.TestAlgorithm);
+            _workerTestAlgorithm.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
+            _workerTestAlgorithm.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
+            _workerGNihao = new AlgorithmBackgroundWorker(NodeType.GNihao);
+            _workerGNihao.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
+            _workerGNihao.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
+            _workerBalancedNihao = new AlgorithmBackgroundWorker(NodeType.BalancedNihao);
+            _workerBalancedNihao.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
+            _workerBalancedNihao.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
+            _workerAccGossipPNihao = new AlgorithmBackgroundWorker(NodeType.AccGossipPNihao);
+            _workerAccGossipPNihao.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
+            _workerAccGossipPNihao.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
 
         }
 
@@ -85,7 +85,7 @@ namespace UINetworkDiscovery
         {
             if (x / xMajorStep > 0)
             {
-                var X = new LinearAxis(AxisPosition.Bottom, 0, x, "Discovery latency (slots)")
+                var xAxis = new LinearAxis(AxisPosition.Bottom, 0, x, "Discovery latency (slots)")
                 {
                     MajorStep = x / xMajorStep,
                     MajorGridlineThickness = 1,
@@ -94,11 +94,11 @@ namespace UINetworkDiscovery
                     TitleFontSize = 14,
                     TickStyle = TickStyle.Inside
                 };
-                if (Model.Axes.Count > 0)
-                    Model.Axes[0] = X;
-                else Model.Axes.Add(X);
+                if (_model.Axes.Count > 0)
+                    _model.Axes[0] = xAxis;
+                else _model.Axes.Add(xAxis);
 
-                oxyplot.Model = Model;
+                oxyplot.Model = _model;
                 oxyplot.RefreshPlot(true);
             }
         }
@@ -107,7 +107,7 @@ namespace UINetworkDiscovery
         {
             if (y / yMajorStep > 0)
             {
-                var Y = new LinearAxis(AxisPosition.Left, 0, y, "Fraction of Discoveries")
+                var yAxis = new LinearAxis(AxisPosition.Left, 0, y, "Fraction of Discoveries")
                 {
                     MajorStep = y / yMajorStep,
                     MajorGridlineThickness = 1,
@@ -116,10 +116,10 @@ namespace UINetworkDiscovery
                     TitleFontSize = 14,
                     TickStyle = TickStyle.Inside
                 };
-                if (Model.Axes.Count > 1)
-                    Model.Axes[1] = Y;
-                else Model.Axes.Add(Y);
-                oxyplot.Model = Model;
+                if (_model.Axes.Count > 1)
+                    _model.Axes[1] = yAxis;
+                else _model.Axes.Add(yAxis);
+                oxyplot.Model = _model;
                 oxyplot.RefreshPlot(true);
             }
         }
@@ -136,39 +136,39 @@ namespace UINetworkDiscovery
             //    btGenerate.IsEnabled = !workerBirthday.IsReading && !workerDisco.IsReading 
             //        && !workerQuorum.IsReading && !workerSearchLight.IsReading && !workerUConnect.IsReading;
             //}
-            if (sender.Equals(workerDisco.Worker))
+            if (sender.Equals(_workerDisco.Worker))
             {
                 progressBarDisco.Value = e.ProgressPercentage;
             }
-            else if (sender.Equals(workerUConnect.Worker))
+            else if (sender.Equals(_workerUConnect.Worker))
             {
                 progressBarUConnect.Value = e.ProgressPercentage;
             }
-            else if (sender.Equals(workerSearchLight.Worker))
+            else if (sender.Equals(_workerSearchLight.Worker))
             {
                 progressBarSearchlight.Value = e.ProgressPercentage;
             }
-            else if (sender.Equals(workerBirthday.Worker))
+            else if (sender.Equals(_workerBirthday.Worker))
             {
                 progressBarBirthday.Value = e.ProgressPercentage;
             }
-            else if (sender.Equals(workerStripedSearchlight.Worker))
+            else if (sender.Equals(_workerStripedSearchlight.Worker))
             {
                 progressBarStripedSearchlight.Value = e.ProgressPercentage;
             }
-            else if (sender.Equals(workerTestAlgorithm.Worker))
+            else if (sender.Equals(_workerTestAlgorithm.Worker))
             {
                 progressBarTestAlg.Value = e.ProgressPercentage;
             }
-            else if (sender.Equals(workerGNihao.Worker))
+            else if (sender.Equals(_workerGNihao.Worker))
             {
                 progressBarGNihao.Value = e.ProgressPercentage;
             }
-            else if (sender.Equals(workerAccGossipGNihao.Worker))
+            else if (sender.Equals(_workerBalancedNihao.Worker))
             {
                 progressBarBalancedNihao.Value = e.ProgressPercentage;
             }
-            else if (sender.Equals(workerAccGossipPNihao.Worker))
+            else if (sender.Equals(_workerAccGossipPNihao.Worker))
             {
                 progressBarAccGossipPNihao.Value = e.ProgressPercentage;
             }
@@ -298,12 +298,12 @@ namespace UINetworkDiscovery
 
         private void CancellAll()
         {
-            workerDisco.CancelAsync();
-            workerUConnect.CancelAsync();
-            workerSearchLight.CancelAsync();
-            workerBirthday.CancelAsync();
-            workerStripedSearchlight.CancelAsync();
-            workerTestAlgorithm.CancelAsync();
+            _workerDisco.CancelAsync();
+            _workerUConnect.CancelAsync();
+            _workerSearchLight.CancelAsync();
+            _workerBirthday.CancelAsync();
+            _workerStripedSearchlight.CancelAsync();
+            _workerTestAlgorithm.CancelAsync();
         }
 
         private void ResetAlgorithmProperties()
@@ -350,7 +350,7 @@ namespace UINetworkDiscovery
             }
             else
             {
-                if (File.Exists(fileName))
+                if (File.Exists(_fileName))
                 {
                     //RandomGenerator.PercentageToFix = double.Parse(tbFixAsymmetricNetwork.Text);
                     var selectedAlgs = cbDisco.IsChecked.Value || cbUConnect.IsChecked.Value ||
@@ -373,52 +373,52 @@ namespace UINetworkDiscovery
                         {
                             //var parameters = new DiscoParameters(-1, -1, -1, false);
                             //RunningInfo.AddRunningAlgorithm();
-                            workerDisco.RunWorkerAsync(fileName);
+                            _workerDisco.RunWorkerAsync(_fileName);
                         }
 
                         if (cbUConnect.IsChecked == true)
                         {
                             //RunningInfo.AddRunningAlgorithm();
-                            workerUConnect.RunWorkerAsync(fileName);
+                            _workerUConnect.RunWorkerAsync(_fileName);
                         }
 
                         if (cbSearchlight.IsChecked == true)
                         {
                             //RunningInfo.AddRunningAlgorithm();
-                            workerSearchLight.RunWorkerAsync(fileName);
+                            _workerSearchLight.RunWorkerAsync(_fileName);
                         }
 
                         if (cbBirthday.IsChecked == true)
                         {
                             //RunningInfo.AddRunningAlgorithm();
-                            workerBirthday.RunWorkerAsync(fileName);
+                            _workerBirthday.RunWorkerAsync(_fileName);
                         }
 
                         if (cbStripedSearchlight.IsChecked == true)
                         {
                             //RunningInfo.AddRunningAlgorithm();
-                            workerStripedSearchlight.RunWorkerAsync(fileName);
+                            _workerStripedSearchlight.RunWorkerAsync(_fileName);
                         }
 
                         if (cbTestAlgorithm.IsChecked == true)
                         {
                             //RunningInfo.AddRunningAlgorithm();
-                            workerTestAlgorithm.RunWorkerAsync(fileName);
+                            _workerTestAlgorithm.RunWorkerAsync(_fileName);
                         }
 
                         if (cbGNihao.IsChecked == true)
                         {
-                            workerGNihao.RunWorkerAsync(fileName);
+                            _workerGNihao.RunWorkerAsync(_fileName);
                         }
 
                         if (cbBalancedNihao.IsChecked == true)
                         {
-                            workerAccGossipGNihao.RunWorkerAsync(fileName);
+                            _workerBalancedNihao.RunWorkerAsync(_fileName);
                         }
 
                         if (cbAccGossipPNihao.IsChecked == true)
                         {
-                            workerAccGossipPNihao.RunWorkerAsync(fileName);
+                            _workerAccGossipPNihao.RunWorkerAsync(_fileName);
                         }
                     }
                     else
@@ -433,7 +433,7 @@ namespace UINetworkDiscovery
 
         private bool ModelContainsAlgorithm(NodeType type)
         {
-            var v = Model.Series.Where(s => s.Title.Equals(type.ToString()));
+            var v = _model.Series.Where(s => s.Title.Equals(type.ToString()));
             return (v.Any());
         }
 
@@ -570,23 +570,23 @@ namespace UINetworkDiscovery
             }
 
 
-            var Points = new List<DataPoint>();
+            var points = new List<DataPoint>();
             var x = 0;
             double y = 0;
             while (x <= result.GetMaxLatency() && (y = result.GetAverageFractionOfDiscoveryAtLatency(x)) < 1)
             {
-                Points.Add(new DataPoint(x, y));
+                points.Add(new DataPoint(x, y));
                 x++;
             }
 
-            Points.Add(new DataPoint(x, y));
+            points.Add(new DataPoint(x, y));
             //var serie = new FunctionSeries(result.GetAverageFractionOfDiscoveryAtLatency, 1, max, max, type.ToString());
             //model.Series.Add(serie);
 
             var lineserie = new LineSeries
             {
                 Title = type.ToString(),
-                ItemsSource = Points,
+                ItemsSource = points,
                 DataFieldX = "X",
                 DataFieldY = "Y",
                 StrokeThickness = 2,
@@ -596,12 +596,12 @@ namespace UINetworkDiscovery
                 MarkerType = markerType
             };
 
-            lock (Model)
+            lock (_model)
             {
-                Model.Series.Add(lineserie);
+                _model.Series.Add(lineserie);
                 lock (oxyplot)
                 {
-                    oxyplot.Model = Model;
+                    oxyplot.Model = _model;
                     oxyplot.RefreshPlot(true);
                 }
             }
@@ -611,7 +611,7 @@ namespace UINetworkDiscovery
 
         private void btClear_Click(object sender, RoutedEventArgs e)
         {
-            if (Model.Series.Count > 0)
+            if (_model.Series.Count > 0)
             {
                 oxyplot.Model.Series.Clear();
                 oxyplot.RefreshPlot(true);

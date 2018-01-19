@@ -53,31 +53,23 @@ namespace NeighborDiscovery.Environment
         
         public StatisticTestResult RunSimulation(int latencyLimit)
         {
-            //Console.WriteLine("CONSOLE HERE!!");
-            var latencies = new int[latencyLimit][];
+            var statistics = new StatisticTestResult();
             
-            for (var i = 0; i < latencies.Length; i++)
-                latencies[i] = new int[latencyLimit * 2];
-
             //Parallel.For(0, halfPeriod,
             //(node1State) =>
-            for (int node1State = 0; node1State < latencies.Length; node1State++)//node2 hyper period is offset slots relative to node1 (node2 always starts at the same time or after node1 but never before)
+            for (int node1State = 0; node1State < latencyLimit; node1State++)//node2 hyper period is offset slots relative to node1 (node2 always starts at the same time or after node1 but never before)
             {
                 for (var node2State = 0; node2State < latencyLimit; node2State++)//after gotInRange slots they got in range and the latency starts from that point and on
                 {
-                    var simulation1 = RunTwoNodesSimulation(node1State, node2State, latencyLimit);
-                    latencies[node1State][node2State*2] = simulation1.Item1;
-                    latencies[node1State][node2State*2 + 1] = simulation1.Item2;
+                    var simulation = RunTwoNodesSimulation(node1State, node2State, latencyLimit);
+                    statistics.AddDiscovery(simulation.Item1);
+                    statistics.AddDiscovery(simulation.Item2);
+                    //latencies[node1State][node2State*2] = simulation1.Item1;
+                    //latencies[node1State][node2State*2 + 1] = simulation1.Item2;
                 }
             }
-            //);
-
-            var expectedDiscoveries = latencies.Length * latencies[0].Length;
-            var result = new StatisticTestResult(expectedDiscoveries);
-            for (var i = 0; i < latencies.Length; i++)
-                for (var j = 0; j < latencies[0].Length; j++)
-                    result.AddDiscovery(latencies[i][j]);
-            return result;
+            
+            return statistics;
         }
     }
 }

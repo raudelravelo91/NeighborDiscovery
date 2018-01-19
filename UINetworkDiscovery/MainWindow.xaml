@@ -276,7 +276,7 @@
 
             <StackPanel Height="40" Orientation="Horizontal">
                 <Button Name="btPlot"  Height="30" Width="60" Margin="20,2,2,2" Padding="5" Content="RunEnv" Click="btPlot_Click" />
-                <Button Name="btTwoNodesSimulation"  Height="30" Width="60" Margin="20,2,2,2" Padding="5" Content="1 vs 1" Click="btTwoNodesSimulation_Click" />
+                <Button Name="btTwoNodesSimulation"  Height="30" Width="60" Margin="20,3,2,7" Padding="5" Content="1 vs 1" Click="btTwoNodesSimulation_Click" />
                 <Label Content="Duty Cycles:" Margin="2,2,2,2" VerticalAlignment="Center"/>
                 <CheckBox Name="cb05p" Content="0.5%" IsChecked="True" Margin="10,2,2,2" VerticalAlignment="Center"/>
                 <CheckBox Name="cb1p" Content="1%" IsChecked="True" Margin="10,2,2,2" VerticalAlignment="Center"/>

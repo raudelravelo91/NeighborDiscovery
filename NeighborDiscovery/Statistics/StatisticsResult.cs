@@ -11,69 +11,69 @@ namespace NeighborDiscovery.Statistics
 {
     public class StatisticsResult
     {
-        public NodeType NodeType { get; private set; }
-        private double[] averageFractionOfDiscovery;
-        private List<StatisticTestResult> tests;
-        private double avgContactByWakeUp;
-        private double avgDiscoveryLatency;
-        public double AverageContactByWakesUp { get { if (avgContactByWakeUp == 0)
+        public NodeType NodeType { get; }
+        private double[] _averageFractionOfDiscovery;
+        private readonly List<StatisticTestResult> _tests;
+        private double _avgContactByWakeUp;
+        private double _avgDiscoveryLatency;
+        public double AverageContactByWakesUp { get { if (_avgContactByWakeUp == 0)
                 {
-                    avgContactByWakeUp = Math.Round(tests.Average(t => t.GetContactsByWakeUpRatio()), 2);
+                    _avgContactByWakeUp = Math.Round(_tests.Average(t => t.GetContactsByWakeUpRatio()), 2);
                 }
-                return avgContactByWakeUp;
+                return _avgContactByWakeUp;
             } }
         public double AverageDiscoveryLatency {
             get {
-                if (avgDiscoveryLatency == 0)
+                if (_avgDiscoveryLatency == 0)
                 {
-                    avgDiscoveryLatency = Math.Round(tests.Average(t => t.AverageDiscoveryLatency));
+                    _avgDiscoveryLatency = Math.Round(_tests.Average(t => t.AverageDiscoveryLatency));
                 }
-                return avgDiscoveryLatency;
+                return _avgDiscoveryLatency;
             }
         }
 
         public StatisticsResult(NodeType nodeType)
         {
-            tests = new List<StatisticTestResult>();
+            _tests = new List<StatisticTestResult>();
             NodeType = nodeType;
         }
 
         public void AddStatisticTest(StatisticTestResult test)
         {
-            tests.Add(test);
+            _tests.Add(test);
         }
 
         public void BuildAverageFractionOfDiscovey(int maxLatency)
         {
             //var highestLatency = tests.Max(test => test.MaxLatency);
-            averageFractionOfDiscovery = new double[maxLatency + 1];
+            _averageFractionOfDiscovery = new double[maxLatency + 1];
 
-            foreach (var testResult in tests)
+            foreach (var testResult in _tests)
             {
                 foreach (var pair in testResult.GetCummulativeFractionOfDiscovery(maxLatency))
                 {
                     var index = (pair.Key < maxLatency)?pair.Key:maxLatency;
-                    averageFractionOfDiscovery[index] += pair.Value;
+                    _averageFractionOfDiscovery[index] += pair.Value;
                 }
             }
 
-            for (var i = 0; i < averageFractionOfDiscovery.Length; i++)
+            for (var i = 0; i < _averageFractionOfDiscovery.Length; i++)
             {
-                averageFractionOfDiscovery[i] /= tests.Count;
+                _averageFractionOfDiscovery[i] /= _tests.Count;
             }
         }
 
         public double GetAverageFractionOfDiscoveryAtLatency(double latency)
         {
             var index = (int)latency;
-            if (index > averageFractionOfDiscovery.Length)//above maxLatency is always 100%
-                return averageFractionOfDiscovery[averageFractionOfDiscovery.Length - 1];
-            return averageFractionOfDiscovery[index];
+            if (index > _averageFractionOfDiscovery.Length)//above maxLatency is always 100%
+                return _averageFractionOfDiscovery[_averageFractionOfDiscovery.Length - 1];
+            return _averageFractionOfDiscovery[index];
         }
 
         public int GetMaxLatency()
         {
-            return averageFractionOfDiscovery.Length - 1;
+            return _averageFractionOfDiscovery.Length - 1;
         }
 
     }

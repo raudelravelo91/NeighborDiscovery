@@ -62,8 +62,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Environment\Event.cs" />
     <Compile Include="Environment\TwoNodesEnvironmentTmll.cs" />
-    <Compile Include="Environment\FullDiscoveryEnvironment.cs" />
+    <Compile Include="Environment\FullDiscoveryEnvironmentTmll.cs" />
     <Compile Include="Protocols\BalancedNihaoTmll.cs" />
     <Compile Include="Protocols\IContact.cs" />
     <Compile Include="Protocols\IDiscoveryProtocol.cs" />
@@ -90,7 +91,6 @@
     <Compile Include="Protocols\SearchlightNode.cs" />
     <Compile Include="Statistics\StatisticsResult.cs" />
     <Compile Include="Statistics\StatisticTestResult.cs" />
-    <Compile Include="Statistics\Value.cs" />
     <Compile Include="Protocols\Transmission.cs" />
     <Compile Include="Protocols\UConnect.cs" />
     <Compile Include="Utils\Shuffle.cs" />

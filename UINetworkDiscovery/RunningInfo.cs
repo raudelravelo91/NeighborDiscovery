@@ -8,12 +8,12 @@ namespace UINetworkDiscovery
 {
     public class RunningInfo
     {
-        private int running;
+        private int _running;
 
         public RunningInfo()
         {
             TotalAlgorithmsRan = 0;
-            running = 0;
+            _running = 0;
             CancelationPending = false;
         }
 
@@ -21,19 +21,19 @@ namespace UINetworkDiscovery
         {
             if (wasCanceled)
                 CancelationPending = true;
-            running--;
+            _running--;
         }
 
         public void AddRunningAlgorithm()
         {
-            running++;
-            TotalAlgorithmsRan = Math.Max(TotalAlgorithmsRan, running);
+            _running++;
+            TotalAlgorithmsRan = Math.Max(TotalAlgorithmsRan, _running);
         }
 
-        public bool IsRunning => running > 0;
+        public bool IsRunning => _running > 0;
 
 
-        public int RunningAlgorithms => running;
+        public int RunningAlgorithms => _running;
 
         public int TotalAlgorithmsRan { get; private set; }
 

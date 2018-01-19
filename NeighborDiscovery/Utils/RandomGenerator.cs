@@ -17,7 +17,7 @@ namespace NeighborDiscovery.Utils
             Random = new Random();
         }
 
-        public IEnumerable<double> GetRandomValues(double max)
+        public IEnumerable<double> GetRandomDoubleValues(double max)
         {
             while (true)
             {
@@ -25,6 +25,13 @@ namespace NeighborDiscovery.Utils
             }
         }
 
+        public IEnumerable<double> GetRandomIntValues(int max)
+        {
+            while (true)
+            {
+                yield return Random.Next(max);
+            }
+        }
 
         public IEnumerable<MyPair> GetRandomPairs(double maxX, double maxY)
         {
