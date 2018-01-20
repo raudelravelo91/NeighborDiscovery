@@ -23,10 +23,12 @@ namespace NeighborDiscovery.Environment
     {
         private readonly Network2D _network;
         private readonly Queue<Event> _events;
-        private readonly Dictionary<DiscoverableDevice, Network2DNode> _binding;
+        private readonly Dictionary<DiscoverableDevice, Network2DNode> _deviceToLocation;
+        private readonly Dictionary<Network2DNode, DiscoverableDevice> _locationToDevice;
+        private readonly Dictionary<int, DiscoverableDevice> _deviceById;
 
         public int CurrentTimeSlot { get; private set; }
-        public int CurrentNumberOfDevices => _binding.Count;
+        public int CurrentNumberOfDevices => _deviceToLocation.Count;
         public RunningMode RunningMode { get; }
 
         public FullDiscoveryEnvironmentTmll(RunningMode runningMode, IEnumerable<Event> initialEvents = default(IEnumerable<Event>))
@@ -49,7 +51,9 @@ namespace NeighborDiscovery.Environment
             var staticDevices = RunningMode == RunningMode.StaticDevices;
             _network = new Network2D(staticDevices);
             
-            _binding = new Dictionary<DiscoverableDevice, Network2DNode>();
+            _deviceToLocation = new Dictionary<DiscoverableDevice, Network2DNode>();
+            _locationToDevice = new Dictionary<Network2DNode, DiscoverableDevice>();
+            _deviceById = new Dictionary<int, DiscoverableDevice>();
             
             if (initialEvents != null) 
                 _events = new Queue<Event>(initialEvents);
@@ -76,9 +80,9 @@ namespace NeighborDiscovery.Environment
 
         private void RemoveDevice(DiscoverableDevice device)
         {
-            var physicalNode = _binding[device];
+            var physicalNode = _deviceToLocation[device];
             _network.RemoveNode(physicalNode);
-            _binding.Remove(device);
+            _deviceToLocation.Remove(device);
         }
 
         public void MoveNext()
@@ -91,7 +95,9 @@ namespace NeighborDiscovery.Environment
                         var device = iEvent.Device;
                         var newPhysicalNode = Get2DNodeFromDiscoverableDevice(device);
                         _network.AddNode(newPhysicalNode);
-                        _binding.Add(device, newPhysicalNode);
+                        _deviceById.Add(device.DeviceLogic.Id, device);
+                        _deviceToLocation.Add(device, newPhysicalNode);
+                        _locationToDevice.Add(newPhysicalNode, device);
                         break;
                     case EventType.DeviceGone:
                         RemoveDevice(iEvent.Device);
@@ -100,7 +106,7 @@ namespace NeighborDiscovery.Environment
             }
 
             //send transmissions
-            foreach (var kvPair in _binding)
+            foreach (var kvPair in _deviceToLocation)
             {
                 var currentDevice = kvPair.Key;
                 var currentPhysicalDevice = kvPair.Value;
@@ -109,10 +115,10 @@ namespace NeighborDiscovery.Environment
                     continue;
                 
                 var transmission = currentDevice.DeviceLogic.GetTransmission();
-                foreach (var device in _binding.Keys)
+                foreach (var device in _deviceToLocation.Keys)
                 {
                     var deviceLogic = device.DeviceLogic;
-                    var physicalDevice = _binding[device];
+                    var physicalDevice = _deviceToLocation[device];
                     if (device.Equals(currentDevice) || !deviceLogic.IsListening() ||
                         !currentPhysicalDevice.NodeIsInRange(physicalDevice))
                         continue;
@@ -121,7 +127,7 @@ namespace NeighborDiscovery.Environment
             }
 
             //move next both the phisical part and the logical part
-            foreach (var kvPair in _binding)
+            foreach (var kvPair in _deviceToLocation)
             {
                 var device = kvPair.Key;
                 var physicalNode = kvPair.Value;
@@ -136,6 +142,35 @@ namespace NeighborDiscovery.Environment
         public void AddEvent(Event newEvent)
         {
             _events.Enqueue(newEvent);
+        }
+
+        private int GetDiscoveryLatency(DiscoverableDevice listener, DiscoverableDevice transmitter)
+        {
+            var contactInfo = listener.DeviceLogic.GetContactInfo(transmitter.DeviceLogic);
+            if (contactInfo == null)
+                throw new Exception("Devices did not discover each other");
+            int listenedIn = contactInfo.FirstContact;
+            var listenerLocation = _deviceToLocation[listener];
+            var transmitterLocation = _deviceToLocation[transmitter];
+            int gotInRange = _network.GotInRange(transmitterLocation, listenerLocation);
+
+            return listenedIn - gotInRange;
+        }
+
+        public StatisticTestResult GetCurrentResult()
+        {
+            var statistics = new StatisticTestResult();
+            foreach (var kvPair in _locationToDevice)
+            {
+                var device = kvPair.Value;
+                foreach (var neighbor in device.DeviceLogic.Neighbors())
+                {
+                    var neighborDevice = _deviceById[neighbor.Id];
+                    var latency = GetDiscoveryLatency(device, neighborDevice);
+                    statistics.AddDiscovery(latency);
+                }
+            }
+            return statistics;
         }
     }
 }

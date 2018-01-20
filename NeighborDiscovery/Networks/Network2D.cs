@@ -9,12 +9,12 @@ namespace NeighborDiscovery.Networks
     public class Network2D
     {
         private readonly HashSet<Network2DNode> _nodes;
-        private readonly Dictionary<Network2DNode, List<Network2DNode>> _neighbors;
-        
+        private readonly Dictionary<Network2DNode, Dictionary<Network2DNode, int>> _neighbors;
+        public int CurrentTimeSlot { get; set; }
+
         public bool IsStatic { get; private set; }
         public int CurrentSize => _nodes.Count;
         public int NumberOfLinks { get; private set; }
-        
         
         public Network2D(bool isStatic = false)
         {
@@ -22,8 +22,15 @@ namespace NeighborDiscovery.Networks
             IsStatic = isStatic;
             if (IsStatic)
             {
-                _neighbors = new Dictionary<Network2DNode, List<Network2DNode>>();
+                _neighbors = new Dictionary<Network2DNode, Dictionary<Network2DNode, int>>();
             }
+        }
+
+        public int GotInRange(Network2DNode node1, Network2DNode node2)
+        {
+            if(!_nodes.Contains(node1) || !_nodes.Contains(node2))
+                throw new ArgumentNullException(string.Format("{0} or {1} not founded", node1, node2));
+            return _neighbors[node1][node2];
         }
 
         public void RemoveNode(Network2DNode node)
@@ -36,7 +43,7 @@ namespace NeighborDiscovery.Networks
         {
             if(_nodes.Contains(newNode2D))
                 throw new Exception("Node already exists");
-            _neighbors.Add(newNode2D, new List<Network2DNode>());
+            _neighbors.Add(newNode2D, new Dictionary<Network2DNode, int>());
             
 
             //update number of links and adjacency list when the network is static
@@ -49,7 +56,7 @@ namespace NeighborDiscovery.Networks
                     {
                         if (IsStatic)
                         {
-                            _neighbors[newNode2D].Add(possibleNeighbor);
+                            _neighbors[newNode2D].Add(possibleNeighbor, CurrentTimeSlot);
                         }
                     }
                 }
@@ -58,7 +65,7 @@ namespace NeighborDiscovery.Networks
                     NumberOfLinks++;
                     if (IsStatic)
                     {
-                        _neighbors[possibleNeighbor].Add(newNode2D);
+                        _neighbors[possibleNeighbor].Add(newNode2D, CurrentTimeSlot);
                     }
                 }
             }
@@ -68,7 +75,7 @@ namespace NeighborDiscovery.Networks
 
         public IEnumerable<Network2DNode> NeighborsOf(Network2DNode node)
         {
-            return IsStatic ? _neighbors[node] : _nodes.Where(node.NodeIsInRange);
+            return IsStatic ? _neighbors[node].Select(x => x.Key) : _nodes.Where(node.NodeIsInRange);
         }
 
         public void MoveAllNodes()
@@ -77,7 +84,8 @@ namespace NeighborDiscovery.Networks
             {
                 node.Move();
             }
+
+            CurrentTimeSlot++;
         }
-        
     }
 }
