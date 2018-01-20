@@ -14,12 +14,6 @@ namespace NeighborDiscovery.Protocols
         public BalancedNihaoTmll(int id, double dutyCyclePercentage) : base(id)
         {
             SetDutyCycle(dutyCyclePercentage);
-            SetHyperPeriod();
-        }
-
-        private void SetHyperPeriod()
-        {
-            T = N * N;
         }
 
         public override double GetDutyCycle()
@@ -48,6 +42,10 @@ namespace NeighborDiscovery.Protocols
             }
             DesiredDutyCycle = value;
         }
+
+        public override int Bound => N * N;
+        
+        public override int T => N * N;
 
         public override IDiscoveryProtocol Clone()
         {

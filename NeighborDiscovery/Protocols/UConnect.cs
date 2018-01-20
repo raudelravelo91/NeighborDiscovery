@@ -16,7 +16,6 @@ namespace NeighborDiscovery.Protocols
         public UConnect(int id, double dutyCyclePercentage) :base(id)
         {
             SetDutyCycle(dutyCyclePercentage);
-            SetHyperPeriod();
         }
 
         public override double GetDutyCycle()
@@ -61,17 +60,9 @@ namespace NeighborDiscovery.Protocols
             DesiredDutyCycle = value;
         }
 
+        public override int Bound => P * P;
         
-
-        //public override double GetDutyCycle()
-        //{
-        //    return (3.0 * P + 1) / (2 * P * P);
-        //}
-
-        private void SetHyperPeriod()
-        {
-            T = P * P;
-        }
+        public override int T => P * P;
 
         public override IDiscoveryProtocol Clone()
         {

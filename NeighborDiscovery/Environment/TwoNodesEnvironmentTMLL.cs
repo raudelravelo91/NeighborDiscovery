@@ -11,10 +11,10 @@ namespace NeighborDiscovery.Environment
 {
     public class TwoNodesEnvironmentTmll
     {
-        public IDiscoveryProtocol Node1 { get; }
-        public IDiscoveryProtocol Node2 { get; }
+        public BoundedProtocol Node1 { get; }
+        public BoundedProtocol Node2 { get; }
 
-        public TwoNodesEnvironmentTmll(IDiscoveryProtocol node1, IDiscoveryProtocol node2)
+        public TwoNodesEnvironmentTmll(BoundedProtocol node1, BoundedProtocol node2)
         {
             Node1 = node1;
             Node2 = node2;
@@ -50,18 +50,17 @@ namespace NeighborDiscovery.Environment
             return new Tuple<int,int>(latency1, latency2);
         }
 
-        
-        public StatisticTestResult RunSimulation(int latencyLimit)
+        public StatisticTestResult RunSimulation()
         {
             var statistics = new StatisticTestResult();
             
             //Parallel.For(0, halfPeriod,
             //(node1State) =>
-            for (int node1State = 0; node1State < latencyLimit; node1State++)//node2 hyper period is offset slots relative to node1 (node2 always starts at the same time or after node1 but never before)
+            for (int node1State = 0; node1State < Node1.T; node1State++)//node2 hyper period is offset slots relative to node1 (node2 always starts at the same time or after node1 but never before)
             {
-                for (var node2State = 0; node2State < latencyLimit; node2State++)//after gotInRange slots they got in range and the latency starts from that point and on
+                for (var node2State = 0; node2State < Node2.T; node2State++)//after gotInRange slots they got in range and the latency starts from that point and on
                 {
-                    var simulation = RunTwoNodesSimulation(node1State, node2State, latencyLimit);
+                    var simulation = RunTwoNodesSimulation(node1State, node2State, Math.Max(Node1.Bound, Node2.Bound));
                     statistics.AddDiscovery(simulation.Item1);
                     statistics.AddDiscovery(simulation.Item2);
                     //latencies[node1State][node2State*2] = simulation1.Item1;

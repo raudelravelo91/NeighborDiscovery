@@ -13,7 +13,6 @@ namespace NeighborDiscovery.Protocols
         public Disco(int id, double dutyCyclePercentage) : base(id)
         {
             SetDutyCycle(dutyCyclePercentage);
-            SetHyperPeriod();
         }
 
         public override double GetDutyCycle()
@@ -46,10 +45,9 @@ namespace NeighborDiscovery.Protocols
             
         }
 
-        private void SetHyperPeriod()
-        {
-            T = P1 * P2;
-        }
+        public override int Bound => P1 * P2;
+
+        public override int T => P1 * P2;
 
         public override IDiscoveryProtocol Clone()
         {

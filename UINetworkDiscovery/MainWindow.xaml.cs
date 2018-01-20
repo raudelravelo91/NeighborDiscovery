@@ -663,10 +663,10 @@ namespace UINetworkDiscovery
         private void RunTwoNodesSimulation(BoundedProtocol node1, BoundedProtocol node2, NodeType type)
         {
             var environment = new TwoNodesEnvironmentTmll(node1, node2);
-            var testResult = environment.RunSimulation(node1.T);
+            var testResult = environment.RunSimulation();
             var statistics = new StatisticsResult(type);
             statistics.AddStatisticTest(testResult);
-            statistics.BuildAverageFractionOfDiscovey(node1.T);
+            statistics.BuildAverageFractionOfDiscovey(node1.Bound);
             worker_RunWorkerCompleted(this, new RunWorkerCompletedEventArgs(statistics, null, false));
         }
 

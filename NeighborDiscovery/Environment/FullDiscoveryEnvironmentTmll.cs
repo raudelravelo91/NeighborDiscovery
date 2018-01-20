@@ -27,7 +27,7 @@ namespace NeighborDiscovery.Environment
             CurrentTimeSlot = 0;
             _events =  new Queue<Event>(events);
             _network = new Network2D();
-            _binding = new Dictionary<Network2DNode, DiscoverableDevice>();
+            _binding = new Dictionary<DiscoverableDevice, Network2DNode>();
         }
 
         private void UpdatePhysicalPartOfDiscoverableDevice(DiscoverableDevice device, Network2DNode node)
