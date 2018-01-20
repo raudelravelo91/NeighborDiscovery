@@ -9,12 +9,21 @@ namespace NeighborDiscovery.Networks
     public class Network2D
     {
         private readonly HashSet<Network2DNode> _nodes;
+        private readonly Dictionary<Network2DNode, List<Network2DNode>> _neighbors;
+        
+        public bool IsStatic { get; private set; }
         public int CurrentSize => _nodes.Count;
         public int NumberOfLinks { get; private set; }
         
-        public Network2D()
+        
+        public Network2D(bool isStatic = false)
         {
             _nodes = new HashSet<Network2DNode>();
+            IsStatic = isStatic;
+            if (IsStatic)
+            {
+                _neighbors = new Dictionary<Network2DNode, List<Network2DNode>>();
+            }
         }
 
         public void RemoveNode(Network2DNode node)
@@ -27,17 +36,30 @@ namespace NeighborDiscovery.Networks
         {
             if(_nodes.Contains(newNode2D))
                 throw new Exception("Node already exists");
+            _neighbors.Add(newNode2D, new List<Network2DNode>());
             
-            //update number of links   
+
+            //update number of links and adjacency list when the network is static
             foreach(var possibleNeighbor in _nodes)
             {
                 if (newNode2D.NodeIsInRange(possibleNeighbor))
                 {
                     NumberOfLinks++;
+                    if (IsStatic)
+                    {
+                        if (IsStatic)
+                        {
+                            _neighbors[newNode2D].Add(possibleNeighbor);
+                        }
+                    }
                 }
                 if (possibleNeighbor.NodeIsInRange(newNode2D))
                 {
                     NumberOfLinks++;
+                    if (IsStatic)
+                    {
+                        _neighbors[possibleNeighbor].Add(newNode2D);
+                    }
                 }
             }
 
@@ -46,7 +68,7 @@ namespace NeighborDiscovery.Networks
 
         public IEnumerable<Network2DNode> NeighborsOf(Network2DNode node)
         {
-            return _nodes.Where(node.NodeIsInRange);
+            return IsStatic ? _neighbors[node] : _nodes.Where(node.NodeIsInRange);
         }
 
         public void MoveAllNodes()

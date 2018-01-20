@@ -15,13 +15,13 @@ namespace NeighborDiscovery.Environment
     public class Event
     {
         public EventType EventType { get; }
-        public int TimeSlot { get; }
+        //public int TimeSlot { get; }
         public DiscoverableDevice Device { get; }
 
-        protected Event(int timeSlot, DiscoverableDevice device, EventType eventType)
+        protected Event(DiscoverableDevice device, EventType eventType)
         {
             EventType = eventType;
-            TimeSlot = timeSlot;
+            //TimeSlot = timeSlot;
             Device = device;
         }
     }

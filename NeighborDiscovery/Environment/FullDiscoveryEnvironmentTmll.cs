@@ -13,21 +13,46 @@ using NeighborDiscovery.Protocols;
 
 namespace NeighborDiscovery.Environment
 {
+    public enum RunningMode
+    {
+        StaticDevices,
+        MovingDevices
+    }
+
     public sealed class FullDiscoveryEnvironmentTmll
     {
-        public int CurrentTimeSlot { get; private set; }
-        public int CurrentNumberOfDevices => _binding.Count;
-
         private readonly Network2D _network;
         private readonly Queue<Event> _events;
         private readonly Dictionary<DiscoverableDevice, Network2DNode> _binding;
 
-        public FullDiscoveryEnvironmentTmll(IEnumerable<Event> events)
+        public int CurrentTimeSlot { get; private set; }
+        public int CurrentNumberOfDevices => _binding.Count;
+        public RunningMode RunningMode { get; }
+
+        public FullDiscoveryEnvironmentTmll(RunningMode runningMode, IEnumerable<Event> initialEvents = default(IEnumerable<Event>))
         {
             CurrentTimeSlot = 0;
-            _events =  new Queue<Event>(events);
-            _network = new Network2D();
+            RunningMode = runningMode;
+            
+            switch (runningMode)
+            {
+                case RunningMode.StaticDevices:
+                    RunningMode = RunningMode.StaticDevices;
+                    break;
+                case RunningMode.MovingDevices:
+                    RunningMode = RunningMode.MovingDevices;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(runningMode), runningMode, null);
+            }
+            
+            var staticDevices = RunningMode == RunningMode.StaticDevices;
+            _network = new Network2D(staticDevices);
+            
             _binding = new Dictionary<DiscoverableDevice, Network2DNode>();
+            
+            if (initialEvents != null) 
+                _events = new Queue<Event>(initialEvents);
         }
 
         private void UpdatePhysicalPartOfDiscoverableDevice(DiscoverableDevice device, Network2DNode node)
@@ -46,10 +71,7 @@ namespace NeighborDiscovery.Environment
 
         private IEnumerable<Event> FetchNextEvents()
         {
-            while (_events.Peek().TimeSlot == CurrentTimeSlot)
-            {
-                yield return _events.Dequeue();
-            }
+            return _events;
         }
 
         private void RemoveDevice(DiscoverableDevice device)
@@ -109,6 +131,11 @@ namespace NeighborDiscovery.Environment
             }
 
             CurrentTimeSlot++;
+        }
+
+        public void AddEvent(Event newEvent)
+        {
+            _events.Enqueue(newEvent);
         }
     }
 }
