@@ -10,14 +10,9 @@ namespace NeighborDiscovery.Utils
 {
     public class RandomGenerator
     {
-        public Random Random { get; }
+        private static Random Random = new Random();
 
-        public RandomGenerator()
-        {
-            Random = new Random();
-        }
-
-        public IEnumerable<double> GetRandomDoubleValues(double max)
+        public static IEnumerable<double> GetRandomDoubleValues(double max)
         {
             while (true)
             {
@@ -25,7 +20,7 @@ namespace NeighborDiscovery.Utils
             }
         }
 
-        public IEnumerable<double> GetRandomIntValues(int max)
+        public static IEnumerable<double> GetRandomIntValues(int max)
         {
             while (true)
             {
@@ -33,12 +28,22 @@ namespace NeighborDiscovery.Utils
             }
         }
 
-        public IEnumerable<MyPair> GetRandomPairs(double maxX, double maxY)
+        public static IEnumerable<MyPair> GetRandomPairs(double maxX, double maxY)
         {
             while (true)
             {
                 yield return new MyPair(Random.NextDouble()*maxX, Random.NextDouble()*maxY);
             }
+        }
+
+        public static int GetRandomInteger(int limit)
+        {
+            return Random.Next(limit);
+        }
+
+        public static double GetRandomDouble()
+        {
+            return Random.NextDouble();
         }
     }
 }

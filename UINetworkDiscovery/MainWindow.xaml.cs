@@ -6,6 +6,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.IO;
 using System.ComponentModel;
+using NeighborDiscovery.DataGeneration;
 using NeighborDiscovery.Networks;
 using NeighborDiscovery.Statistics;
 using NeighborDiscovery.Utils;
@@ -225,18 +226,15 @@ namespace UINetworkDiscovery
         }
 
         public bool GetTestSettings(out int numberOfTests, out int startUpLimit, out int posRange, out int networkSize,
-            out int minCRange, out int maxCRange, out int gotInRange)
+            out int minCRange, out int maxCRange)
         {
-
-            numberOfTests = startUpLimit = posRange = networkSize = minCRange = maxCRange = gotInRange = 0;
+            numberOfTests = startUpLimit = posRange = networkSize = minCRange = maxCRange = 0;
             return int.TryParse(tbNumberOfTestCases.Text, out numberOfTests) &&
                    int.TryParse(tbStartUpLimit.Text, out startUpLimit) &&
                    int.TryParse(tbPosRange.Text, out posRange) &&
                    int.TryParse(tbMinCommRange.Text, out minCRange) &&
                    int.TryParse(tbMaxCommRange.Text, out maxCRange) &&
-                   int.TryParse(tbnetworkSize.Text, out networkSize) &&
-                   int.TryParse(tbGotInRangeLimit.Text, out gotInRange);
-
+                   int.TryParse(tbnetworkSize.Text, out networkSize);
         }
 
         private void SetDefaultSettings()
@@ -272,14 +270,30 @@ namespace UINetworkDiscovery
         {
             if (!RunningInfo.IsRunning)
             {
-                int numberOfTests, startUpLimit, posRange, networkSize, minCRange, maxCRange, gotInRange;
+                int numberOfTests, startUpLimit, posRange, networkSize, minCRange, maxCRange;
                 if (GetTestSettings(out numberOfTests, out startUpLimit, out posRange, out networkSize, out minCRange,
-                    out maxCRange, out gotInRange))
+                    out maxCRange))
                 {
                     double[] duties;
                     if (GetDutyCycle(out duties))
                     {
-                        //RandomGenerator.GenerateTestCasesToFile(this.fileName, numberOfTests, startUpLimit, posRange, networkSize, minCRange, maxCRange, duties, gotInRange);
+                        var generator = new TestCasesGenerator();
+                        var suite = generator.GenerateTestSuite(numberOfTests, networkSize, startUpLimit, posRange,
+                            minCRange, maxCRange, duties);
+                        if (generator.SaveTestSuite(_fileName, suite))
+                        {
+                            testCaseMessage.Text = "Test cases generated";
+                            testCaseMessage.Visibility = Visibility.Visible;
+                            testCaseIcon.Fill = Brushes.Lime;
+                            testCaseIcon.Visibility = Visibility.Visible;
+                        }
+                        else
+                        {
+                            testCaseMessage.Text = "An error ocurred while generating the test cases";
+                            testCaseMessage.Visibility = Visibility.Visible;
+                            testCaseIcon.Fill = Brushes.Red;
+                            testCaseIcon.Visibility = Visibility.Visible;
+                        }
                     }
                     else
                         MessageBox.Show("At least 1 Duty Cycle must be checked", "Duty Cycle Info", MessageBoxButton.OK,
@@ -288,11 +302,6 @@ namespace UINetworkDiscovery
                 else
                     MessageBox.Show("Invalid Tests Setting Parameters (Ex: check all are numbers)",
                         "Tests Settings Info", MessageBoxButton.OK, MessageBoxImage.Information);
-
-                testCaseMessage.Text = "Test Cases Generated.";
-                testCaseMessage.Visibility = Visibility.Visible;
-                testCaseIcon.Fill = Brushes.Lime;
-                testCaseIcon.Visibility = Visibility.Visible;
             }
         }
 
@@ -352,7 +361,6 @@ namespace UINetworkDiscovery
             {
                 if (File.Exists(_fileName))
                 {
-                    //RandomGenerator.PercentageToFix = double.Parse(tbFixAsymmetricNetwork.Text);
                     var selectedAlgs = cbDisco.IsChecked.Value || cbUConnect.IsChecked.Value ||
                                        cbSearchlight.IsChecked.Value || cbBirthday.IsChecked.Value ||
                                        cbStripedSearchlight.IsChecked.Value || cbTestAlgorithm.IsChecked.Value ||
@@ -371,53 +379,55 @@ namespace UINetworkDiscovery
 
                         if (cbDisco.IsChecked == true)
                         {
-                            //var parameters = new DiscoParameters(-1, -1, -1, false);
-                            //RunningInfo.AddRunningAlgorithm();
+                            RunningInfo.AddRunningAlgorithm();
                             _workerDisco.RunWorkerAsync(_fileName);
                         }
 
                         if (cbUConnect.IsChecked == true)
                         {
-                            //RunningInfo.AddRunningAlgorithm();
+                            RunningInfo.AddRunningAlgorithm();
                             _workerUConnect.RunWorkerAsync(_fileName);
                         }
 
                         if (cbSearchlight.IsChecked == true)
                         {
-                            //RunningInfo.AddRunningAlgorithm();
+                            RunningInfo.AddRunningAlgorithm();
                             _workerSearchLight.RunWorkerAsync(_fileName);
                         }
 
                         if (cbBirthday.IsChecked == true)
                         {
-                            //RunningInfo.AddRunningAlgorithm();
+                            RunningInfo.AddRunningAlgorithm();
                             _workerBirthday.RunWorkerAsync(_fileName);
                         }
 
                         if (cbStripedSearchlight.IsChecked == true)
                         {
-                            //RunningInfo.AddRunningAlgorithm();
+                            RunningInfo.AddRunningAlgorithm();
                             _workerStripedSearchlight.RunWorkerAsync(_fileName);
                         }
 
                         if (cbTestAlgorithm.IsChecked == true)
                         {
-                            //RunningInfo.AddRunningAlgorithm();
+                            RunningInfo.AddRunningAlgorithm();
                             _workerTestAlgorithm.RunWorkerAsync(_fileName);
                         }
 
                         if (cbGNihao.IsChecked == true)
                         {
+                            RunningInfo.AddRunningAlgorithm();
                             _workerGNihao.RunWorkerAsync(_fileName);
                         }
 
                         if (cbBalancedNihao.IsChecked == true)
                         {
+                            RunningInfo.AddRunningAlgorithm();
                             _workerBalancedNihao.RunWorkerAsync(_fileName);
                         }
 
                         if (cbAccGossipPNihao.IsChecked == true)
                         {
+                            RunningInfo.AddRunningAlgorithm();
                             _workerAccGossipPNihao.RunWorkerAsync(_fileName);
                         }
                     }

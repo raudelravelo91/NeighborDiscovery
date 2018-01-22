@@ -6,22 +6,21 @@ using System.Text;
 using System.Threading.Tasks;
 using NeighborDiscovery.Protocols;
 using NeighborDiscovery.Utils;
-using NeighborDiscovery;
+using NeighborDiscovery.DataGeneration;
 using NeighborDiscovery.Environment;
-using NeighborDiscovery.Networks;
 using NeighborDiscovery.Statistics;
 
 namespace UINetworkDiscovery
 {
     public class AlgorithmBackgroundWorker
     {
-        public NodeType Type { get; private set; }
+        public NodeType DeviceProtocol { get; private set; }
         public BackgroundWorker Worker { get; private set; }
         public bool IsReading { get; private set; }
 
         public AlgorithmBackgroundWorker(NodeType type)
         {
-            Type = type;
+            DeviceProtocol = type;
             Worker = new BackgroundWorker() { WorkerSupportsCancellation = true, WorkerReportsProgress = true, };
             Worker.DoWork += Start;
             IsReading = false;
@@ -39,7 +38,7 @@ namespace UINetworkDiscovery
 
         private IDiscoveryProtocol NodeFactoryFunc(int id, int dutyCycle)
         {
-            switch (Type)
+            switch (DeviceProtocol)
             {
                 case NodeType.Disco:
                     return new Disco(id, dutyCycle);
@@ -74,51 +73,51 @@ namespace UINetworkDiscovery
             }
         }
 
-        private void Start(object sender, DoWorkEventArgs e)
-        {
-
-        }
-
         //private void Start(object sender, DoWorkEventArgs e)
         //{
-        //    lock (MainWindow.RunningInfo)
-        //    {
-        //        MainWindow.RunningInfo.AddRunningAlgorithm();
-        //    }
-        //    IsReading = true;
-        //    Worker.ReportProgress(0);
-        //    var fileName = e.Argument.ToString();
-        //    var reader = new RandomGenerator();
-        //    var networks = reader.CreateFromFile(fileName, NodeFactoryFunc).ToList();
-        //    var environment = new FullDiscoveryEnvironment();
-        //    var statisticResults = new StatisticsResult(Type);
-        //    IsReading = false;
-        //    var cnt = 0;
-        //    foreach (var n in networks)
-        //    {
-        //        if (Worker.CancellationPending == true)
-        //        {
-        //            e.Cancel = true;
-        //            lock(MainWindow.RunningInfo)
-        //            {
-        //                MainWindow.RunningInfo.RemoveRunningAlgorithm(true);
-        //            }
-        //            return;
-        //        }
-        //        //int trackNode = (Type.Equals(NodeType.GNihao)) ? -1 : -1; 
-        //        var test = environment.RunSingleSimulation(n);
-        //        statisticResults.AddStatisticTest(test);
-        //        cnt++;
-        //        Worker.ReportProgress(cnt*100/networks.Count);
-        //    }
-        //    var latencyLimit = 1000;
-        //    statisticResults.BuildAverageFractionOfDiscovey(latencyLimit);
-        //    lock(MainWindow.RunningInfo)
-        //    {
-        //        MainWindow.RunningInfo.RemoveRunningAlgorithm(false);
-                
-        //    }
-        //    e.Result = statisticResults;
+
         //}
+
+        private void Start(object sender, DoWorkEventArgs e)
+        {
+            lock (MainWindow.RunningInfo)
+            {
+                MainWindow.RunningInfo.AddRunningAlgorithm();
+            }
+            IsReading = true;
+            Worker.ReportProgress(0);
+            var fileName = e.Argument.ToString();
+            var generator = new TestCasesGenerator();
+            var suite = generator.LoadTestSuite(fileName);
+            var environment = new NeighborDiscoveryEnvironment();
+
+            var statisticResults = new StatisticsResult(DeviceProtocol);
+            
+            var cnt = 0;
+            foreach (var n in suite.Tests)
+            {
+                if (Worker.CancellationPending == true)
+                {
+                    e.Cancel = true;
+                    lock (MainWindow.RunningInfo)
+                    {
+                        MainWindow.RunningInfo.RemoveRunningAlgorithm(true);
+                    }
+                    return;
+                }
+                
+                var test = environment.RunSingleSimulation(n.Data, DeviceProtocol);
+                statisticResults.AddStatisticTest(test);
+                cnt++;
+                Worker.ReportProgress(cnt * 100 / suite.NumberOfTests);
+            }
+            var latencyLimit = 1000;
+            statisticResults.BuildAverageFractionOfDiscovey(latencyLimit);
+            lock (MainWindow.RunningInfo)
+            {
+                MainWindow.RunningInfo.RemoveRunningAlgorithm(false);
+            }
+            e.Result = statisticResults;
+        }
     }
 }

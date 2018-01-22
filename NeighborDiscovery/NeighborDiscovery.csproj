@@ -62,7 +62,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Environment\DeviceData.cs" />
+    <Compile Include="Environment\NeighborDiscoveryEnvironment.cs" />
     <Compile Include="Environment\Event.cs" />
+    <Compile Include="DataGeneration\TestCase.cs" />
+    <Compile Include="DataGeneration\TestCasesGenerator.cs" />
+    <Compile Include="DataGeneration\TestSuite.cs" />
     <Compile Include="Environment\TwoNodesEnvironmentTmll.cs" />
     <Compile Include="Environment\FullDiscoveryEnvironmentTmll.cs" />
     <Compile Include="Protocols\BalancedNihaoTmll.cs" />

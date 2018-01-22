@@ -115,14 +115,11 @@ namespace NeighborDiscovery.Environment
                     continue;
                 
                 var transmission = currentDevice.DeviceLogic.GetTransmission();
-                foreach (var device in _deviceToLocation.Keys)
+                
+                foreach (var neighborLocation in _network.NeighborsOf(currentPhysicalDevice))//neighbors in range
                 {
-                    var deviceLogic = device.DeviceLogic;
-                    var physicalDevice = _deviceToLocation[device];
-                    if (device.Equals(currentDevice) || !deviceLogic.IsListening() ||
-                        !currentPhysicalDevice.NodeIsInRange(physicalDevice))
-                        continue;
-                    deviceLogic.ListenTo(transmission);
+                    var neighborLogic = _locationToDevice[neighborLocation].DeviceLogic;
+                    neighborLogic.ListenTo(transmission);
                 }
             }
 
@@ -144,7 +141,7 @@ namespace NeighborDiscovery.Environment
             _events.Enqueue(newEvent);
         }
 
-        private int GetDiscoveryLatency(DiscoverableDevice listener, DiscoverableDevice transmitter)
+        private int GetDiscoveryLatencyInStaticNetwork(DiscoverableDevice listener, DiscoverableDevice transmitter)
         {
             var contactInfo = listener.DeviceLogic.GetContactInfo(transmitter.DeviceLogic);
             if (contactInfo == null)
@@ -166,7 +163,7 @@ namespace NeighborDiscovery.Environment
                 foreach (var neighbor in device.DeviceLogic.Neighbors())
                 {
                     var neighborDevice = _deviceById[neighbor.Id];
-                    var latency = GetDiscoveryLatency(device, neighborDevice);
+                    var latency = GetDiscoveryLatencyInStaticNetwork(device, neighborDevice);
                     statistics.AddDiscovery(latency);
                 }
             }
