@@ -13,6 +13,8 @@ namespace NeighborDiscovery.Environment
     {
         private NodeType _protocolType;
 
+        private Random _random = new Random();
+
         private int EndsAt(int startUpSlot, BoundedProtocol device)
         {
             return startUpSlot + device.Bound;
@@ -21,6 +23,7 @@ namespace NeighborDiscovery.Environment
         private DiscoverableDevice FromDeviceDataToDiscoverableDevice(DeviceData data)
         {
             var logic = CreateProtocol(data.Id, data.DutyCycle);
+            logic.MoveNext(_random.Next(logic.T));
             return new DiscoverableDevice(logic, data.Position, new MyPair(0,0), 0, data.CommunicationRange);
         }
 

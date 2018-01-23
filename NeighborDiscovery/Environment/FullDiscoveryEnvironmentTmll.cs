@@ -21,17 +21,30 @@ namespace NeighborDiscovery.Environment
 
     public sealed class FullDiscoveryEnvironmentTmll
     {
+        private class DeviceInfo
+        {
+            public int InitialState { get; }
+            public int EnviromentState { get; }
+
+            public DeviceInfo(int initialState, int enviromentState)
+            {
+                InitialState = initialState;
+                EnviromentState = enviromentState;
+            }
+        }
+
         private readonly Network2D _network;
         private readonly Queue<Event> _events;
         private readonly Dictionary<DiscoverableDevice, Network2DNode> _deviceToLocation;
         private readonly Dictionary<Network2DNode, DiscoverableDevice> _locationToDevice;
         private readonly Dictionary<int, DiscoverableDevice> _deviceById;
+        private readonly Dictionary<IDiscoveryProtocol, DeviceInfo> _eventArrival;
 
         public int CurrentTimeSlot { get; private set; }
         public int CurrentNumberOfDevices => _deviceToLocation.Count;
         public RunningMode RunningMode { get; }
 
-        public FullDiscoveryEnvironmentTmll(RunningMode runningMode, IEnumerable<Event> initialEvents = default(IEnumerable<Event>))
+        public FullDiscoveryEnvironmentTmll(RunningMode runningMode)
         {
             CurrentTimeSlot = 0;
             RunningMode = runningMode;
@@ -54,8 +67,8 @@ namespace NeighborDiscovery.Environment
             _deviceToLocation = new Dictionary<DiscoverableDevice, Network2DNode>();
             _locationToDevice = new Dictionary<Network2DNode, DiscoverableDevice>();
             _deviceById = new Dictionary<int, DiscoverableDevice>();
-            
-            _events = initialEvents != null ? new Queue<Event>(initialEvents) : new Queue<Event>();
+            _eventArrival = new Dictionary<IDiscoveryProtocol, DeviceInfo>();
+            _events = new Queue<Event>();
         }
 
         private void UpdatePhysicalPartOfDiscoverableDevice(DiscoverableDevice device, Network2DNode node)
@@ -122,23 +135,37 @@ namespace NeighborDiscovery.Environment
                     neighborLogic.ListenTo(transmission);
                 }
             }
+    
+            MoveAll();
+        }
 
+        public void AddEvent(Event newEvent)
+        {
+            _events.Enqueue(newEvent);
+            var logic = newEvent.Device.DeviceLogic;
+            _eventArrival.Add(logic, new DeviceInfo(logic.InternalTimeSlot, CurrentTimeSlot));
+        }
+
+        private void MoveAll()
+        {
             //move next both the phisical part and the logical part
+            _network.MoveAllNodes();//move the physical part first
+            
             foreach (var kvPair in _deviceToLocation)
             {
                 var device = kvPair.Key;
                 var physicalNode = kvPair.Value;
-                physicalNode.Move();
-                UpdatePhysicalPartOfDiscoverableDevice(device, physicalNode);
+                UpdatePhysicalPartOfDiscoverableDevice(device, physicalNode);//update 
                 device.DeviceLogic.MoveNext();
             }
 
             CurrentTimeSlot++;
         }
 
-        public void AddEvent(Event newEvent)
+
+        private int ToEnviromentTime(IDiscoveryProtocol device, int deviceSlot)
         {
-            _events.Enqueue(newEvent);
+            return _eventArrival[device].EnviromentState + (deviceSlot - _eventArrival[device].InitialState);
         }
 
         private int GetDiscoveryLatencyInStaticNetwork(DiscoverableDevice listener, DiscoverableDevice transmitter)
@@ -146,12 +173,23 @@ namespace NeighborDiscovery.Environment
             var contactInfo = listener.DeviceLogic.GetContactInfo(transmitter.DeviceLogic);
             if (contactInfo == null)
                 throw new Exception("Devices did not discover each other");
-            int listenedIn = contactInfo.FirstContact;
+            
             var listenerLocation = _deviceToLocation[listener];
             var transmitterLocation = _deviceToLocation[transmitter];
-            int gotInRange = _network.GotInRange(transmitterLocation, listenerLocation);
+            
+            //todo => fix this
+            int listenedIn = ToEnviromentTime(listener.DeviceLogic, contactInfo.FirstContact);//environment time
+            int gotInRange = _network.GotInRange(transmitterLocation, listenerLocation);//double check if the returned value is in environment time
+            int latency = listenedIn - gotInRange;
 
-            return listenedIn - gotInRange;
+            if (latency > 200)
+            {
+                Console.WriteLine("Something wrong");
+                ToEnviromentTime(listener.DeviceLogic, contactInfo.FirstContact);
+                _network.GotInRange(transmitterLocation, listenerLocation);
+            }
+
+            return latency;
         }
 
         public StatisticTestResult GetCurrentResult()
