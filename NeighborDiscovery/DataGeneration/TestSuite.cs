@@ -9,13 +9,13 @@ namespace NeighborDiscovery.DataGeneration
     [Serializable]
     public class TestSuite
     {
-        public IEnumerable<TestCase> Tests { get; }
-        public int NumberOfTests { get; }
+        private List<TestCase> _tests;
+        public IEnumerable<TestCase> Tests => _tests;
+        public int NumberOfTests => _tests.Count;
 
         public TestSuite(IEnumerable<TestCase> data)
         {
-            Tests = data;
-            NumberOfTests = data.Count();
+            _tests = data.ToList();
         }
     }
 }

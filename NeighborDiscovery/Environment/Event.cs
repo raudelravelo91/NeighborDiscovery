@@ -24,5 +24,10 @@ namespace NeighborDiscovery.Environment
             //TimeSlot = timeSlot;
             Device = device;
         }
+
+        public override string ToString()
+        {
+            return EventType.ToString() + ": " + Device.ToString();
+        }
     }
 }

@@ -26,9 +26,9 @@ namespace UINetworkDiscovery
             IsReading = false;
         }
 
-        public void RunWorkerAsync(string fileName)
+        public void RunWorkerAsync(TestSuite suite)
         {
-            Worker.RunWorkerAsync(fileName);
+            Worker.RunWorkerAsync(suite);
         }
 
         public void CancelAsync()
@@ -86,11 +86,10 @@ namespace UINetworkDiscovery
             }
             IsReading = true;
             Worker.ReportProgress(0);
-            var fileName = e.Argument.ToString();
-            var generator = new TestCasesGenerator();
-            var suite = generator.LoadTestSuite(fileName);
+            if(!(e.Argument is TestSuite suite))
+                throw new Exception("Wrong parameter argument, expected TestSuite");
+            
             var environment = new NeighborDiscoveryEnvironment();
-
             var statisticResults = new StatisticsResult(DeviceProtocol);
             
             var cnt = 0;

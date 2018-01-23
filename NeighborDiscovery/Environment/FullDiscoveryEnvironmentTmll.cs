@@ -35,7 +35,7 @@ namespace NeighborDiscovery.Environment
         {
             CurrentTimeSlot = 0;
             RunningMode = runningMode;
-            
+
             switch (runningMode)
             {
                 case RunningMode.StaticDevices:
@@ -55,8 +55,7 @@ namespace NeighborDiscovery.Environment
             _locationToDevice = new Dictionary<Network2DNode, DiscoverableDevice>();
             _deviceById = new Dictionary<int, DiscoverableDevice>();
             
-            if (initialEvents != null) 
-                _events = new Queue<Event>(initialEvents);
+            _events = initialEvents != null ? new Queue<Event>(initialEvents) : new Queue<Event>();
         }
 
         private void UpdatePhysicalPartOfDiscoverableDevice(DiscoverableDevice device, Network2DNode node)
@@ -75,7 +74,8 @@ namespace NeighborDiscovery.Environment
 
         private IEnumerable<Event> FetchNextEvents()
         {
-            return _events;
+            while (_events.Count > 0)
+                yield return _events.Dequeue();
         }
 
         private void RemoveDevice(DiscoverableDevice device)

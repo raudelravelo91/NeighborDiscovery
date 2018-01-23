@@ -22,6 +22,7 @@ namespace UINetworkDiscovery
     public partial class MainWindow : Window
     {
         public static RunningInfo RunningInfo { get; private set; }
+        public static TestCasesGenerator Generator { get; private set; }
         private readonly string _fileName;
         private readonly PlotModel _model;
         private readonly AlgorithmBackgroundWorker _workerDisco;
@@ -49,7 +50,7 @@ namespace UINetworkDiscovery
             oxyplot.PlotMargins = new System.Windows.Thickness(currentMargins.Left, btClear.Height,
                 currentMargins.Right, currentMargins.Bottom);
             RunningInfo = new RunningInfo();
-
+            Generator = new TestCasesGenerator();
             SetDefaultSettings();
 
             _workerDisco = new AlgorithmBackgroundWorker(NodeType.Disco);
@@ -183,7 +184,7 @@ namespace UINetworkDiscovery
                 {
                     Plot(results);
                 }
-                else throw new ArgumentException("Invalid Task type");
+                else throw new ArgumentException("Invalid result");
 
                 if (!RunningInfo.IsRunning)
                 {
@@ -277,10 +278,9 @@ namespace UINetworkDiscovery
                     double[] duties;
                     if (GetDutyCycle(out duties))
                     {
-                        var generator = new TestCasesGenerator();
-                        var suite = generator.GenerateTestSuite(numberOfTests, networkSize, startUpLimit, posRange,
+                        var suite = Generator.GenerateTestSuite(numberOfTests, networkSize, startUpLimit, posRange,
                             minCRange, maxCRange, duties);
-                        if (generator.SaveTestSuite(_fileName, suite))
+                        if (Generator.SaveTestSuite(_fileName, suite))
                         {
                             testCaseMessage.Text = "Test cases generated";
                             testCaseMessage.Visibility = Visibility.Visible;
@@ -379,56 +379,47 @@ namespace UINetworkDiscovery
 
                         if (cbDisco.IsChecked == true)
                         {
-                            RunningInfo.AddRunningAlgorithm();
-                            _workerDisco.RunWorkerAsync(_fileName);
+                            _workerDisco.RunWorkerAsync(Generator.LoadTestSuite(_fileName));
                         }
 
                         if (cbUConnect.IsChecked == true)
                         {
-                            RunningInfo.AddRunningAlgorithm();
-                            _workerUConnect.RunWorkerAsync(_fileName);
+                            _workerUConnect.RunWorkerAsync(Generator.LoadTestSuite(_fileName));
                         }
 
                         if (cbSearchlight.IsChecked == true)
                         {
-                            RunningInfo.AddRunningAlgorithm();
-                            _workerSearchLight.RunWorkerAsync(_fileName);
+                            _workerSearchLight.RunWorkerAsync(Generator.LoadTestSuite(_fileName));
                         }
 
                         if (cbBirthday.IsChecked == true)
                         {
-                            RunningInfo.AddRunningAlgorithm();
-                            _workerBirthday.RunWorkerAsync(_fileName);
+                            _workerBirthday.RunWorkerAsync(Generator.LoadTestSuite(_fileName));
                         }
 
                         if (cbStripedSearchlight.IsChecked == true)
                         {
-                            RunningInfo.AddRunningAlgorithm();
-                            _workerStripedSearchlight.RunWorkerAsync(_fileName);
+                            _workerStripedSearchlight.RunWorkerAsync(Generator.LoadTestSuite(_fileName));
                         }
 
                         if (cbTestAlgorithm.IsChecked == true)
                         {
-                            RunningInfo.AddRunningAlgorithm();
-                            _workerTestAlgorithm.RunWorkerAsync(_fileName);
+                            _workerTestAlgorithm.RunWorkerAsync(Generator.LoadTestSuite(_fileName));
                         }
 
                         if (cbGNihao.IsChecked == true)
                         {
-                            RunningInfo.AddRunningAlgorithm();
-                            _workerGNihao.RunWorkerAsync(_fileName);
+                            _workerGNihao.RunWorkerAsync(Generator.LoadTestSuite(_fileName));
                         }
 
                         if (cbBalancedNihao.IsChecked == true)
                         {
-                            RunningInfo.AddRunningAlgorithm();
-                            _workerBalancedNihao.RunWorkerAsync(_fileName);
+                            _workerBalancedNihao.RunWorkerAsync(Generator.LoadTestSuite(_fileName));
                         }
 
                         if (cbAccGossipPNihao.IsChecked == true)
                         {
-                            RunningInfo.AddRunningAlgorithm();
-                            _workerAccGossipPNihao.RunWorkerAsync(_fileName);
+                            _workerAccGossipPNihao.RunWorkerAsync(Generator.LoadTestSuite(_fileName));
                         }
                     }
                     else

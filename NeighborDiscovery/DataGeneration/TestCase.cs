@@ -10,14 +10,15 @@ namespace NeighborDiscovery.DataGeneration
     [Serializable]
     public class TestCase
     {
-        public IEnumerable<DeviceData> Data { get; }
+        private readonly List<DeviceData> _data;
 
-        public int NetworkSize { get; }
+        public IEnumerable<DeviceData> Data => _data;
+
+        public int NetworkSize => _data.Count;
 
         public TestCase(IEnumerable<DeviceData> data)
         {
-            Data = data;
-            NetworkSize = data.Count();
+            _data = data.ToList();
         }
     }
 }

@@ -12,6 +12,11 @@ namespace NeighborDiscovery.DataGeneration
 {
     public class TestCasesGenerator
     {
+        public TestCasesGenerator()
+        {
+
+        }
+
         private void GenerateTest(StreamWriter wr, int networkSize, int startUpLimit, int posRange, int comRange, int[] duties)
         {
             wr.WriteLine(networkSize);
@@ -84,11 +89,12 @@ namespace NeighborDiscovery.DataGeneration
                     bf.Serialize(fsout, suite);  
                 }  
             }  
-            catch
+            catch(Exception e)
             {
+                Console.WriteLine(e.ToString());
                 return false;
             }
-
+            fsout.Close();
             return true;
         }
 
@@ -97,18 +103,21 @@ namespace NeighborDiscovery.DataGeneration
             BinaryFormatter bf = new BinaryFormatter();  
   
             FileStream fsin = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.None);  
-            try  
-            {  
+            try
+            {
+                TestSuite suite;
                 using (fsin)  
                 {  
-                    var suite = (TestSuite) bf.Deserialize(fsin);
-                    return suite;
-                }  
+                    suite = (TestSuite) bf.Deserialize(fsin);
+                } 
+                return suite;
             }  
-            catch  
+            catch(Exception e)
             {  
+                Console.WriteLine(e.ToString());
                 throw new Exception("An error ocurred when trying to load the data.");
-            }  
+            }
+            
         }
 
     }

@@ -2,6 +2,7 @@
 
 namespace NeighborDiscovery.Utils
 {
+    [Serializable]
     public class MyPair
     {
         public double X { get; set; }

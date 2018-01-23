@@ -27,5 +27,9 @@ namespace NeighborDiscovery.Environment
             CommunicationRange = communicationRange;
         }
 
+        public override string ToString()
+        {
+            return DeviceLogic.ToString() + " Pos:" + Position.ToString();
+        }
     }
 }
