@@ -25,8 +25,8 @@ namespace NeighborDiscovery.Protocols
             double TOLERANCE = 1e-1;
             if (Math.Abs(value - 1) < TOLERANCE)
             {
-                P1 = 17;
-                P2 = 23;
+                P1 = 197;
+                P2 = 203;
             }
             else if (Math.Abs(value - 5) < TOLERANCE)
             {

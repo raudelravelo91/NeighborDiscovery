@@ -640,6 +640,8 @@ namespace UINetworkDiscovery
         private void RunTwoNodesSimulation(BoundedProtocol node1, BoundedProtocol node2, NodeType type)
         {
             var environment = new TwoNodesEnvironmentTmll(node1, node2);
+            //environment.PropertyChanged +=
+            //    (sender, args) => progressBarBalancedNihao.Value = environment.PercentageCompleted;
             var testResult = environment.RunSimulation();
             var statistics = new StatisticsResult(type);
             statistics.AddStatisticTest(testResult);
