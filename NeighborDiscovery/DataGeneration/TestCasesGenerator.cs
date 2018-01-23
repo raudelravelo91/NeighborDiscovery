@@ -43,7 +43,7 @@ namespace NeighborDiscovery.DataGeneration
             }
         }
 
-        private IEnumerable<DeviceData> GenerateDeviceData(int networkSize, int startUpLimit, int posRange, int comRange, double[] duties)
+        private static IEnumerable<DeviceData> GenerateDeviceData(int networkSize, int startUpLimit, int posRange, int comRange, double[] duties)
         {
             for (int i = 0; i < networkSize; i++)
             {
@@ -52,32 +52,34 @@ namespace NeighborDiscovery.DataGeneration
                 var posX = RandomGenerator.GetRandomDouble() * posRange;
                 var posY = RandomGenerator.GetRandomDouble() * posRange;
                 var duty = duties[RandomGenerator.GetRandomInteger(duties.Length)];
-                yield return new DeviceData(i,startUp, (int)duty, new MyPair(posX, posY), comRange);
+                var dirX = RandomGenerator.GetRandomDouble();
+                var dirY = RandomGenerator.GetRandomDouble();
+                var speed = 0;//todo: add speed limit as a parameter
+                yield return new DeviceData(i,startUp, (int)duty, comRange, posX, posY, dirX, dirY, speed);
             }
         }
 
-        public TestCase GenerateTestCase(int networkSize, int startUpLimit, int posRange, int comRange, double[] duties)
+        public static TestCase GenerateTestCase(int networkSize, int startUpLimit, int posRange, int comRange, double[] duties)
         {
             var data = GenerateDeviceData(networkSize, startUpLimit, posRange, comRange, duties);
             var testCase = new TestCase(data);
             return testCase;
         }
 
-        public TestSuite GenerateTestSuite(int numberOfTests, int networkSize, int startUpLimit, int posRange, int minComRange,
+        public static TestSuite GenerateTestSuite(int numberOfTests, int networkSize, int startUpLimit, int posRange, int minComRange,
             int maxComRange, double[] duties)
         {
             List<TestCase> tests = new List<TestCase>();
             for (int i = 0; i < numberOfTests; i++)
             {
-                int testStartUpLimit = RandomGenerator.GetRandomInteger(startUpLimit);
                 int testCommRange = minComRange + RandomGenerator.GetRandomInteger(maxComRange - minComRange + 1);
-                var test = GenerateTestCase(networkSize, testStartUpLimit, posRange, testCommRange, duties);
+                var test = GenerateTestCase(networkSize, startUpLimit, posRange, testCommRange, duties);
                 tests.Add(test);
             }
             return new TestSuite(tests);
         }
 
-        public bool SaveTestSuite(string fileName, TestSuite suite)
+        public static bool SaveTestSuite(string fileName, TestSuite suite)
         {
             BinaryFormatter bf = new BinaryFormatter();  
   
@@ -98,7 +100,7 @@ namespace NeighborDiscovery.DataGeneration
             return true;
         }
 
-        public TestSuite LoadTestSuite(string fileName)
+        public static TestSuite LoadTestSuite(string fileName)
         {
             BinaryFormatter bf = new BinaryFormatter();  
   

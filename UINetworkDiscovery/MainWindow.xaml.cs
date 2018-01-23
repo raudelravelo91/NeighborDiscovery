@@ -22,7 +22,7 @@ namespace UINetworkDiscovery
     public partial class MainWindow : Window
     {
         public static RunningInfo RunningInfo { get; private set; }
-        public static TestCasesGenerator Generator { get; private set; }
+        
         private readonly string _fileName;
         private readonly PlotModel _model;
         private readonly AlgorithmBackgroundWorker _workerDisco;
@@ -50,7 +50,7 @@ namespace UINetworkDiscovery
             oxyplot.PlotMargins = new System.Windows.Thickness(currentMargins.Left, btClear.Height,
                 currentMargins.Right, currentMargins.Bottom);
             RunningInfo = new RunningInfo();
-            Generator = new TestCasesGenerator();
+            
             SetDefaultSettings();
 
             _workerDisco = new AlgorithmBackgroundWorker(NodeType.Disco);
@@ -128,16 +128,11 @@ namespace UINetworkDiscovery
 
         private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            if (((BackgroundWorker) sender).CancellationPending)
+            if (((BackgroundWorker)sender).CancellationPending)
             {
                 return;
             }
-
-            //if (!btGenerate.IsEnabled)
-            //{
-            //    btGenerate.IsEnabled = !workerBirthday.IsReading && !workerDisco.IsReading 
-            //        && !workerQuorum.IsReading && !workerSearchLight.IsReading && !workerUConnect.IsReading;
-            //}
+            
             if (sender.Equals(_workerDisco.Worker))
             {
                 progressBarDisco.Value = e.ProgressPercentage;
@@ -200,9 +195,9 @@ namespace UINetworkDiscovery
             {
                 if (!RunningInfo.IsRunning)
                 {
+                    RunningInfo.CancelationPending = false;
                     btGenerate.IsEnabled = true;
                     btPlot.Content = "Run";
-                    RunningInfo.CancelationPending = false;
                     testCaseIcon.Fill = Brushes.Red;
                     testCaseMessage.Text = "Cancelled by User.";
                 }
@@ -278,9 +273,9 @@ namespace UINetworkDiscovery
                     double[] duties;
                     if (GetDutyCycle(out duties))
                     {
-                        var suite = Generator.GenerateTestSuite(numberOfTests, networkSize, startUpLimit, posRange,
+                        var suite = TestCasesGenerator.GenerateTestSuite(numberOfTests, networkSize, startUpLimit, posRange,
                             minCRange, maxCRange, duties);
-                        if (Generator.SaveTestSuite(_fileName, suite))
+                        if (TestCasesGenerator.SaveTestSuite(_fileName, suite))
                         {
                             testCaseMessage.Text = "Test cases generated";
                             testCaseMessage.Visibility = Visibility.Visible;
@@ -313,6 +308,7 @@ namespace UINetworkDiscovery
             _workerBirthday.CancelAsync();
             _workerStripedSearchlight.CancelAsync();
             _workerTestAlgorithm.CancelAsync();
+            _workerBalancedNihao.CancelAsync();
         }
 
         private void ResetAlgorithmProperties()
@@ -379,47 +375,47 @@ namespace UINetworkDiscovery
 
                         if (cbDisco.IsChecked == true)
                         {
-                            _workerDisco.RunWorkerAsync(Generator.LoadTestSuite(_fileName));
+                            _workerDisco.RunWorkerAsync(TestCasesGenerator.LoadTestSuite(_fileName));
                         }
 
                         if (cbUConnect.IsChecked == true)
                         {
-                            _workerUConnect.RunWorkerAsync(Generator.LoadTestSuite(_fileName));
+                            _workerUConnect.RunWorkerAsync(TestCasesGenerator.LoadTestSuite(_fileName));
                         }
 
                         if (cbSearchlight.IsChecked == true)
                         {
-                            _workerSearchLight.RunWorkerAsync(Generator.LoadTestSuite(_fileName));
+                            _workerSearchLight.RunWorkerAsync(TestCasesGenerator.LoadTestSuite(_fileName));
                         }
 
                         if (cbBirthday.IsChecked == true)
                         {
-                            _workerBirthday.RunWorkerAsync(Generator.LoadTestSuite(_fileName));
+                            _workerBirthday.RunWorkerAsync(TestCasesGenerator.LoadTestSuite(_fileName));
                         }
 
                         if (cbStripedSearchlight.IsChecked == true)
                         {
-                            _workerStripedSearchlight.RunWorkerAsync(Generator.LoadTestSuite(_fileName));
+                            _workerStripedSearchlight.RunWorkerAsync(TestCasesGenerator.LoadTestSuite(_fileName));
                         }
 
                         if (cbTestAlgorithm.IsChecked == true)
                         {
-                            _workerTestAlgorithm.RunWorkerAsync(Generator.LoadTestSuite(_fileName));
+                            _workerTestAlgorithm.RunWorkerAsync(TestCasesGenerator.LoadTestSuite(_fileName));
                         }
 
                         if (cbGNihao.IsChecked == true)
                         {
-                            _workerGNihao.RunWorkerAsync(Generator.LoadTestSuite(_fileName));
+                            _workerGNihao.RunWorkerAsync(TestCasesGenerator.LoadTestSuite(_fileName));
                         }
 
                         if (cbBalancedNihao.IsChecked == true)
                         {
-                            _workerBalancedNihao.RunWorkerAsync(Generator.LoadTestSuite(_fileName));
+                            _workerBalancedNihao.RunWorkerAsync(TestCasesGenerator.LoadTestSuite(_fileName));
                         }
 
                         if (cbAccGossipPNihao.IsChecked == true)
                         {
-                            _workerAccGossipPNihao.RunWorkerAsync(Generator.LoadTestSuite(_fileName));
+                            _workerAccGossipPNihao.RunWorkerAsync(TestCasesGenerator.LoadTestSuite(_fileName));
                         }
                     }
                     else
@@ -462,7 +458,6 @@ namespace UINetworkDiscovery
 
                     lineStyle = LineStyle.Solid;
                     birthdayAvg.Text = result.AverageDiscoveryLatency.ToString();
-                    birthdayCnt.Text = result.AverageContactByWakesUp.ToString();
                     break;
                 case NodeType.Disco:
                     //cbDisco.Content = "Disco (E: " + result.AverageContactByWakesUp * 100 + "%)" + "(Avg: " + result.AverageDiscoveryLatency + ")";
@@ -475,7 +470,6 @@ namespace UINetworkDiscovery
 
                     lineStyle = LineStyle.Dash;
                     discoAvg.Text = result.AverageDiscoveryLatency.ToString();
-                    discoCnt.Text = result.AverageContactByWakesUp.ToString();
                     break;
                 case NodeType.UConnect:
                     //cbUConnect.Content = "UConnect (E: " + result.AverageContactByWakesUp * 100 + "%)" + "(Avg: " + result.AverageDiscoveryLatency + ")";
@@ -488,7 +482,6 @@ namespace UINetworkDiscovery
 
                     lineStyle = LineStyle.Dot;
                     uconnectAvg.Text = result.AverageDiscoveryLatency.ToString();
-                    uconnectCnt.Text = result.AverageContactByWakesUp.ToString();
                     break;
                 case NodeType.Searchlight:
                     //cbSearchlightR.Content = "SearchlightR (E: " + result.AverageContactByWakesUp * 100 + "%)" + "(Avg: " + result.AverageDiscoveryLatency + ")";
@@ -501,7 +494,6 @@ namespace UINetworkDiscovery
 
                     lineStyle = LineStyle.DashDot;
                     searchlightAvg.Text = result.AverageDiscoveryLatency.ToString();
-                    searchlightCnt.Text = result.AverageContactByWakesUp.ToString();
                     break;
                 case NodeType.StripedSearchlight:
                     markerType = MarkerType.Star;
@@ -513,7 +505,6 @@ namespace UINetworkDiscovery
 
                     lineStyle = LineStyle.LongDashDotDot;
                     stripedSearchlighAvg.Text = result.AverageDiscoveryLatency.ToString();
-                    stripedSearchlighCnt.Text = result.AverageContactByWakesUp.ToString();
                     break;
                 case NodeType.TestAlgorithm:
                     markerType = MarkerType.Cross;
@@ -525,7 +516,6 @@ namespace UINetworkDiscovery
 
                     lineStyle = LineStyle.LongDashDotDot;
                     testAlgAvg.Text = result.AverageDiscoveryLatency.ToString();
-                    testAlgCnt.Text = result.AverageContactByWakesUp.ToString();
                     break;
                 case NodeType.BalancedNihao:
                     markerType = MarkerType.Circle;
@@ -536,20 +526,7 @@ namespace UINetworkDiscovery
                     }
 
                     lineStyle = LineStyle.Dot;
-                    gNihaoAvg.Text = result.AverageDiscoveryLatency.ToString();
-                    gNihaoCnt.Text = result.AverageContactByWakesUp.ToString();
-                    break;
-                case NodeType.AccGossipGNihao:
-                    markerType = MarkerType.Circle;
-                    oxyColor = OxyColors.Red;
-                    if (ModelContainsAlgorithm(NodeType.AccGossipGNihao))
-                    {
-                        oxyColor = OxyColors.DarkRed;
-                    }
-
-                    lineStyle = LineStyle.Dot;
-                    AccGossipGNihaoAvg.Text = result.AverageDiscoveryLatency.ToString();
-                    BalancedNihaoCnt.Text = result.AverageContactByWakesUp.ToString();
+                    balanceNihaoAvg.Text = result.AverageDiscoveryLatency.ToString();
                     break;
                 case NodeType.AccGossipPNihao:
                     markerType = MarkerType.Circle;
@@ -561,7 +538,6 @@ namespace UINetworkDiscovery
 
                     lineStyle = LineStyle.Dot;
                     AccGossipPNihaoAvg.Text = result.AverageDiscoveryLatency.ToString();
-                    AccGossipPNihaoCnt.Text = result.AverageContactByWakesUp.ToString();
                     break;
                 default:
                     oxyColor = OxyColors.Black;

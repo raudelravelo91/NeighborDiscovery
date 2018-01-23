@@ -13,7 +13,7 @@ namespace NeighborDiscovery.Environment
     {
         private NodeType _protocolType;
 
-        private Random _random = new Random();
+        private readonly Random _random = new Random();
 
         private int EndsAt(int startUpSlot, BoundedProtocol device)
         {
@@ -23,8 +23,8 @@ namespace NeighborDiscovery.Environment
         private DiscoverableDevice FromDeviceDataToDiscoverableDevice(DeviceData data)
         {
             var logic = CreateProtocol(data.Id, data.DutyCycle);
-            logic.MoveNext(_random.Next(logic.T));
-            return new DiscoverableDevice(logic, data.Position, new MyPair(0,0), 0, data.CommunicationRange);
+            logic.MoveNext(_random.Next(logic.T));//todo: change this :)
+            return new DiscoverableDevice(logic, data.Position, data.Direction, data.Speed, data.CommunicationRange);
         }
 
         private Event CreateIncomingEvent(DeviceData data)
@@ -68,10 +68,11 @@ namespace NeighborDiscovery.Environment
         public StatisticTestResult RunSingleSimulation(IEnumerable<DeviceData> data, NodeType protocolType)
         {
             _protocolType = protocolType;
-            List<DeviceData> _data = data.ToList();
-            _data.Sort();
-            Queue<DeviceData> events = new Queue<DeviceData>(_data);
-            int maxSlot = _data[_data.Count - 1].StartUpSlot * 2  + 1;//todo, improve the way to calculate the limit
+            List<DeviceData> dataList = data.ToList();
+            dataList.Sort();
+            Queue<DeviceData> events = new Queue<DeviceData>(dataList);
+            int maxSlot = dataList[dataList.Count - 1].StartUpSlot * 2  + 1;//todo, improve the way to calculate the limit
+            //int maxSlot = 1000;
             int currentSlot = 0;
             FullDiscoveryEnvironmentTmll fullEnv = new FullDiscoveryEnvironmentTmll(RunningMode.StaticDevices);
             while (currentSlot < maxSlot)
