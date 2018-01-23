@@ -18,7 +18,7 @@ namespace NeighborDiscovery.Environment
         //public int TimeSlot { get; }
         public DiscoverableDevice Device { get; }
 
-        protected Event(DiscoverableDevice device, EventType eventType)
+        public Event(DiscoverableDevice device, EventType eventType)
         {
             EventType = eventType;
             //TimeSlot = timeSlot;
