@@ -7,84 +7,35 @@ namespace SuperPrimeRib
     {
         static void Main(string[] args)
         {
-            Randy();
-            Console.WriteLine("----------------------");
-            Raude();
+            Console.WriteLine(subsetGcd(37,6));
         }
 
-        public static string resultado = "0";
-
-        public static void PrimeRib(int n, int pos)
-        {
-            if (pos == n)
+        static int subsetGcd(int n, int g) {
+            int mod = 1000000007;
+            long[] pow = new long[100001];
+            pow[0] = 1;
+            for (int i = 1; i < pow.Length; i++)
+                pow[i] = (pow[i - 1] * 2) % mod;
+    
+            int mults = n/g;
+            long total = getPowMinusOne(pow, mod, mults);
+            mults--;
+            for(int i = 2*g; i <= n; i += g)//for every mult
             {
-                if (EsPrimo(int.Parse(resultado)))
-                    Console.WriteLine(resultado.Substring(1, resultado.Length - 1));
+                long withi = getPowMinusOne(pow, mod, n / i);
+                long minus = (withi - (n/i - 1) + mod) % mod;
+                total = ((total - minus + mod) % mod);
+                mults--;
             }
-            else
-            {
-                for (int i = 1; i <= 9; i++)
-                    if (EsPrimo(int.Parse(resultado + i)))
-                    {
-                        resultado += i;
-                        PrimeRib(n, pos + 1);
-                        resultado = resultado.Substring(0, resultado.Length - 1);
-                    }
-            }
+            
+            return (int)total;
         }
 
-        public static void Raude()
+        static long getPowMinusOne(long[] pow, int mod, int pos)
         {
-            string s;
-            while ((s = Console.ReadLine()) != null)
-            { resultado = "0"; PrimeRib(int.Parse(s), 0); }
+            return (pow[pos] - 1 + mod) % mod;
         }
 
-        public static void Randy()
-        {
-            int cifras =int.Parse(Console.ReadLine());
 
-            List<int> r =new List<int>{3,5,7};
-
-            for (int i = 1; i < cifras; i++)
-            {
-                r = CreaSuperPrimos(r);
-            }                    
-
-            for (int i = 0; i < r.Count; i++)
-            {
-                Console.WriteLine(r[i].ToString());
-            }
-        }
-
-        public  static List<int> CreaSuperPrimos(List<int> SuperPrimosMenores)
-        {
-            List<int> r = new List<int>();
-
-            int t;
-            for (int i = 0; i < SuperPrimosMenores.Count; i++)
-            {
-                for (int j = 1; j <= 9; j++)
-                {
-                    t = SuperPrimosMenores[i] * 10 + j;
-                    if (EsPrimo(t))
-                    {
-                        r.Add(t);
-                    }
-                }
-            }
-
-            return r;
-        }
-
-        public static bool EsPrimo(int n)
-        {
-            if (n < 2 || n % 2 == 0) 
-                return false;
-            for (int i = 3; i * i <= n; i += 2)
-                if (n % i == 0)
-                    return false;
-            return true;
-        }
     }
 }

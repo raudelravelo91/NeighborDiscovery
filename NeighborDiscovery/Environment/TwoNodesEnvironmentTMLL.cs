@@ -12,15 +12,11 @@ using NeighborDiscovery.Statistics;
 
 namespace NeighborDiscovery.Environment
 {
-    public class TwoNodesEnvironmentTmll//:INotifyPropertyChanged
+    public class TwoNodesEnvironmentTmll
     {
         public BoundedProtocol Node1 { get; }
         public BoundedProtocol Node2 { get; }
 
-        //public int PercentageCompleted => _simulationsCompleted / _totalSimulations;
-        
-        //private int _totalSimulations;
-        //private int _simulationsCompleted;
 
         private readonly object _mutex = new object();
 
@@ -39,8 +35,7 @@ namespace NeighborDiscovery.Environment
             int latency1 = -1;
             int latency2 = -1;
             int slotCnt = 1;
-            if (node2State == 10)
-                Console.WriteLine("debug");
+            
             while (latency1 < 0 || latency2 < 0)
             {
                 if (latency1 < 0 && node1.IsListening() && node2.IsTransmitting())
@@ -71,20 +66,10 @@ namespace NeighborDiscovery.Environment
                 {
                     for (var node2State = node1State; node2State < Node2.T; node2State++)
                     {
-                        //after gotInRange slots they got in range and the latency starts from that point and on
                         var simulation =
                             RunTwoNodesSimulation(node1State, node2State, Math.Max(Node1.Bound, Node2.Bound));
                         statistics.AddDiscovery(simulation.Item1);
                         statistics.AddDiscovery(simulation.Item2);
-                        //lock (_mutex)
-                        //{
-                        //    int previousValue = PercentageCompleted;
-                        //    _simulationsCompleted++;
-                        //    if (PercentageCompleted != previousValue)
-                        //    {
-                        //        OnPropertyChanged(nameof(PercentageCompleted));
-                        //    }
-                        //}
                     }
                 }
             );
@@ -93,11 +78,5 @@ namespace NeighborDiscovery.Environment
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
     }
 }

@@ -71,6 +71,7 @@
     <Compile Include="Environment\TwoNodesEnvironmentTmll.cs" />
     <Compile Include="Environment\FullDiscoveryEnvironmentTmll.cs" />
     <Compile Include="Properties\Annotations.cs" />
+    <Compile Include="Protocols\AccProtocol.cs" />
     <Compile Include="Protocols\BalancedNihaoTmll.cs" />
     <Compile Include="Protocols\IContact.cs" />
     <Compile Include="Protocols\IDiscoveryProtocol.cs" />
@@ -82,7 +83,7 @@
     <Compile Include="Utils\RandomGenerator.cs" />
     <Compile Include="Protocols\AccGossipGNihao.cs" />
     <Compile Include="Protocols\AccGossipPNihao.cs" />
-    <Compile Include="Protocols\AccGreedy.cs" />
+    <Compile Include="Protocols\AccBNihaoGreedy.cs" />
     <Compile Include="Protocols\BirthdayNode.cs" />
     <Compile Include="Protocols\ContactInfo.cs" />
     <Compile Include="Protocols\Disco.cs" />
