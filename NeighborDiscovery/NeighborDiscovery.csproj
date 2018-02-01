@@ -71,8 +71,10 @@
     <Compile Include="Environment\TwoNodesEnvironmentTmll.cs" />
     <Compile Include="Environment\FullDiscoveryEnvironmentTmll.cs" />
     <Compile Include="Properties\Annotations.cs" />
+    <Compile Include="Protocols\AccIndirectDiscovery.cs" />
     <Compile Include="Protocols\AccProtocol.cs" />
     <Compile Include="Protocols\BalancedNihaoTmll.cs" />
+    <Compile Include="Protocols\ContactInfo2Hop.cs" />
     <Compile Include="Protocols\IContact.cs" />
     <Compile Include="Protocols\IDiscoveryProtocol.cs" />
     <Compile Include="Protocols\ITransmission.cs" />

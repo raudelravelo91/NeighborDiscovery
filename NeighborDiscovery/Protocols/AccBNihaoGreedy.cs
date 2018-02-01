@@ -10,6 +10,7 @@ namespace NeighborDiscovery.Protocols
 {
     public class AccBNihaoGreedy : AccProtocol
     {
+
         public AccBNihaoGreedy(int id) : base(id)
         {
 

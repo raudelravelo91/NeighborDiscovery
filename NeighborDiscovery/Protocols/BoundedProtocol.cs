@@ -12,9 +12,8 @@ namespace NeighborDiscovery.Protocols
     {
         protected Dictionary<IDiscoveryProtocol, IContact> NeighborsDiscovered;
         public int Id { get; protected set; }
-        public int NumberOfNeighbors => NeighborsDiscovered.Count;
         public int InternalTimeSlot { get; private set; }
-        
+        public virtual int NumberOfNeighbors => NeighborsDiscovered.Count;
         public abstract int Bound { get; }
         public abstract int T { get; }
 

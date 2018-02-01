@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,9 +9,9 @@ namespace NeighborDiscovery.Protocols
 {
     public abstract class AccProtocol:BoundedProtocol
     {
-        
 
-        public abstract double SlotGain(int slot);
+        protected Dictionary<IDiscoveryProtocol, ContactInfo2Hop> Neighbors2HopDiscovered;
+        public virtual int NumberOfNeighbors2Hop => Neighbors2HopDiscovered.Count;
 
         protected AccProtocol(int id) : base(id)
         {
@@ -18,38 +19,30 @@ namespace NeighborDiscovery.Protocols
 
         }
 
-        protected double SpatialSimilarity(int t0, int tn, IDiscoveryProtocol neighbor)
-        {
-            var iNeighbors = Get2HopNeighborsFromNeighbor(neighbor);
-            var jNeighbors = Neighbors().Where(n => !n.Equals(neighbor));
-            double num = IntersectionOfKnownNeighbors(iNeighbors, jNeighbors);
-            double den = IntersectionOfKnownNeighbors(jNeighbors, jNeighbors);
+        protected abstract double SlotGain(int slot);
 
-            return num/den;
+        protected virtual int ExpectedDiscovery(int t0, BoundedProtocol device)
+        {
+            int limit = int.MaxValue;
+            var transmissions = GetDeviceNextTransmissionSlot(t0, limit, device).GetEnumerator();
+            var listen = GetDeviceNextListeningSlots(t0, limit, this).GetEnumerator();
+            transmissions.MoveNext();
+            listen.MoveNext();
+            while (listen.Current != transmissions.Current)
+            {
+                if (listen.Current < transmissions.Current)
+                    listen.MoveNext();
+                else
+                {
+                    transmissions.MoveNext();
+                }
+            }
+            transmissions.Dispose();
+            listen.Dispose();
+            return listen.Current - t0;
         }
 
-        protected double TemporalDiversity(int t0, int tn, IDiscoveryProtocol neighbor)//how good is i(the neighbor) to j(S)
-        {
-            var iSlots = GetDeviceNextTransmissions(t0,tn, neighbor);
-            var jSlots = GetDeviceNextTransmissions(t0,tn, this);
-            double num = IntersectionOfListeningSlots(iSlots,iSlots) - IntersectionOfListeningSlots(iSlots, jSlots);
-            double den = tn - t0;
-            
-            return num/den;
-        }
-
-        protected int IntersectionOfKnownNeighbors(IEnumerable<IDiscoveryProtocol> iNeighbors,
-            IEnumerable<IDiscoveryProtocol> jNeighbors)
-        {
-            return iNeighbors.Intersect(jNeighbors).Count();
-        }
-
-        protected int IntersectionOfListeningSlots(IEnumerable<int> p1, IEnumerable<int> p2)
-        {
-            return p1.Intersect(p2).Count();
-        }
-
-        protected IEnumerable<IDiscoveryProtocol> Get2HopNeighborsFromNeighbor(IDiscoveryProtocol neighbor)
+        protected virtual IEnumerable<IDiscoveryProtocol> Get2HopNeighborsFromDirectNeighbor(IDiscoveryProtocol neighbor)
         {
             var lastContact = ((ContactInfo)GetContactInfo(neighbor)).LastContact;
             int slotsPassed = InternalTimeSlot - lastContact;//how many slots since I listened to it the last time
@@ -65,7 +58,7 @@ namespace NeighborDiscovery.Protocols
             }
         }
 
-        protected IEnumerable<int> GetDeviceNextTransmissions(int t0, int tn, IDiscoveryProtocol device)
+        protected virtual IEnumerable<int> GetDeviceNextTransmissionSlot(int t0, int tn, IDiscoveryProtocol device)
         {
             var clone = device.Clone();
             clone.MoveNext(device.InternalTimeSlot + t0);
@@ -77,6 +70,35 @@ namespace NeighborDiscovery.Protocols
                     yield return cnt;
                 cnt++;
             }
+        }
+
+        protected virtual IEnumerable<int> GetDeviceNextListeningSlots(int t0, int tn, IDiscoveryProtocol device)
+        {
+            var clone = device.Clone();
+            clone.MoveNext(device.InternalTimeSlot + t0);
+            int cnt = t0;
+            while (cnt <= tn)
+            {
+                clone.MoveNext();
+                if (clone.IsListening())
+                    yield return cnt;
+                cnt++;
+            }
+        }
+
+        public virtual IEnumerable<IDiscoveryProtocol> Neighbors2Hop()
+        {
+            return Neighbors2HopDiscovered.Keys;
+        }
+
+        public virtual bool ContainsNeighbor2Hop(IDiscoveryProtocol device)
+        {
+            return Neighbors2HopDiscovered.ContainsKey(device);
+        }
+
+        public ContactInfo2Hop GetContactInfoFor2Hop(IDiscoveryProtocol device)
+        {
+            return Neighbors2HopDiscovered.TryGetValue(device, out var value) ? value : null;
         }
     }
 }
