@@ -85,7 +85,7 @@
     <Compile Include="Utils\RandomGenerator.cs" />
     <Compile Include="Protocols\AccGossipGNihao.cs" />
     <Compile Include="Protocols\AccGossipPNihao.cs" />
-    <Compile Include="Protocols\AccBNihaoGreedy.cs" />
+    <Compile Include="Protocols\AccBalancedNihaoGreedy.cs" />
     <Compile Include="Protocols\BirthdayNode.cs" />
     <Compile Include="Protocols\ContactInfo.cs" />
     <Compile Include="Protocols\Disco.cs" />

@@ -9,6 +9,8 @@ namespace NeighborDiscovery.Protocols
     public sealed class BalancedNihaoTmll: BoundedProtocol
     {
         public int N { get; set; }
+        public override int Bound => N * N;
+        public override int T => N * N;
         private double DesiredDutyCycle { get; set; }
 
         public BalancedNihaoTmll(int id, double dutyCyclePercentage) : base(id)
@@ -43,9 +45,7 @@ namespace NeighborDiscovery.Protocols
             DesiredDutyCycle = value;
         }
 
-        public override int Bound => N * N;
         
-        public override int T => N * N;
 
         public override IDiscoveryProtocol Clone()
         {

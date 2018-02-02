@@ -10,7 +10,7 @@ namespace NeighborDiscovery.Protocols
 {
     public abstract class BoundedProtocol:IDiscoveryProtocol
     {
-        protected Dictionary<IDiscoveryProtocol, IContact> NeighborsDiscovered;
+        protected Dictionary<IDiscoveryProtocol, ContactInfo> NeighborsDiscovered;
         public int Id { get; protected set; }
         public int InternalTimeSlot { get; private set; }
         public virtual int NumberOfNeighbors => NeighborsDiscovered.Count;
@@ -19,7 +19,7 @@ namespace NeighborDiscovery.Protocols
 
         protected BoundedProtocol(int id)
         {
-            NeighborsDiscovered = new Dictionary<IDiscoveryProtocol, IContact>();
+            NeighborsDiscovered = new Dictionary<IDiscoveryProtocol, ContactInfo>();
             Id = id;
             InternalTimeSlot = 0;
         }
@@ -27,6 +27,12 @@ namespace NeighborDiscovery.Protocols
         protected virtual void AddNeighbor(IDiscoveryProtocol device)
         {
             NeighborsDiscovered.Add(device, new ContactInfo(device, InternalTimeSlot));
+        }
+
+        protected virtual void RemoveNeihbor(IDiscoveryProtocol device)
+        {
+            if (ContainsNeighbor(device))
+                NeighborsDiscovered.Remove(device);
         }
 
         //protected virtual void UpdateNeighborContactInfo(IDiscoveryProtocol device)
@@ -64,9 +70,9 @@ namespace NeighborDiscovery.Protocols
             
             if(!ContainsNeighbor(transmission.Sender))
                 AddNeighbor(transmission.Sender);
-            //else
-                //UpdateNeighborContactInfo(transmission.Sender);
         }
+
+        
 
         public IContact GetContactInfo(IDiscoveryProtocol device)
         {

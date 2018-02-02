@@ -6,28 +6,43 @@ using System.Threading.Tasks;
 
 namespace NeighborDiscovery.Protocols
 {
-    public class ContactInfo2Hop
+    public class ContactInfo2Hop: IContact, ICloneable
     {
-        public BoundedProtocol Device { get; set; }
-        public int ExpectedInternalSlotWhenDiscovered { get; private set; }
+        public IDiscoveryProtocol Device { get; set; }
+        public int FirstContact { get; }
+        public int LastContact { get; private set; }
+        public int ExpectedDiscoverySlot { get; }
+        public int MissedToListen { get; private set; }
 
-        public ContactInfo2Hop(BoundedProtocol device)
+        public ContactInfo2Hop(IDiscoveryProtocol device, int discovered, int expectedDiscoverySlot)
         {
             Device = device;
-            CalculateInfo();
+            FirstContact = LastContact = discovered;
+            ExpectedDiscoverySlot = expectedDiscoverySlot;
         }
 
-        //public int CumulativeTransmissions(int t0, int tn)
-        //{
-        //    if(tn > ExpectedInternalSlotWhenDiscovered)
-        //        throw new ArgumentException($"Parameter {tn} can not be beyond the expected internal slot when discovered (Property {ExpectedInternalSlotWhenDiscovered})");
-
-        //}
-
-        private void CalculateInfo()
+        public void UpdateMissed(int number)
         {
-            var clone = Device.Clone();
-            clone.MoveNext();
+            MissedToListen = number;
         }
+
+        public void Update(int lastContact)
+        {
+            LastContact = lastContact;
+        }
+
+        public override string ToString()
+        {
+            return "[" + FirstContact + ":" + LastContact + "]" + "[Fst.C/Lst.C]";
+        }
+
+        public object Clone()
+        {
+            var clone = new ContactInfo2Hop(Device, FirstContact, ExpectedDiscoverySlot);
+            clone.Update(LastContact);
+            clone.UpdateMissed(MissedToListen);
+            return clone;
+        }
+
     }
 }

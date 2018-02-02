@@ -9,7 +9,6 @@ namespace NeighborDiscovery.Protocols
 {
     public abstract class AccProtocol:BoundedProtocol
     {
-
         protected Dictionary<IDiscoveryProtocol, ContactInfo2Hop> Neighbors2HopDiscovered;
         public virtual int NumberOfNeighbors2Hop => Neighbors2HopDiscovered.Count;
 
@@ -21,32 +20,32 @@ namespace NeighborDiscovery.Protocols
 
         protected abstract double SlotGain(int slot);
 
-        protected virtual int ExpectedDiscovery(int t0, BoundedProtocol device)
-        {
-            int limit = int.MaxValue;
-            var transmissions = GetDeviceNextTransmissionSlot(t0, limit, device).GetEnumerator();
-            var listen = GetDeviceNextListeningSlots(t0, limit, this).GetEnumerator();
-            transmissions.MoveNext();
-            listen.MoveNext();
-            while (listen.Current != transmissions.Current)
-            {
-                if (listen.Current < transmissions.Current)
-                    listen.MoveNext();
-                else
-                {
-                    transmissions.MoveNext();
-                }
-            }
-            transmissions.Dispose();
-            listen.Dispose();
-            return listen.Current - t0;
-        }
+        //protected virtual int ExpectedDiscovery(int t0, BoundedProtocol device)
+        //{
+        //    int limit = int.MaxValue;
+        //    var transmissions = GetDeviceNextTransmissionSlot(t0, limit, device).GetEnumerator();
+        //    var listen = GetDeviceNextListeningSlots(t0, limit, this).GetEnumerator();
+        //    transmissions.MoveNext();
+        //    listen.MoveNext();
+        //    while (listen.Current != transmissions.Current)
+        //    {
+        //        if (listen.Current < transmissions.Current)
+        //            listen.MoveNext();
+        //        else
+        //        {
+        //            transmissions.MoveNext();
+        //        }
+        //    }
+        //    transmissions.Dispose();
+        //    listen.Dispose();
+        //    return listen.Current - t0;
+        //}
 
         protected virtual IEnumerable<IDiscoveryProtocol> Get2HopNeighborsFromDirectNeighbor(IDiscoveryProtocol neighbor)
         {
             var lastContact = ((ContactInfo)GetContactInfo(neighbor)).LastContact;
-            int slotsPassed = InternalTimeSlot - lastContact;//how many slots since I listened to it the last time
-            int myKey = neighbor.InternalTimeSlot - slotsPassed;//internal time slot of the neighbor the last time I listened to it
+            int slotsPassed = InternalTimeSlot - lastContact;//how many slots since I listened to my neighbor the last time
+            int myKey = neighbor.InternalTimeSlot - slotsPassed;//this means I can see any discovered device by my neighbor before he contacted me the last time
             //this can access 2 hop neighbors via a neighbor when they were discovered before myKey
             foreach (var neighbor2Hop in neighbor.Neighbors())
             {
@@ -86,14 +85,25 @@ namespace NeighborDiscovery.Protocols
             }
         }
 
-        public virtual IEnumerable<IDiscoveryProtocol> Neighbors2Hop()
+        protected virtual void AddNeighbor2Hop(IDiscoveryProtocol device)
         {
-            return Neighbors2HopDiscovered.Keys;
+
+        }
+
+        protected virtual void RemoveNeighbor2Hop(IDiscoveryProtocol device)
+        {
+            if (ContainsNeighbor2Hop(device))
+                Neighbors2HopDiscovered.Remove(device);
         }
 
         public virtual bool ContainsNeighbor2Hop(IDiscoveryProtocol device)
         {
             return Neighbors2HopDiscovered.ContainsKey(device);
+        }
+
+        public virtual IEnumerable<IDiscoveryProtocol> Neighbors2Hop()
+        {
+            return Neighbors2HopDiscovered.Keys;
         }
 
         public ContactInfo2Hop GetContactInfoFor2Hop(IDiscoveryProtocol device)
