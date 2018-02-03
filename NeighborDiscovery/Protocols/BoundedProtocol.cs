@@ -12,7 +12,7 @@ namespace NeighborDiscovery.Protocols
     {
         protected Dictionary<IDiscoveryProtocol, ContactInfo> NeighborsDiscovered;
         public int Id { get; protected set; }
-        public int InternalTimeSlot { get; private set; }
+        public int InternalTimeSlot { get; protected set; }
         public virtual int NumberOfNeighbors => NeighborsDiscovered.Count;
         public abstract int Bound { get; }
         public abstract int T { get; }
@@ -71,8 +71,6 @@ namespace NeighborDiscovery.Protocols
             if(!ContainsNeighbor(transmission.Sender))
                 AddNeighbor(transmission.Sender);
         }
-
-        
 
         public IContact GetContactInfo(IDiscoveryProtocol device)
         {

@@ -20,26 +20,26 @@ namespace NeighborDiscovery.Protocols
 
         protected abstract double SlotGain(int slot);
 
-        //protected virtual int ExpectedDiscovery(int t0, BoundedProtocol device)
-        //{
-        //    int limit = int.MaxValue;
-        //    var transmissions = GetDeviceNextTransmissionSlot(t0, limit, device).GetEnumerator();
-        //    var listen = GetDeviceNextListeningSlots(t0, limit, this).GetEnumerator();
-        //    transmissions.MoveNext();
-        //    listen.MoveNext();
-        //    while (listen.Current != transmissions.Current)
-        //    {
-        //        if (listen.Current < transmissions.Current)
-        //            listen.MoveNext();
-        //        else
-        //        {
-        //            transmissions.MoveNext();
-        //        }
-        //    }
-        //    transmissions.Dispose();
-        //    listen.Dispose();
-        //    return listen.Current - t0;
-        //}
+        protected virtual int ExpectedDiscovery(int t0, IDiscoveryProtocol device)
+        {
+            int limit = int.MaxValue;
+            var transmissions = GetDeviceNextTransmissionSlot(t0, limit, device).GetEnumerator();
+            var listen = GetDeviceNextListeningSlots(t0, limit, this).GetEnumerator();
+            transmissions.MoveNext();
+            listen.MoveNext();
+            while (listen.Current != transmissions.Current)
+            {
+                if (listen.Current < transmissions.Current)
+                    listen.MoveNext();
+                else
+                {
+                    transmissions.MoveNext();
+                }
+            }
+            transmissions.Dispose();
+            listen.Dispose();
+            return listen.Current - t0;
+        }
 
         protected virtual IEnumerable<IDiscoveryProtocol> Get2HopNeighborsFromDirectNeighbor(IDiscoveryProtocol neighbor)
         {
@@ -57,37 +57,47 @@ namespace NeighborDiscovery.Protocols
             }
         }
 
+        /// <summary>
+        /// T0 and Tn are defined as the internal time slot of the given device
+        /// </summary>
+        /// <param name="t0">the starting internal time slot</param>
+        /// <param name="tn">the ending internal time slot</param>
+        /// <param name="device"></param>
+        /// <returns></returns>
         protected virtual IEnumerable<int> GetDeviceNextTransmissionSlot(int t0, int tn, IDiscoveryProtocol device)
         {
             var clone = device.Clone();
-            clone.MoveNext(device.InternalTimeSlot + t0);
-            int cnt = t0;
-            while (cnt <= tn)
+            clone.MoveNext(t0);
+            for (; t0 <= tn; t0++, clone.MoveNext())
             {
-                clone.MoveNext();
                 if (clone.IsTransmitting())
-                    yield return cnt;
-                cnt++;
+                    yield return t0;
             }
         }
 
+        /// <summary>
+        /// T0 and Tn are defined as the internal time slot of the given device
+        /// </summary>
+        /// <param name="t0">the starting internal time slot</param>
+        /// <param name="tn">the ending internal time slot</param>
+        /// <param name="device"></param>
+        /// <returns></returns>
         protected virtual IEnumerable<int> GetDeviceNextListeningSlots(int t0, int tn, IDiscoveryProtocol device)
         {
             var clone = device.Clone();
-            clone.MoveNext(device.InternalTimeSlot + t0);
-            int cnt = t0;
-            while (cnt <= tn)
+            clone.MoveNext(t0);
+            for (; t0 <= tn; t0++, clone.MoveNext())
             {
-                clone.MoveNext();
                 if (clone.IsListening())
-                    yield return cnt;
-                cnt++;
+                    yield return t0;
             }
         }
 
         protected virtual void AddNeighbor2Hop(IDiscoveryProtocol device)
         {
-
+            int expectedDiscovery = ExpectedDiscovery(InternalTimeSlot, device);
+            ContactInfo2Hop info = new ContactInfo2Hop(device, InternalTimeSlot, expectedDiscovery);
+            Neighbors2HopDiscovered.Add(device, info);
         }
 
         protected virtual void RemoveNeighbor2Hop(IDiscoveryProtocol device)
@@ -106,7 +116,7 @@ namespace NeighborDiscovery.Protocols
             return Neighbors2HopDiscovered.Keys;
         }
 
-        public ContactInfo2Hop GetContactInfoFor2Hop(IDiscoveryProtocol device)
+        public virtual ContactInfo2Hop GetContactInfoFor2Hop(IDiscoveryProtocol device)
         {
             return Neighbors2HopDiscovered.TryGetValue(device, out var value) ? value : null;
         }

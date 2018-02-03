@@ -1,6 +1,7 @@
 ﻿using NeighborDiscovery.Environment;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,12 +18,14 @@ namespace NeighborDiscovery.Protocols
         private double DesiredDutyCycle { get; set; }
         private bool[,] _listeningSchedule;
         private int _nextAccSlot;
+        private int[] _slotValue;
         
         public AccBalancedNihaoGreedy(int id, double dutyCyclePercentage) : base(id)
         {
             _listeningSchedule = new bool[2*N,N];
             GenerateListenningSchedule();
             _nextAccSlot = -1;
+            _slotValue = new int[N];
         }
 
         public void  GenerateListenningSchedule()
@@ -59,11 +62,13 @@ namespace NeighborDiscovery.Protocols
             if (row % 2 == 0)
                 return _listeningSchedule[row, col];
             
-            //ACC in action here
+            //acc slot
             if (InternalTimeSlot == _nextAccSlot)
+            {
                 return true;
+            }
 
-            return false;//todo
+            return false;
         }
 
         public override bool IsTransmitting()
@@ -100,14 +105,10 @@ namespace NeighborDiscovery.Protocols
 
         protected override double SlotGain(int slot)
         {
-            double value = 0;
-            foreach (var neihbor in Neighbors2Hop())
-            {
-                //todo => if neighbor is transmitting at slot
-                value += 1;
-            }
-
-            return value;
+            int schedulePos = slot % T;
+            int row = schedulePos / 2*N;
+            int col = schedulePos % N;
+            return _slotValue[col];
         }
 
         public override void ListenTo(ITransmission transmission)
@@ -122,9 +123,92 @@ namespace NeighborDiscovery.Protocols
                 {
                     RemoveNeighbor2Hop(transmission.Sender);
                 }
+                //adding new 2hop neighbors via the new discovered neighbor
+                foreach (var neighbor2Hop in Get2HopNeighborsFromDirectNeighbor(transmission.Sender))
+                {
+                    AddNeighbor2Hop(neighbor2Hop);
+                }
+                //update slot gain
+                if (IsAccSlot(InternalTimeSlot + 1))
+                {
+                    ClearSlots();
+                    foreach (var neighbor2Hop in Neighbors2Hop())
+                    {
+                        int myT0 = InternalTimeSlot + 1;
+                        int myTn = LastAccSlotAfter(myT0);
+                        int t0 = neighbor2Hop.InternalTimeSlot + 1;
+                        int tn = t0 + (myTn - myT0);
+                        foreach (var neig2HopTran in GetDeviceNextTransmissionSlot(t0, tn, neighbor2Hop))
+                        {
+                            int transmitsIn = 1 + (neig2HopTran - t0);
+                            int slotToUpdate = InternalTimeSlot + transmitsIn;
+                            UpdateSlot(slotToUpdate);
+                        }
+                    }
+                    _nextAccSlot = GetBestSlot(InternalTimeSlot + 1);
+                }
             }
-            //else todo => Update ContactInfo
+            else//update last contact 
+                Neighbors2HopDiscovered[transmission.Sender].Update(InternalTimeSlot);
         }
 
+        private int LastAccSlotAfter(int t0)
+        {
+            while (IsAccSlot(t0))
+                t0++;
+            return t0-1;
+        }
+
+        private int GetBestSlot(int t0)
+        {
+            if(!IsAccSlot(t0))
+                throw new Exception("The given slot is not within the correct range");
+            int slot = t0;
+            int best = t0;
+            while (IsAccSlot(slot))
+            {
+                if (_slotValue[slot] > _slotValue[best])
+                    best = slot;
+                slot++;
+            }
+            return best;
+        }
+
+        private void ClearSlots()
+        {
+            for (int i = 0; i < _slotValue.Length; i++)
+            {
+                _slotValue[i] = 0;
+            }
+        }
+
+        private bool IsAccSlot(int t0)
+        {
+            int slot = t0 % T;
+            int row = slot / N;
+            int col = slot % N;
+
+            if (row % 2 == 0 || col >= N)
+                return false;
+
+            return true;
+        }
+
+        private void UpdateSlot(int t0)
+        {
+            if(!IsAccSlot(t0))
+                throw new Exception("The given slot is not within the correct range");
+            int slot = t0 % T;
+            int row = slot / N;
+            int col = slot % N;
+            _slotValue[col]++;
+        }
+
+        public override void MoveNext(int slot = 1)
+        {
+            if (slot < 0)
+                throw new Exception("The Device can not move a negative number of slots");
+            InternalTimeSlot += slot;
+        }
     }
 }
