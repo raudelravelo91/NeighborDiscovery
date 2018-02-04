@@ -21,6 +21,7 @@ namespace NeighborDiscovery.Protocols
         private double DesiredDutyCycle { get; set; }
         private bool[,] _listeningSchedule;
         private int _nextAccSlot;
+        private int _lastAccSlot;
         private readonly int[] _slotValue;
         
         public AccBalancedNihaoGreedy(int id, double dutyCyclePercentage) : base(id)
@@ -29,6 +30,7 @@ namespace NeighborDiscovery.Protocols
             GenerateListenningSchedule();
             _nextAccSlot = -1;
             _slotValue = new int[N];
+            _lastAccSlot = -1;
         }
 
         public void  GenerateListenningSchedule()
@@ -56,7 +58,7 @@ namespace NeighborDiscovery.Protocols
             return "Id: " + Id + " DC: " + DesiredDutyCycle + " AccBalancedNihaoGreedy (" + N + ")";
         }
 
-        private bool IsAccInCharge()
+        private bool AccIsInCharge()
         {
             int slot = InternalTimeSlot % T;
             int row = slot / N;
@@ -71,7 +73,7 @@ namespace NeighborDiscovery.Protocols
             int row = slot / N;
             int col = slot % N;
 
-            if (IsAccInCharge())
+            if (AccIsReadyToListenAgain())
                 return InternalTimeSlot == _nextAccSlot;
 
             return _listeningSchedule[row, col];
@@ -222,18 +224,31 @@ namespace NeighborDiscovery.Protocols
             _slotValue[col]++;
         }
 
+        private bool AccIsReadyToListenAgain()
+        {
+            if(!AccIsInCharge())
+                return false;
+
+            if(_lastAccSlot < 0)
+                return true;
+            return  (InternalTimeSlot - _lastAccSlot) > N;
+        }
+
         public override void MoveNext(int slot = 1)
         {
             if (slot < 0)
                 throw new Exception("The Device can not move a negative number of slots");
-            InternalTimeSlot += slot;
             if (IsListening())
             {
-                if (IsAccInCharge())
+                if (AccIsReadyToListenAgain())
+                {
                     AccProtocolListenedSlots++;
+                    _lastAccSlot = InternalTimeSlot;
+                }
                 else
                     ProtocolListenedSlots++;
             }
+            InternalTimeSlot += slot;
         }
     }
 }
