@@ -10,6 +10,9 @@ using NeighborDiscovery.Utils;
 
 namespace NeighborDiscovery.Protocols
 {
+    /// <summary>
+    /// This Acc Protocol is a greedy Acc that prioritize the listening in slots where the maximum number of 2-hop neighbors are transmitting
+    /// </summary>
     public class AccBalancedNihaoGreedy : AccProtocol
     {
         public int N { get; set; }// M = N AND N => 2N
@@ -18,7 +21,7 @@ namespace NeighborDiscovery.Protocols
         private double DesiredDutyCycle { get; set; }
         private bool[,] _listeningSchedule;
         private int _nextAccSlot;
-        private int[] _slotValue;
+        private readonly int[] _slotValue;
         
         public AccBalancedNihaoGreedy(int id, double dutyCyclePercentage) : base(id)
         {
@@ -53,22 +56,25 @@ namespace NeighborDiscovery.Protocols
             return "Id: " + Id + " DC: " + DesiredDutyCycle + " AccBalancedNihaoGreedy (" + N + ")";
         }
 
+        private bool IsAccInCharge()
+        {
+            int slot = InternalTimeSlot % T;
+            int row = slot / N;
+            int col = slot % N;
+
+            return row % 2 != 0;
+        }
+
         public override bool IsListening()
         {
             int slot = InternalTimeSlot % T;
             int row = slot / N;
             int col = slot % N;
 
-            if (row % 2 == 0)
-                return _listeningSchedule[row, col];
-            
-            //acc slot
-            if (InternalTimeSlot == _nextAccSlot)
-            {
-                return true;
-            }
+            if (IsAccInCharge())
+                return InternalTimeSlot == _nextAccSlot;
 
-            return false;
+            return _listeningSchedule[row, col];
         }
 
         public override bool IsTransmitting()
@@ -115,41 +121,53 @@ namespace NeighborDiscovery.Protocols
         {
             if (!IsListening())
                 return;
-
+            bool slotsGainUpdatedNeeded = false;
             if (!ContainsNeighbor(transmission.Sender))
             {
-                AddNeighbor(transmission.Sender);
+                AddNeighbor(transmission.Sender); //adding new neighbor as a direct one
                 if (ContainsNeighbor2Hop(transmission.Sender))
                 {
-                    RemoveNeighbor2Hop(transmission.Sender);
-                }
-                //adding new 2hop neighbors via the new discovered neighbor
-                foreach (var neighbor2Hop in Get2HopNeighborsFromDirectNeighbor(transmission.Sender))
-                {
-                    AddNeighbor2Hop(neighbor2Hop);
-                }
-                //update slot gain
-                if (IsAccSlot(InternalTimeSlot + 1))
-                {
-                    ClearSlots();
-                    foreach (var neighbor2Hop in Neighbors2Hop())
-                    {
-                        int myT0 = InternalTimeSlot + 1;
-                        int myTn = LastAccSlotAfter(myT0);
-                        int t0 = neighbor2Hop.InternalTimeSlot + 1;
-                        int tn = t0 + (myTn - myT0);
-                        foreach (var neig2HopTran in GetDeviceNextTransmissionSlot(t0, tn, neighbor2Hop))
-                        {
-                            int transmitsIn = 1 + (neig2HopTran - t0);
-                            int slotToUpdate = InternalTimeSlot + transmitsIn;
-                            UpdateSlot(slotToUpdate);
-                        }
-                    }
-                    _nextAccSlot = GetBestSlot(InternalTimeSlot + 1);
+                    RemoveNeighbor2Hop(transmission.Sender); //removing the neighbor from 2-hop neighbors
+                    slotsGainUpdatedNeeded = true;
                 }
             }
-            else//update last contact 
+            else //update last contact => key updated to get more information
                 Neighbors2HopDiscovered[transmission.Sender].Update(InternalTimeSlot);
+
+            foreach (var neighbor2Hop in Get2HopNeighborsFromDirectNeighbor(transmission.Sender)
+            ) //adding new 2hop neighbors that may be discovered by the new information
+            {
+                if (!ContainsNeighbor2Hop(transmission.Sender))
+                {
+                    AddNeighbor2Hop(neighbor2Hop);
+                    slotsGainUpdatedNeeded = true;
+                }
+            }
+
+            if (slotsGainUpdatedNeeded) //update slots gain, if needed
+                UpdateSlotsGain();
+        }
+
+        private void UpdateSlotsGain()
+        {
+            if (IsAccSlot(InternalTimeSlot + 1))
+            {
+                ClearSlots();
+                foreach (var neighbor2Hop in Neighbors2Hop())
+                {
+                    int myT0 = InternalTimeSlot + 1;
+                    int myTn = LastAccSlotAfter(myT0);
+                    int t0 = neighbor2Hop.InternalTimeSlot + 1;
+                    int tn = t0 + (myTn - myT0);
+                    foreach (var neig2HopTran in GetDeviceNextTransmissionSlot(t0, tn, neighbor2Hop))
+                    {
+                        int transmitsIn = 1 + (neig2HopTran - t0);
+                        int slotToUpdate = InternalTimeSlot + transmitsIn;
+                        UpdateSlot(slotToUpdate);
+                    }
+                }
+                //_nextAccSlot = GetBestSlot(InternalTimeSlot + 1);
+            }
         }
 
         private int LastAccSlotAfter(int t0)
@@ -209,6 +227,13 @@ namespace NeighborDiscovery.Protocols
             if (slot < 0)
                 throw new Exception("The Device can not move a negative number of slots");
             InternalTimeSlot += slot;
+            if (IsListening())
+            {
+                if (IsAccInCharge())
+                    AccProtocolListenedSlots++;
+                else
+                    ProtocolListenedSlots++;
+            }
         }
     }
 }

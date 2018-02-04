@@ -10,12 +10,15 @@ namespace NeighborDiscovery.Protocols
     public abstract class AccProtocol:BoundedProtocol
     {
         protected Dictionary<IDiscoveryProtocol, ContactInfo2Hop> Neighbors2HopDiscovered;
+        protected int ProtocolListenedSlots;
+        protected int AccProtocolListenedSlots;
         public virtual int NumberOfNeighbors2Hop => Neighbors2HopDiscovered.Count;
+        
 
         protected AccProtocol(int id) : base(id)
         {
-            
-
+            ProtocolListenedSlots = 0;
+            AccProtocolListenedSlots = 0;
         }
 
         protected abstract double SlotGain(int slot);
@@ -95,6 +98,8 @@ namespace NeighborDiscovery.Protocols
 
         protected virtual void AddNeighbor2Hop(IDiscoveryProtocol device)
         {
+            if (ContainsNeighbor2Hop(device))
+                return;
             int expectedDiscovery = ExpectedDiscovery(InternalTimeSlot, device);
             ContactInfo2Hop info = new ContactInfo2Hop(device, InternalTimeSlot, expectedDiscovery);
             Neighbors2HopDiscovered.Add(device, info);

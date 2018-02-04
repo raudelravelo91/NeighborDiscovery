@@ -76,7 +76,5 @@ namespace NeighborDiscovery.Environment
             
             return statistics;
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
     }
 }
