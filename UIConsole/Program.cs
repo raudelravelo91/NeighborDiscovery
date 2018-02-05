@@ -9,17 +9,28 @@ namespace UIConsole
     {
         static void Main(string[] args)
         {
-            for (int i = 1; i <= 180; i++)
-            {
-                if(Test(i))
-                    Console.WriteLine("X = " + i + " Y = " + (i+30));
-            }
+            Console.WriteLine(" --------------------------------------------------------------");
+            PrintResult("TestMoveNextAccGreedy", TestingAManoLOL.TestMoveNextAccGreedy());
+            PrintResult("TestIsListeningAccGreedy", TestingAManoLOL.TestIsListeningAccGreedy());
+            Console.WriteLine(" --------------------------------------------------------------");
         }
         
-        static bool Test(int x)
+        static void PrintResult(string testName, bool result)
         {
-            int y = x + 30;
-            return (1800 / x) == (1800 / y) + 10 && 1800 % x == 0 && 1800 % y == 0;
+            if(result)
+            {
+                Console.Write("|");
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write("Passed: ");
+            }
+            else
+            {
+                Console.Write("|");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write("Failed: ");
+            }
+            Console.ResetColor();
+            Console.WriteLine(testName);
         }
     }
 }

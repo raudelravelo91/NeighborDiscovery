@@ -19,6 +19,7 @@ namespace NeighborDiscovery.Protocols
         {
             ProtocolListenedSlots = 0;
             AccProtocolListenedSlots = 0;
+            Neighbors2HopDiscovered = new Dictionary<IDiscoveryProtocol, ContactInfo2Hop>();
         }
 
         protected abstract double SlotGain(int slot);

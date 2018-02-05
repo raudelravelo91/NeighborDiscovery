@@ -23,14 +23,18 @@ namespace NeighborDiscovery.Protocols
         private int _nextAccSlot;
         private int _lastAccSlot;
         private readonly int[] _slotValue;
+        private bool _slotsGainUpdatedNeeded;
         
         public AccBalancedNihaoGreedy(int id, double dutyCyclePercentage) : base(id)
         {
+            SetDutyCycle(dutyCyclePercentage);
             _listeningSchedule = new bool[2*N,N];
             GenerateListenningSchedule();
             _nextAccSlot = -1;
             _slotValue = new int[N];
             _lastAccSlot = -1;
+            _slotsGainUpdatedNeeded = true;
+            UpdateSlotsGain();
         }
 
         public void  GenerateListenningSchedule()
@@ -74,7 +78,7 @@ namespace NeighborDiscovery.Protocols
             int col = slot % N;
 
             if (AccIsReadyToListenAgain())
-                return InternalTimeSlot == _nextAccSlot;
+                return col == _nextAccSlot;
 
             return _listeningSchedule[row, col];
         }
@@ -123,14 +127,14 @@ namespace NeighborDiscovery.Protocols
         {
             if (!IsListening())
                 return;
-            bool slotsGainUpdatedNeeded = false;
+            _slotsGainUpdatedNeeded = false;
             if (!ContainsNeighbor(transmission.Sender))
             {
                 AddNeighbor(transmission.Sender); //adding new neighbor as a direct one
                 if (ContainsNeighbor2Hop(transmission.Sender))
                 {
                     RemoveNeighbor2Hop(transmission.Sender); //removing the neighbor from 2-hop neighbors
-                    slotsGainUpdatedNeeded = true;
+                    _slotsGainUpdatedNeeded = true;
                 }
             }
             else //update last contact => key updated to get more information
@@ -142,12 +146,11 @@ namespace NeighborDiscovery.Protocols
                 if (!ContainsNeighbor2Hop(transmission.Sender))
                 {
                     AddNeighbor2Hop(neighbor2Hop);
-                    slotsGainUpdatedNeeded = true;
+                    _slotsGainUpdatedNeeded = true;
                 }
             }
 
-            if (slotsGainUpdatedNeeded) //update slots gain, if needed
-                UpdateSlotsGain();
+            
         }
 
         private void UpdateSlotsGain()
@@ -168,7 +171,7 @@ namespace NeighborDiscovery.Protocols
                         UpdateSlot(slotToUpdate);
                     }
                 }
-                //_nextAccSlot = GetBestSlot(InternalTimeSlot + 1);
+                _nextAccSlot = GetBestSlot(InternalTimeSlot + 1);    
             }
         }
 
@@ -184,14 +187,16 @@ namespace NeighborDiscovery.Protocols
             if(!IsAccSlot(t0))
                 throw new Exception("The given slot is not within the correct range");
             int slot = t0;
-            int best = t0;
+            int bestIndex = 0;
             while (IsAccSlot(slot))
             {
-                if (_slotValue[slot] > _slotValue[best])
-                    best = slot;
+                int mod = t0 % T;
+                int slotIndex = mod % N;
+                if (_slotValue[slotIndex] > _slotValue[bestIndex])
+                    bestIndex = slotIndex;
                 slot++;
             }
-            return best;
+            return bestIndex;
         }
 
         private void ClearSlots()
@@ -248,6 +253,10 @@ namespace NeighborDiscovery.Protocols
                 else
                     ProtocolListenedSlots++;
             }
+
+            if (IsAccSlot(InternalTimeSlot + 1) || _slotsGainUpdatedNeeded) //update slots gain, if needed
+                UpdateSlotsGain();
+
             InternalTimeSlot += slot;
         }
     }
