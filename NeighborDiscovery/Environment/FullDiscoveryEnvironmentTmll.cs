@@ -71,33 +71,6 @@ namespace NeighborDiscovery.Environment
             _events = new Queue<Event>();
         }
 
-        private void UpdatePhysicalPartOfDiscoverableDevice(DiscoverableDevice device, Network2DNode node)
-        {
-            device.Position.X = node.Position.X;
-            device.Position.Y = node.Position.Y;
-            device.Direction.X = node.Direction.X;
-            device.Direction.Y = node.Direction.Y;
-            device.Speed = node.Speed;
-        }
-
-        private Network2DNode Get2DNodeFromDiscoverableDevice(DiscoverableDevice device)
-        {
-            return new Network2DNode(device.DeviceLogic.Id, device.Position, device.Direction, device.CommunicationRange, device.Speed);
-        }
-
-        private IEnumerable<Event> FetchNextEvents()
-        {
-            while (_events.Count > 0)
-                yield return _events.Dequeue();
-        }
-
-        private void RemoveDevice(DiscoverableDevice device)
-        {
-            var physicalNode = _deviceToLocation[device];
-            _network.RemoveNode(physicalNode);
-            _deviceToLocation.Remove(device);
-        }
-
         public void MoveNext()
         {
             foreach (var iEvent in FetchNextEvents())
@@ -145,6 +118,68 @@ namespace NeighborDiscovery.Environment
             var logic = newEvent.Device.DeviceLogic;
             _eventArrival.Add(logic, new DeviceInfo(logic.InternalTimeSlot, CurrentTimeSlot));
         }
+        
+        public StatisticTestResult GetCurrentResult()
+        {
+            var statistics = new StatisticTestResult();
+            foreach (var kvPair in _locationToDevice)
+            {
+                var device = kvPair.Value;
+                foreach (var neighbor in device.DeviceLogic.Neighbors())
+                {
+                    var neighborDevice = _deviceById[neighbor.Id];
+                    var latency = GetDiscoveryLatencyInStaticNetwork(device, neighborDevice);
+                    statistics.AddDiscovery(latency);
+                }
+            }
+            return statistics;
+        }
+
+        public StatisticTestResult GetCurrentResult(int deviceId)
+        {
+            if(!_deviceById.ContainsKey(deviceId))
+                throw new Exception("The environment does not contains any device whith the given Id");
+            
+            var device = _deviceById[deviceId];
+            var statistics = new StatisticTestResult();
+
+            foreach (var neighbor in device.DeviceLogic.Neighbors())
+            {
+                var neighborDevice = _deviceById[neighbor.Id];
+                var latency = GetDiscoveryLatencyInStaticNetwork(device, neighborDevice);
+                statistics.AddDiscovery(latency);
+            }
+            
+            return statistics;
+        }
+
+        #region private methods
+        private void UpdatePhysicalPartOfDiscoverableDevice(DiscoverableDevice device, Network2DNode node)
+        {
+            device.Position.X = node.Position.X;
+            device.Position.Y = node.Position.Y;
+            device.Direction.X = node.Direction.X;
+            device.Direction.Y = node.Direction.Y;
+            device.Speed = node.Speed;
+        }
+
+        private Network2DNode Get2DNodeFromDiscoverableDevice(DiscoverableDevice device)
+        {
+            return new Network2DNode(device.DeviceLogic.Id, device.Position, device.Direction, device.CommunicationRange, device.Speed);
+        }
+
+        private IEnumerable<Event> FetchNextEvents()
+        {
+            while (_events.Count > 0)
+                yield return _events.Dequeue();
+        }
+
+        private void RemoveDevice(DiscoverableDevice device)
+        {
+            var physicalNode = _deviceToLocation[device];
+            _network.RemoveNode(physicalNode);
+            _deviceToLocation.Remove(device);
+        }
 
         private void MoveAll()
         {
@@ -161,7 +196,6 @@ namespace NeighborDiscovery.Environment
 
             CurrentTimeSlot++;
         }
-
 
         private int ToEnviromentTime(IDiscoveryProtocol device, int deviceSlot)
         {
@@ -191,21 +225,6 @@ namespace NeighborDiscovery.Environment
 
             return latency;
         }
-
-        public StatisticTestResult GetCurrentResult()
-        {
-            var statistics = new StatisticTestResult();
-            foreach (var kvPair in _locationToDevice)
-            {
-                var device = kvPair.Value;
-                foreach (var neighbor in device.DeviceLogic.Neighbors())
-                {
-                    var neighborDevice = _deviceById[neighbor.Id];
-                    var latency = GetDiscoveryLatencyInStaticNetwork(device, neighborDevice);
-                    statistics.AddDiscovery(latency);
-                }
-            }
-            return statistics;
-        }
+        #endregion
     }
 }

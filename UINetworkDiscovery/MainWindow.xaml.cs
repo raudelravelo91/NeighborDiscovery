@@ -77,7 +77,7 @@ namespace UINetworkDiscovery
             _workerBalancedNihao = new AlgorithmBackgroundWorker(NodeType.BalancedNihao);
             _workerBalancedNihao.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
             _workerBalancedNihao.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
-            _workerAccGossipPNihao = new AlgorithmBackgroundWorker(NodeType.AccGossipPNihao);
+            _workerAccGossipPNihao = new AlgorithmBackgroundWorker(NodeType.AccGreedyBalancedNihao);
             _workerAccGossipPNihao.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
             _workerAccGossipPNihao.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
 

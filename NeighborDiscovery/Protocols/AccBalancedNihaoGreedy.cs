@@ -37,20 +37,6 @@ namespace NeighborDiscovery.Protocols
             UpdateSlotsGain();
         }
 
-        public void  GenerateListenningSchedule()
-        {
-            var slots = new int[N];
-            for (var i = 0; i < N; i++)
-            {
-                slots[i] = i;
-            }
-            var shuffle = new Shuffle(N);
-            shuffle.KnuthShuffle(slots);
-
-            _listeningSchedule = new bool[2*N,N];
-            for (int i = 0; i < 2 * N; i += 2)
-                _listeningSchedule[i, slots[i / 2]] = true;
-        }
 
         public override IDiscoveryProtocol Clone()
         {
@@ -60,15 +46,6 @@ namespace NeighborDiscovery.Protocols
         public override string ToString()
         {
             return "Id: " + Id + " DC: " + DesiredDutyCycle + " AccBalancedNihaoGreedy (" + N + ")";
-        }
-
-        private bool AccIsInCharge()
-        {
-            int slot = InternalTimeSlot % T;
-            int row = slot / N;
-            int col = slot % N;
-
-            return row % 2 != 0;
         }
 
         public override bool IsListening()
@@ -115,6 +92,27 @@ namespace NeighborDiscovery.Protocols
             DesiredDutyCycle = value;
         }
 
+        public override void MoveNext(int slot = 1)
+        {
+            if (slot < 0)
+                throw new Exception("The Device can not move a negative number of slots");
+            if (IsListening())
+            {
+                if (AccIsReadyToListenAgain())
+                {
+                    AccProtocolListenedSlots++;
+                    _lastAccSlot = InternalTimeSlot;
+                }
+                else
+                    ProtocolListenedSlots++;
+            }
+
+            if (IsAccSlot(InternalTimeSlot + 1) || _slotsGainUpdatedNeeded) //update slots gain, if needed
+                UpdateSlotsGain();
+
+            InternalTimeSlot += slot;
+        }
+
         protected override double SlotGain(int slot)
         {
             int schedulePos = slot % T;
@@ -137,8 +135,8 @@ namespace NeighborDiscovery.Protocols
                     _slotsGainUpdatedNeeded = true;
                 }
             }
-            else //update last contact => key updated to get more information
-                Neighbors2HopDiscovered[transmission.Sender].Update(InternalTimeSlot);
+            else//update last contact => key updated to get more information
+                NeighborsDiscovered[transmission.Sender].Update(InternalTimeSlot);
 
             foreach (var neighbor2Hop in Get2HopNeighborsFromDirectNeighbor(transmission.Sender)
             ) //adding new 2hop neighbors that may be discovered by the new information
@@ -151,6 +149,16 @@ namespace NeighborDiscovery.Protocols
             }
 
             
+        }
+
+        #region private methods
+        private bool AccIsInCharge()
+        {
+            int slot = InternalTimeSlot % T;
+            int row = slot / N;
+            int col = slot % N;
+
+            return row % 2 != 0;
         }
 
         private void UpdateSlotsGain()
@@ -239,25 +247,20 @@ namespace NeighborDiscovery.Protocols
             return  (InternalTimeSlot - _lastAccSlot) > N;
         }
 
-        public override void MoveNext(int slot = 1)
+        private void GenerateListenningSchedule()
         {
-            if (slot < 0)
-                throw new Exception("The Device can not move a negative number of slots");
-            if (IsListening())
+            var slots = new int[N];
+            for (var i = 0; i < N; i++)
             {
-                if (AccIsReadyToListenAgain())
-                {
-                    AccProtocolListenedSlots++;
-                    _lastAccSlot = InternalTimeSlot;
-                }
-                else
-                    ProtocolListenedSlots++;
+                slots[i] = i;
             }
+            var shuffle = new Shuffle(N);
+            shuffle.KnuthShuffle(slots);
 
-            if (IsAccSlot(InternalTimeSlot + 1) || _slotsGainUpdatedNeeded) //update slots gain, if needed
-                UpdateSlotsGain();
-
-            InternalTimeSlot += slot;
+            _listeningSchedule = new bool[2 * N, N];
+            for (int i = 0; i < 2 * N; i += 2)
+                _listeningSchedule[i, slots[i / 2]] = true;
         }
+        #endregion
     }
 }

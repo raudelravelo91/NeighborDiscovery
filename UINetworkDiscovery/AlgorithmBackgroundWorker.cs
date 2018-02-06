@@ -17,6 +17,7 @@ namespace UINetworkDiscovery
         public NodeType DeviceProtocol { get; private set; }
         public BackgroundWorker Worker { get; private set; }
         public bool IsReading { get; private set; }
+        public int LatencyLimit{ get;set;}
 
         public AlgorithmBackgroundWorker(NodeType type)
         {
@@ -24,6 +25,7 @@ namespace UINetworkDiscovery
             Worker = new BackgroundWorker() { WorkerSupportsCancellation = true, WorkerReportsProgress = true, };
             Worker.DoWork += Start;
             IsReading = false;
+            LatencyLimit = 1000;
         }
 
         public void RunWorkerAsync(TestSuite suite)
@@ -73,11 +75,6 @@ namespace UINetworkDiscovery
             }
         }
 
-        //private void Start(object sender, DoWorkEventArgs e)
-        //{
-
-        //}
-
         private void Start(object sender, DoWorkEventArgs e)
         {
             lock (MainWindow.RunningInfo)
@@ -110,8 +107,8 @@ namespace UINetworkDiscovery
                 cnt++;
                 Worker.ReportProgress(cnt * 100 / suite.NumberOfTests);
             }
-            var latencyLimit = 1000;
-            statisticResults.BuildAverageFractionOfDiscovey(latencyLimit);
+            
+            statisticResults.BuildAverageFractionOfDiscovey(LatencyLimit);
             lock (MainWindow.RunningInfo)
             {
                 MainWindow.RunningInfo.RemoveRunningAlgorithm(false);

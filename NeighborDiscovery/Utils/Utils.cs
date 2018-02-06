@@ -20,6 +20,7 @@ namespace NeighborDiscovery.Utils
         GNihao,
         BalancedNihao,
         AccGossipGNihao,
-        AccGossipPNihao
+        AccGossipPNihao,
+        AccGreedyBalancedNihao,
     }
 }

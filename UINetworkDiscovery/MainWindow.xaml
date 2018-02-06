@@ -255,7 +255,7 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
-        <CheckBox Name="cbAccGossipPNihao" Content="AccGossip-PNihao" IsChecked="False" Margin="5" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <CheckBox Name="cbAccGossipPNihao" Content="AccGreedy (Balanced-Nihao)" IsChecked="False" Margin="5" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
         <Label Margin="0" Name="lbAccGossipPNihao" Content="Avg:" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
         <TextBlock Margin="0" Name="AccGossipPNihaoAvg" Text="" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
@@ -278,8 +278,8 @@
                 <Button Name="btPlot"  Height="30" Width="60" Margin="20,2,2,2" Padding="5" Content="RunEnv" Click="btPlot_Click" />
                 <Button Name="btTwoNodesSimulation"  Height="30" Width="60" Margin="20,3,2,7" Padding="5" Content="1 vs 1" Click="btTwoNodesSimulation_Click" />
                 <Label Content="Duty Cycles:" Margin="2,2,2,2" VerticalAlignment="Center"/>
-                <CheckBox Name="cb05p" Content="0.5%" IsChecked="True" Margin="10,2,2,2" VerticalAlignment="Center"/>
-                <CheckBox Name="cb1p" Content="1%" IsChecked="True" Margin="10,2,2,2" VerticalAlignment="Center"/>
+                <CheckBox Name="cb05p" Content="0.5%" IsChecked="False" Margin="10,2,2,2" VerticalAlignment="Center"/>
+                <CheckBox Name="cb1p" Content="1%" IsChecked="False" Margin="10,2,2,2" VerticalAlignment="Center"/>
                 <CheckBox Name="cb2p" Content="2%" IsChecked="False" Margin="10,2,2,2" VerticalAlignment="Center"/>
                 <CheckBox Name="cb5p" Content="5%" IsChecked="False" Margin="10,2,2,2" VerticalAlignment="Center"/>
                 <CheckBox Name="cb10p" Content="10%" IsChecked="False" Margin="10,2,2,2" VerticalAlignment="Center"/>

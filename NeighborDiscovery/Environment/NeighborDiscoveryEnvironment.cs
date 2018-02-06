@@ -12,6 +12,7 @@ namespace NeighborDiscovery.Environment
     public sealed class NeighborDiscoveryEnvironment
     {
         private NodeType _protocolType;
+        private int _accId;
 
         private readonly Random _random = new Random();
 
@@ -19,10 +20,25 @@ namespace NeighborDiscovery.Environment
         {
             return startUpSlot + device.Bound;
         }
-
+        
         private DiscoverableDevice FromDeviceDataToDiscoverableDevice(DeviceData data)
         {
-            var logic = CreateProtocol(data.Id, data.DutyCycle);
+            BoundedProtocol logic;
+            if (data.Id == _accId)
+            {
+                switch (_protocolType)
+                {
+                    case NodeType.BalancedNihao:
+                        logic = CreateProtocol(data.Id, data.DutyCycle, NodeType.AccGreedyBalancedNihao);
+                        break;
+
+                    default:
+                        logic = CreateProtocol(data.Id, data.DutyCycle, _protocolType);
+                        break;
+                }
+            }
+            else 
+                logic = CreateProtocol(data.Id, data.DutyCycle, _protocolType);
             logic.MoveNext(_random.Next(logic.T));//todo: change this :)
             return new DiscoverableDevice(logic, data.Position, data.Direction, data.Speed, data.CommunicationRange);
         }
@@ -32,9 +48,9 @@ namespace NeighborDiscovery.Environment
             return new Event(FromDeviceDataToDiscoverableDevice(data), EventType.IncomingDevice);
         }
 
-        public BoundedProtocol CreateProtocol(int id, int dutyCycle)
+        public BoundedProtocol CreateProtocol(int id, int dutyCycle, NodeType nodeType)
         {
-            switch (_protocolType)
+            switch (nodeType)
             {
                 case NodeType.Birthday:
                     return null;
@@ -58,6 +74,8 @@ namespace NeighborDiscovery.Environment
                     return null;
                 case NodeType.AccGossipPNihao:
                     return null;
+                case NodeType.AccGreedyBalancedNihao:
+                    return new AccBalancedNihaoGreedy(id, dutyCycle);
                 default:
                 {
                     throw new ArgumentException(_protocolType.ToString() + "(protocol) not supported");
@@ -65,8 +83,9 @@ namespace NeighborDiscovery.Environment
             }
         }
 
-        public StatisticTestResult RunSingleSimulation(IEnumerable<DeviceData> data, NodeType protocolType)
+        public StatisticTestResult RunSingleSimulation(IEnumerable<DeviceData> data, NodeType protocolType, int accId = -1)
         {
+            _accId = accId;
             _protocolType = protocolType;
             List<DeviceData> dataList = data.ToList();
             dataList.Sort();
@@ -84,7 +103,8 @@ namespace NeighborDiscovery.Environment
                 fullEnv.MoveNext();
                 currentSlot++;
             }
-
+            if(_accId >= 0)
+                return fullEnv.GetCurrentResult(_accId);
             return fullEnv.GetCurrentResult();
         }
     }
