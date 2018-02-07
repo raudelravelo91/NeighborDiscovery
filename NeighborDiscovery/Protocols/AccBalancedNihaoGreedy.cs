@@ -194,15 +194,14 @@ namespace NeighborDiscovery.Protocols
         {
             if(!IsAccSlot(t0))
                 throw new Exception("The given slot is not within the correct range");
-            int slot = t0;
             int bestIndex = 0;
-            while (IsAccSlot(slot))
+            while (IsAccSlot(t0))
             {
                 int mod = t0 % T;
                 int slotIndex = mod % N;
                 if (_slotValue[slotIndex] > _slotValue[bestIndex])
                     bestIndex = slotIndex;
-                slot++;
+                t0++;
             }
             return bestIndex;
         }

@@ -10,7 +10,7 @@ namespace NeighborDiscovery.Protocols
 {
     public abstract class BoundedProtocol:IDiscoveryProtocol
     {
-        protected Dictionary<IDiscoveryProtocol, ContactInfo> NeighborsDiscovered;
+        public Dictionary<IDiscoveryProtocol, ContactInfo> NeighborsDiscovered;
         public int Id { get; protected set; }
         public int InternalTimeSlot { get; protected set; }
         public virtual int NumberOfNeighbors => NeighborsDiscovered.Count;
