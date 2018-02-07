@@ -5,7 +5,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using NeighborDiscovery.Annotations;
 using NeighborDiscovery.Environment;
 using NeighborDiscovery.Protocols;
 using NeighborDiscovery.Statistics;
