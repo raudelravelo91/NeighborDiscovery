@@ -39,9 +39,14 @@ namespace NeighborDiscovery.Networks
                 throw new Exception("Node does not exists");
         }
 
+        public bool ContainsNode(Network2DNode node)
+        {
+            return _nodes.Contains(node);
+        }
+
         public void AddNode(Network2DNode newNode2D)
         {
-            if(_nodes.Contains(newNode2D))
+            if(ContainsNode(newNode2D))
                 throw new Exception("Node already exists");
             _neighbors.Add(newNode2D, new Dictionary<Network2DNode, int>());
             

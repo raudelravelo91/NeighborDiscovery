@@ -28,9 +28,9 @@ namespace NeighborDiscovery.Environment
             {
                 switch (_protocolType)
                 {
-                    case NodeType.BalancedNihao:
-                        logic = CreateProtocol(data.Id, data.DutyCycle, NodeType.AccGreedyBalancedNihao);
-                        break;
+                    //case NodeType.BalancedNihao:
+                    //    logic = CreateProtocol(data.Id, data.DutyCycle, NodeType.AccGreedyBalancedNihao);
+                    //    break;
 
                     default:
                         logic = CreateProtocol(data.Id, data.DutyCycle, _protocolType);
@@ -98,7 +98,10 @@ namespace NeighborDiscovery.Environment
             {
                 while (events.Count > 0 && events.Peek().StartUpSlot == currentSlot)
                 {
-                    fullEnv.AddEvent(CreateIncomingEvent(events.Dequeue()));
+                    var nextEvent = CreateIncomingEvent(events.Dequeue());
+                    if(nextEvent.Device.DeviceLogic.Id == 0)
+                        Console.WriteLine(currentSlot);
+                    fullEnv.AddEvent(nextEvent);
                 }
                 fullEnv.MoveNext();
                 currentSlot++;

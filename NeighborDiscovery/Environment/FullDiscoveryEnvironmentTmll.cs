@@ -75,40 +75,11 @@ namespace NeighborDiscovery.Environment
         {
             foreach (var iEvent in FetchNextEvents())
             {
-                switch (iEvent.EventType)
-                {
-                    case EventType.IncomingDevice:
-                        var device = iEvent.Device;
-                        var newPhysicalNode = Get2DNodeFromDiscoverableDevice(device);
-                        _network.AddNode(newPhysicalNode);
-                        _deviceById.Add(device.DeviceLogic.Id, device);
-                        _deviceToLocation.Add(device, newPhysicalNode);
-                        _locationToDevice.Add(newPhysicalNode, device);
-                        break;
-                    case EventType.DeviceGone:
-                        RemoveDevice(iEvent.Device);
-                        break;
-                }
+                ProccessEvent(iEvent);
             }
 
-            //send transmissions
-            foreach (var kvPair in _deviceToLocation)
-            {
-                var currentDevice = kvPair.Key;
-                var currentPhysicalDevice = kvPair.Value;
+            SendTranssmissions();
 
-                if (!currentDevice.DeviceLogic.IsTransmitting()) 
-                    continue;
-                
-                var transmission = currentDevice.DeviceLogic.GetTransmission();
-                
-                foreach (var neighborLocation in _network.NeighborsOf(currentPhysicalDevice))//neighbors in range
-                {
-                    var neighborLogic = _locationToDevice[neighborLocation].DeviceLogic;
-                    neighborLogic.ListenTo(transmission);
-                }
-            }
-    
             MoveAll();
         }
 
@@ -154,6 +125,44 @@ namespace NeighborDiscovery.Environment
         }
 
         #region private methods
+        private void SendTranssmissions()
+        {
+            foreach (var kvPair in _deviceToLocation)
+            {
+                var currentDevice = kvPair.Key;
+                var currentPhysicalDevice = kvPair.Value;
+
+                if (!currentDevice.DeviceLogic.IsTransmitting())
+                    continue;
+
+                var transmission = currentDevice.DeviceLogic.GetTransmission();
+
+                foreach (var neighborLocation in _network.NeighborsOf(currentPhysicalDevice))//neighbors in range
+                {
+                    var neighborLogic = _locationToDevice[neighborLocation].DeviceLogic;
+                    neighborLogic.ListenTo(transmission);
+                }
+            }
+        }
+
+        private void ProccessEvent(Event iEvent)
+        {
+            switch (iEvent.EventType)
+            {
+                case EventType.IncomingDevice:
+                    var device = iEvent.Device;
+                    var newPhysicalNode = Get2DNodeFromDiscoverableDevice(device);
+                    _network.AddNode(newPhysicalNode);
+                    _deviceById.Add(device.DeviceLogic.Id, device);
+                    _deviceToLocation.Add(device, newPhysicalNode);
+                    _locationToDevice.Add(newPhysicalNode, device);
+                    break;
+                case EventType.DeviceGone:
+                    RemoveDevice(iEvent.Device);
+                    break;
+            }
+        }
+
         private void UpdatePhysicalPartOfDiscoverableDevice(DiscoverableDevice device, Network2DNode node)
         {
             device.Position.X = node.Position.X;
@@ -216,12 +225,12 @@ namespace NeighborDiscovery.Environment
             int gotInRange = _network.GotInRange(transmitterLocation, listenerLocation);//double check if the returned value is in environment time
             int latency = listenedIn - gotInRange;
 
-            if (latency > 200)
-            {
-                Console.WriteLine("Something wrong");
-                ToEnviromentTime(listener.DeviceLogic, contactInfo.FirstContact);
-                _network.GotInRange(transmitterLocation, listenerLocation);
-            }
+            //if (latency > 200)
+            //{
+            //    Console.WriteLine("Something wrong");
+            //    ToEnviromentTime(listener.DeviceLogic, contactInfo.FirstContact);
+            //    _network.GotInRange(transmitterLocation, listenerLocation);
+            //}
 
             return latency;
         }

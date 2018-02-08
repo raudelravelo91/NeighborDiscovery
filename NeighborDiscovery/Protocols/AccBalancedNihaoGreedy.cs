@@ -139,15 +139,12 @@ namespace NeighborDiscovery.Protocols
                 NeighborsDiscovered[transmission.Sender].Update(InternalTimeSlot);
 
             foreach (var neighbor2Hop in Get2HopNeighborsFromDirectNeighbor(transmission.Sender)
-            ) //adding new 2hop neighbors that may be discovered by the new information
+            .Where(device => !ContainsNeighbor(device) && !ContainsNeighbor2Hop(device)))
+            //adding new 2hop neighbors that may be discovered by the new information
             {
-                if (!ContainsNeighbor2Hop(transmission.Sender))
-                {
                     AddNeighbor2Hop(neighbor2Hop);
                     _slotsGainUpdatedNeeded = true;
-                }
             }
-
             
         }
 
@@ -194,10 +191,10 @@ namespace NeighborDiscovery.Protocols
                     UpdateViaDevice(neighbor);
                 }
 
-                //foreach (var neighbor2Hop in Neighbors2Hop())
-                //{
-                //    UpdateViaDevice(neighbor2Hop);
-                //}
+                foreach (var neighbor2Hop in Neighbors2Hop())
+                {
+                    UpdateViaDevice(neighbor2Hop);
+                }
 
                 _nextAccSlot = GetBestSlot(InternalTimeSlot + 1);
             }

@@ -102,7 +102,7 @@ namespace UINetworkDiscovery
                     return;
                 }
                 
-                var test = environment.RunSingleSimulation(n.Data, DeviceProtocol);
+                var test = environment.RunSingleSimulation(n.Data, DeviceProtocol, 0);
                 statisticResults.AddStatisticTest(test);
                 cnt++;
                 Worker.ReportProgress(cnt * 100 / suite.NumberOfTests);

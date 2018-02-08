@@ -5,20 +5,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NeighborDiscovery.Environment;
+using NeighborDiscovery.Statistics;
 
 namespace NeighborDiscovery.Protocols
 {
     public abstract class BoundedProtocol:IDiscoveryProtocol
     {
+        
         public Dictionary<IDiscoveryProtocol, ContactInfo> NeighborsDiscovered;
         public int Id { get; protected set; }
         public int InternalTimeSlot { get; protected set; }
         public virtual int NumberOfNeighbors => NeighborsDiscovered.Count;
         public abstract int Bound { get; }
         public abstract int T { get; }
+        public INodeResult NodeStatistics { get;}
 
         protected BoundedProtocol(int id)
         {
+            NodeStatistics = new NodeResult();
             NeighborsDiscovered = new Dictionary<IDiscoveryProtocol, ContactInfo>();
             Id = id;
             InternalTimeSlot = 0;
@@ -35,10 +39,10 @@ namespace NeighborDiscovery.Protocols
                 NeighborsDiscovered.Remove(device);
         }
 
-        //protected virtual void UpdateNeighborContactInfo(IDiscoveryProtocol device)
-        //{
-        //    NeighborsDiscovered[device].Update(InternalTimeSlot);
-        //}
+        protected virtual void UpdateNeighborContactInfo(IDiscoveryProtocol device)
+        {
+            NeighborsDiscovered[device].Update(InternalTimeSlot);
+        }
 
         public virtual ITransmission GetTransmission()
         {
@@ -69,7 +73,9 @@ namespace NeighborDiscovery.Protocols
                 return;
             
             if(!ContainsNeighbor(transmission.Sender))
+            {
                 AddNeighbor(transmission.Sender);
+            }
         }
 
         public IContact GetContactInfo(IDiscoveryProtocol device)

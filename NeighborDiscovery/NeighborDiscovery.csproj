@@ -77,7 +77,9 @@
     <Compile Include="Protocols\ContactInfo2Hop.cs" />
     <Compile Include="Protocols\IContact.cs" />
     <Compile Include="Protocols\IDiscoveryProtocol.cs" />
+    <Compile Include="Protocols\INodeResult.cs" />
     <Compile Include="Protocols\ITransmission.cs" />
+    <Compile Include="Statistics\NodeResult.cs" />
     <Compile Include="Utils\MyPair.cs" />
     <Compile Include="Networks\Network2D.cs" />
     <Compile Include="Networks\Network2DNode.cs" />
