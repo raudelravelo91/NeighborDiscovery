@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NeighborDiscovery.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,10 +13,13 @@ namespace NeighborDiscovery.Protocols
         public override int Bound => N * N;
         public override int T => N * N;
         private double DesiredDutyCycle { get; set; }
+        private bool[,] _listeningSchedule;
 
         public BalancedNihaoTmll(int id, double dutyCyclePercentage) : base(id)
         {
             SetDutyCycle(dutyCyclePercentage);
+            _listeningSchedule = new bool[N, N];
+            GenerateListenningSchedule();
         }
 
         public override double GetDutyCycle()
@@ -59,12 +63,31 @@ namespace NeighborDiscovery.Protocols
 
         public override bool IsListening()
         {
-            return InternalTimeSlot % T < N;
+            int slot = InternalTimeSlot % T;
+            int row = slot / N;
+            int col = slot % N;
+
+            return _listeningSchedule[row, col];
         }
 
         public override bool IsTransmitting()
         {
             return InternalTimeSlot % N == 0;
+        }
+
+        private void GenerateListenningSchedule()
+        {
+            var slots = new int[N];
+            for (var i = 0; i < N; i++)
+            {
+                slots[i] = i;
+            }
+            var shuffle = new Shuffle(N);
+            shuffle.KnuthShuffle(slots);
+
+            _listeningSchedule = new bool[N, N];
+            for (int i = 0; i < N; i ++)
+                _listeningSchedule[i, slots[i]] = true;
         }
     }
 }

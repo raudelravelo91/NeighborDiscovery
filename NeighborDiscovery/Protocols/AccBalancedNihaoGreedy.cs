@@ -161,25 +161,59 @@ namespace NeighborDiscovery.Protocols
             return row % 2 != 0;
         }
 
+        //private void UpdateSlotsGain()
+        //{
+        //    if (IsAccSlot(InternalTimeSlot + 1))
+        //    {
+        //        ClearSlots();
+        //        foreach (var neighbor2Hop in Neighbors2Hop())
+        //        {
+        //            int myT0 = InternalTimeSlot + 1;
+        //            int myTn = LastAccSlotAfter(myT0);
+        //            int t0 = neighbor2Hop.InternalTimeSlot + 1;
+        //            int tn = t0 + (myTn - myT0);
+        //            foreach (var neig2HopTran in GetDeviceNextTransmissionSlot(t0, tn, neighbor2Hop))
+        //            {
+        //                int transmitsIn = 1 + (neig2HopTran - t0);
+        //                int slotToUpdate = InternalTimeSlot + transmitsIn;
+        //                UpdateSlot(slotToUpdate);
+        //            }
+        //        }
+        //        _nextAccSlot = GetBestSlot(InternalTimeSlot + 1);    
+        //    }
+        //}
+
         private void UpdateSlotsGain()
         {
             if (IsAccSlot(InternalTimeSlot + 1))
             {
                 ClearSlots();
-                foreach (var neighbor2Hop in Neighbors2Hop())
+
+                foreach (var neighbor in Neighbors())
                 {
-                    int myT0 = InternalTimeSlot + 1;
-                    int myTn = LastAccSlotAfter(myT0);
-                    int t0 = neighbor2Hop.InternalTimeSlot + 1;
-                    int tn = t0 + (myTn - myT0);
-                    foreach (var neig2HopTran in GetDeviceNextTransmissionSlot(t0, tn, neighbor2Hop))
-                    {
-                        int transmitsIn = 1 + (neig2HopTran - t0);
-                        int slotToUpdate = InternalTimeSlot + transmitsIn;
-                        UpdateSlot(slotToUpdate);
-                    }
+                    UpdateViaDevice(neighbor);
                 }
-                _nextAccSlot = GetBestSlot(InternalTimeSlot + 1);    
+
+                //foreach (var neighbor2Hop in Neighbors2Hop())
+                //{
+                //    UpdateViaDevice(neighbor2Hop);
+                //}
+
+                _nextAccSlot = GetBestSlot(InternalTimeSlot + 1);
+            }
+        }
+
+        private void UpdateViaDevice(IDiscoveryProtocol neighbor)
+        {
+            int myT0 = InternalTimeSlot + 1;
+            int myTn = LastAccSlotAfter(myT0);
+            int t0 = neighbor.InternalTimeSlot + 1;
+            int tn = t0 + (myTn - myT0);
+            foreach (var neig2HopTran in GetDeviceNextTransmissionSlot(t0, tn, neighbor))
+            {
+                int transmitsIn = 1 + (neig2HopTran - t0);
+                int slotToUpdate = InternalTimeSlot + transmitsIn;
+                UpdateSlot(slotToUpdate);
             }
         }
 
