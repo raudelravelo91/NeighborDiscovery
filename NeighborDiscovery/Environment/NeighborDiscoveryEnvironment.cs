@@ -12,8 +12,8 @@ namespace NeighborDiscovery.Environment
     public sealed class NeighborDiscoveryEnvironment
     {
         private NodeType _protocolType;
-        private int _accId;
-
+        private int _trackId;
+        
         private readonly Random _random = new Random();
 
         private int EndsAt(int startUpSlot, BoundedProtocol device)
@@ -24,22 +24,24 @@ namespace NeighborDiscovery.Environment
         private DiscoverableDevice FromDeviceDataToDiscoverableDevice(DeviceData data)
         {
             BoundedProtocol logic;
-            if (data.Id == _accId)
-            {
-                switch (_protocolType)
-                {
-                    //case NodeType.BalancedNihao:
-                    //    logic = CreateProtocol(data.Id, data.DutyCycle, NodeType.AccGreedyBalancedNihao);
-                    //    break;
-
-                    default:
-                        logic = CreateProtocol(data.Id, data.DutyCycle, _protocolType);
-                        break;
-                }
-            }
-            else 
+            if (data.Id == _trackId)
                 logic = CreateProtocol(data.Id, data.DutyCycle, _protocolType);
+
+            
+            switch (_protocolType)
+            {
+                case NodeType.AccGreedyBalancedNihao:
+                    logic = CreateProtocol(data.Id, data.DutyCycle, NodeType.BalancedNihao);
+                    break;
+
+                default:
+                    logic = CreateProtocol(data.Id, data.DutyCycle, _protocolType);
+                    break;
+            }
+            
+            
             logic.MoveNext(_random.Next(logic.T));//todo: change this :)
+            
             return new DiscoverableDevice(logic, data.Position, data.Direction, data.Speed, data.CommunicationRange);
         }
 
@@ -85,15 +87,15 @@ namespace NeighborDiscovery.Environment
 
         public StatisticTestResult RunSingleSimulation(IEnumerable<DeviceData> data, NodeType protocolType, int accId = -1)
         {
-            _accId = accId;
             _protocolType = protocolType;
+            _trackId = accId;
             List<DeviceData> dataList = data.ToList();
             dataList.Sort();
             Queue<DeviceData> events = new Queue<DeviceData>(dataList);
             int maxSlot = dataList[dataList.Count - 1].StartUpSlot * 2  + 1;//todo, improve the way to calculate the limit
             //int maxSlot = 1000;
             int currentSlot = 0;
-            FullDiscoveryEnvironmentTmll fullEnv = new FullDiscoveryEnvironmentTmll(RunningMode.StaticDevices);
+            FullDiscoveryEnvironmentTmll fullEnv = new FullDiscoveryEnvironmentTmll(RunningMode.StaticDevices, accId);
             while (currentSlot < maxSlot)
             {
                 while (events.Count > 0 && events.Peek().StartUpSlot == currentSlot)
@@ -106,8 +108,7 @@ namespace NeighborDiscovery.Environment
                 fullEnv.MoveNext();
                 currentSlot++;
             }
-            if(_accId >= 0)
-                return fullEnv.GetCurrentResult(_accId);
+            
             return fullEnv.GetCurrentResult();
         }
     }

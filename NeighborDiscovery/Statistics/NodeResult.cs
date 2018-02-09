@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace NeighborDiscovery.Statistics
 {
-    public class NodeResult : INodeResult
+    public class NodeResult : EventArgs, INodeResult
     {
         public IEnumerable<IContact> NewDiscoveries => _discoveries;
         public List<IContact> _discoveries;

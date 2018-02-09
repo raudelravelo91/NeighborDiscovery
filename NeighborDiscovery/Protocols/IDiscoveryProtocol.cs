@@ -90,5 +90,10 @@ namespace NeighborDiscovery.Protocols
         /// <returns></returns>
         IDiscoveryProtocol Clone();
 
+        /// <summary>
+        /// 
+        /// </summary>
+        event EventHandler<INodeResult> OnDeviceDiscovered;
+
     }
 }

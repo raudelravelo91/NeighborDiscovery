@@ -18,14 +18,20 @@ namespace NeighborDiscovery.Protocols
         public virtual int NumberOfNeighbors => NeighborsDiscovered.Count;
         public abstract int Bound { get; }
         public abstract int T { get; }
-        public INodeResult NodeStatistics { get;}
+        public event EventHandler<INodeResult> OnDeviceDiscovered;
 
         protected BoundedProtocol(int id)
         {
-            NodeStatistics = new NodeResult();
             NeighborsDiscovered = new Dictionary<IDiscoveryProtocol, ContactInfo>();
             Id = id;
             InternalTimeSlot = 0;
+        }
+
+        private void RaiseOnDeviceDiscovered(INodeResult data)
+        {
+            if(OnDeviceDiscovered != null)
+                OnDeviceDiscovered(this, data);
+
         }
 
         protected virtual void AddNeighbor(IDiscoveryProtocol device)
@@ -75,6 +81,9 @@ namespace NeighborDiscovery.Protocols
             if(!ContainsNeighbor(transmission.Sender))
             {
                 AddNeighbor(transmission.Sender);
+                var data = new NodeResult();
+                data.AddDiscovery(GetContactInfo(transmission.Sender));
+                RaiseOnDeviceDiscovered(data);
             }
         }
 

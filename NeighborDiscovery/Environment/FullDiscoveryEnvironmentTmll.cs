@@ -39,13 +39,19 @@ namespace NeighborDiscovery.Environment
         private readonly Dictionary<Network2DNode, DiscoverableDevice> _locationToDevice;
         private readonly Dictionary<int, DiscoverableDevice> _deviceById;
         private readonly Dictionary<IDiscoveryProtocol, DeviceInfo> _eventArrival;
-
+        private readonly int _trackId;
+        private readonly StatisticTestResult _trackedStatistics;
         public int CurrentTimeSlot { get; private set; }
         public int CurrentNumberOfDevices => _deviceToLocation.Count;
         public RunningMode RunningMode { get; }
 
-        public FullDiscoveryEnvironmentTmll(RunningMode runningMode)
+        public FullDiscoveryEnvironmentTmll(RunningMode runningMode, int trackId = -1)
         {
+            if(trackId >= 0)
+            {
+                _trackId = trackId;
+                _trackedStatistics = new StatisticTestResult();
+            }
             CurrentTimeSlot = 0;
             RunningMode = runningMode;
 
@@ -88,10 +94,18 @@ namespace NeighborDiscovery.Environment
             _events.Enqueue(newEvent);
             var logic = newEvent.Device.DeviceLogic;
             _eventArrival.Add(logic, new DeviceInfo(logic.InternalTimeSlot, CurrentTimeSlot));
+
+            if(_trackId == logic.Id)
+            {
+                logic.OnDeviceDiscovered += Logic_OnDeviceDiscovered;
+            }
         }
-        
+
         public StatisticTestResult GetCurrentResult()
         {
+            if(_trackId >= 0)
+                return _trackedStatistics;
+
             var statistics = new StatisticTestResult();
             foreach (var kvPair in _locationToDevice)
             {
@@ -106,25 +120,20 @@ namespace NeighborDiscovery.Environment
             return statistics;
         }
 
-        public StatisticTestResult GetCurrentResult(int deviceId)
+        #region private methods
+        
+        private void Logic_OnDeviceDiscovered(object sender, INodeResult e)
         {
-            if(!_deviceById.ContainsKey(deviceId))
-                throw new Exception("The environment does not contains any device whith the given Id");
-            
-            var device = _deviceById[deviceId];
-            var statistics = new StatisticTestResult();
-
-            foreach (var neighbor in device.DeviceLogic.Neighbors())
+            IDiscoveryProtocol deviceSender = sender as IDiscoveryProtocol;
+            var device = _deviceById[deviceSender.Id];
+            foreach (var neighbor in e.NewDiscoveries)
             {
-                var neighborDevice = _deviceById[neighbor.Id];
+                var neighborDevice = _deviceById[neighbor.Device.Id];
                 var latency = GetDiscoveryLatencyInStaticNetwork(device, neighborDevice);
-                statistics.AddDiscovery(latency);
+                _trackedStatistics.AddDiscovery(latency);
             }
-            
-            return statistics;
         }
 
-        #region private methods
         private void SendTranssmissions()
         {
             foreach (var kvPair in _deviceToLocation)
