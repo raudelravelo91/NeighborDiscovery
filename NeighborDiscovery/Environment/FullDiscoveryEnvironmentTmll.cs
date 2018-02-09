@@ -222,7 +222,15 @@ namespace NeighborDiscovery.Environment
 
         private int GetDiscoveryLatencyInStaticNetwork(DiscoverableDevice listener, DiscoverableDevice transmitter)
         {
-            var contactInfo = listener.DeviceLogic.GetContactInfo(transmitter.DeviceLogic);
+            IContact contactInfo = null;
+            if(listener.DeviceLogic.ContainsNeighbor(transmitter.DeviceLogic))
+                contactInfo = listener.DeviceLogic.GetContactInfo(transmitter.DeviceLogic);
+            else
+            { 
+                var accLogic = listener.DeviceLogic as AccProtocol;
+                if(accLogic != null)
+                    contactInfo = accLogic.GetContactInfoFor2Hop(transmitter.DeviceLogic);
+            }
             if (contactInfo == null)
                 throw new Exception("Devices did not discover each other");
             

@@ -10,6 +10,8 @@ namespace NeighborDiscovery.Protocols
     {
         IEnumerable<IContact> NewDiscoveries{ get;}
 
+        int Count{ get;}
+
         void AddDiscovery(IContact newDiscovery);
     }
 }

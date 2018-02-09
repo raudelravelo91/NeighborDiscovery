@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NeighborDiscovery.Protocols;
 using NeighborDiscovery.Utils;
+using NeighborDiscovery.Statistics;
 
 namespace NeighborDiscovery.Protocols
 {
@@ -125,6 +126,7 @@ namespace NeighborDiscovery.Protocols
         {
             if (!IsListening())
                 return;
+            var newDiscoveries = new NodeResult();
             _slotsGainUpdatedNeeded = false;
             if (!ContainsNeighbor(transmission.Sender))
             {
@@ -133,6 +135,10 @@ namespace NeighborDiscovery.Protocols
                 {
                     RemoveNeighbor2Hop(transmission.Sender); //removing the neighbor from 2-hop neighbors
                     _slotsGainUpdatedNeeded = true;
+                }
+                else //it's a completely new discovery
+                {
+                    newDiscoveries.AddDiscovery(GetContactInfo(transmission.Sender));
                 }
             }
             else//update last contact => key updated to get more information
@@ -144,7 +150,12 @@ namespace NeighborDiscovery.Protocols
             {
                     AddNeighbor2Hop(neighbor2Hop);
                     _slotsGainUpdatedNeeded = true;
+                    newDiscoveries.AddDiscovery(GetContactInfoFor2Hop(neighbor2Hop));
             }
+
+
+            if(newDiscoveries.Count > 0)
+                RaiseOnDeviceDiscovered(newDiscoveries);
             
         }
 

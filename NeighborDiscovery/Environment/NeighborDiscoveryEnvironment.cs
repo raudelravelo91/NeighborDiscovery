@@ -26,19 +26,19 @@ namespace NeighborDiscovery.Environment
             BoundedProtocol logic;
             if (data.Id == _trackId)
                 logic = CreateProtocol(data.Id, data.DutyCycle, _protocolType);
+            else
+            {            
+                switch (_protocolType)
+                {
+                    case NodeType.AccGreedyBalancedNihao:
+                        logic = CreateProtocol(data.Id, data.DutyCycle, NodeType.BalancedNihao);
+                        break;
 
-            
-            switch (_protocolType)
-            {
-                case NodeType.AccGreedyBalancedNihao:
-                    logic = CreateProtocol(data.Id, data.DutyCycle, NodeType.BalancedNihao);
-                    break;
-
-                default:
-                    logic = CreateProtocol(data.Id, data.DutyCycle, _protocolType);
-                    break;
+                    default:
+                        logic = CreateProtocol(data.Id, data.DutyCycle, _protocolType);
+                        break;
+                }
             }
-            
             
             logic.MoveNext(_random.Next(logic.T));//todo: change this :)
             
@@ -101,8 +101,6 @@ namespace NeighborDiscovery.Environment
                 while (events.Count > 0 && events.Peek().StartUpSlot == currentSlot)
                 {
                     var nextEvent = CreateIncomingEvent(events.Dequeue());
-                    if(nextEvent.Device.DeviceLogic.Id == 0)
-                        Console.WriteLine(currentSlot);
                     fullEnv.AddEvent(nextEvent);
                 }
                 fullEnv.MoveNext();

@@ -27,7 +27,7 @@ namespace NeighborDiscovery.Protocols
             InternalTimeSlot = 0;
         }
 
-        private void RaiseOnDeviceDiscovered(INodeResult data)
+        protected void RaiseOnDeviceDiscovered(INodeResult data)
         {
             if(OnDeviceDiscovered != null)
                 OnDeviceDiscovered(this, data);

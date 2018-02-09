@@ -10,6 +10,9 @@ namespace NeighborDiscovery.Statistics
     public class NodeResult : EventArgs, INodeResult
     {
         public IEnumerable<IContact> NewDiscoveries => _discoveries;
+
+        public int Count => _discoveries.Count;
+
         public List<IContact> _discoveries;
 
         public NodeResult()
