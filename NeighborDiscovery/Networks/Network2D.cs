@@ -16,7 +16,7 @@ namespace NeighborDiscovery.Networks
         public int CurrentSize => _nodes.Count;
         public int NumberOfLinks { get; private set; }
         
-        public Network2D(bool isStatic = false)
+        public Network2D(bool isStatic = true)
         {
             _nodes = new HashSet<Network2DNode>();
             IsStatic = isStatic;
@@ -59,10 +59,7 @@ namespace NeighborDiscovery.Networks
                     NumberOfLinks++;
                     if (IsStatic)
                     {
-                        if (IsStatic)
-                        {
-                            _neighbors[newNode2D].Add(possibleNeighbor, CurrentTimeSlot);
-                        }
+                        _neighbors[newNode2D].Add(possibleNeighbor, CurrentTimeSlot);
                     }
                 }
                 if (possibleNeighbor.NodeIsInRange(newNode2D))

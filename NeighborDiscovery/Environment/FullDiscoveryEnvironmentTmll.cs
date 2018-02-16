@@ -129,6 +129,9 @@ namespace NeighborDiscovery.Environment
             foreach (var neighbor in e.NewDiscoveries)
             {
                 var neighborDevice = _deviceById[neighbor.Device.Id];
+                if(!_deviceToLocation[device].NodeIsInRange(_deviceToLocation[neighborDevice]))
+                    return;
+
                 var latency = GetDiscoveryLatencyInStaticNetwork(device, neighborDevice);
                 _trackedStatistics.AddDiscovery(latency);
             }

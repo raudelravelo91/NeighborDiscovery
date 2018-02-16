@@ -9,12 +9,13 @@ namespace UIConsole
     {
         static void Main(string[] args)
         {
+
             Console.WriteLine(" --------------------------------------------------------------");
             PrintResult("TestMoveNextAccGreedy", TestingAManoLOL.TestMoveNextAccGreedy());
             PrintResult("TestIsListeningAccGreedy", TestingAManoLOL.TestIsListeningAccGreedy());
             PrintResult("IsUnderlyingScheduleCorrectAccGreedy", TestingAManoLOL.IsUnderlyingScheduleCorrectAccGreedy());
             PrintResult("IsPickingTheCorrectSlotAccGreedy", TestingAManoLOL.IsPickingTheCorrectSlotAccGreedy());
-            
+
             Console.WriteLine(" --------------------------------------------------------------");
         }
         
