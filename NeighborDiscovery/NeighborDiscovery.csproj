@@ -71,6 +71,7 @@
     <Compile Include="DataGeneration\TestSuite.cs" />
     <Compile Include="Environment\TwoNodesEnvironmentTmll.cs" />
     <Compile Include="Environment\FullDiscoveryEnvironmentTmll.cs" />
+    <Compile Include="Protocols\AccIndirectBalancedNihao.cs" />
     <Compile Include="Protocols\AccIndirectDiscovery.cs" />
     <Compile Include="Protocols\AccProtocol.cs" />
     <Compile Include="Protocols\BalancedNihaoTmll.cs" />

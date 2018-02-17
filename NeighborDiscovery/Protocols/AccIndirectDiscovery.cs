@@ -19,9 +19,8 @@ namespace NeighborDiscovery.Protocols
         private readonly double[] _slotValue;
         private bool _slotsGainUpdatedNeeded;
 
-        public AccIndirectDiscovery(int id, double dutyCyclePercentage) : base(id)
+        protected AccIndirectDiscovery(int id) : base(id)
         {
-            SetDutyCycle(dutyCyclePercentage);
             _listeningSchedule = new bool[2*N,N];
             GenerateListenningSchedule();
             _nextAccSlot = -1;
@@ -160,20 +159,32 @@ namespace NeighborDiscovery.Protocols
             if (IsAccSlot(InternalTimeSlot + 1))
             {
                 ClearSlots();
+
+                foreach (var neighbor in Neighbors())
+                {
+                    UpdateViaDevice(neighbor);
+                }
+
                 foreach (var neighbor2Hop in Neighbors2Hop())
                 {
-                    int myT0 = InternalTimeSlot + 1;
-                    int myTn = LastAccSlotAfter(myT0);
-                    int t0 = neighbor2Hop.InternalTimeSlot + 1;
-                    int tn = t0 + (myTn - myT0);
-                    foreach (var neig2HopTran in GetDeviceNextTransmissionSlot(t0, tn, neighbor2Hop))
-                    {
-                        int transmitsIn = 1 + (neig2HopTran - t0);
-                        int slotToUpdate = InternalTimeSlot + transmitsIn;
-                        UpdateSlot(slotToUpdate);
-                    }
+                    UpdateViaDevice(neighbor2Hop);
                 }
-                _nextAccSlot = GetBestSlot(InternalTimeSlot + 1);    
+
+                _nextAccSlot = GetBestSlot(InternalTimeSlot + 1);
+            }
+        }
+
+        private void UpdateViaDevice(IDiscoveryProtocol neighbor)
+        {
+            int myT0 = InternalTimeSlot + 1;
+            int myTn = LastAccSlotAfter(myT0);
+            int t0 = neighbor.InternalTimeSlot + 1;
+            int tn = t0 + (myTn - myT0);
+            foreach (var neig2HopTran in GetDeviceNextTransmissionSlot(t0, tn, neighbor))
+            {
+                int transmitsIn = 1 + (neig2HopTran - t0);
+                int slotToUpdate = InternalTimeSlot + transmitsIn;
+                UpdateSlot(slotToUpdate);
             }
         }
 
@@ -255,9 +266,6 @@ namespace NeighborDiscovery.Protocols
                 _listeningSchedule[i, slots[i / 2]] = true;
         }
         #endregion
-
-        
-
         
     }
 }

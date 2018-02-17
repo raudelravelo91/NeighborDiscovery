@@ -528,7 +528,7 @@ namespace UINetworkDiscovery
                     lineStyle = LineStyle.Dot;
                     balanceNihaoAvg.Text = result.AverageDiscoveryLatency.ToString();
                     break;
-                case NodeType.AccGossipPNihao:
+                case NodeType.AccGreedyBalancedNihao:
                     markerType = MarkerType.Circle;
                     oxyColor = OxyColors.Green;
                     if (ModelContainsAlgorithm(NodeType.AccGossipPNihao))
