@@ -11,7 +11,7 @@ namespace UIConsole
     {
         public static bool TestMoveNextAccGreedy()
         {
-            var node = new AccBalancedNihaoGreedy(0, 10);
+            var node = new AccGreedyBalancedNihao(0, 10);
             int its = node.InternalTimeSlot;
             int move = 5;
             node.MoveNext(move);
@@ -20,7 +20,7 @@ namespace UIConsole
 
         public static bool TestIsListeningAccGreedy()
         {
-            var node = new AccBalancedNihaoGreedy(0, 10);
+            var node = new AccGreedyBalancedNihao(0, 10);
             int cnt = 0;
             for(int i = 0; i < node.T; i++, node.MoveNext())
                 if(node.IsListening())
@@ -35,17 +35,17 @@ namespace UIConsole
 
         public static bool IsPickingTheCorrectSlotAccGreedy()
         {
-            var node0 = new AccBalancedNihaoGreedy(0, 10);
+            var node0 = new AccGreedyBalancedNihao(0, 10);
 
 
 
-            var node1 = new BalancedNihaoTmll(1, 10);
+            var node1 = new BalancedNihao(1, 10);
             node1.MoveNext(1);
-            var node2 = new BalancedNihaoTmll(2, 10);
+            var node2 = new BalancedNihao(2, 10);
             node2.MoveNext(2);
-            var node3 = new BalancedNihaoTmll(3, 10);
+            var node3 = new BalancedNihao(3, 10);
             node3.MoveNext(3);
-            var node4 = new BalancedNihaoTmll(4, 10);
+            var node4 = new BalancedNihao(4, 10);
             node4.MoveNext(3);
 
             node1.NeighborsDiscovered.Add(node2, new ContactInfo(node2, node1.InternalTimeSlot));
@@ -91,7 +91,7 @@ namespace UIConsole
 
         public static bool IsUnderlyingScheduleCorrectAccGreedy()
         {
-            AccBalancedNihaoGreedy node = new AccBalancedNihaoGreedy(0,10);
+            AccGreedyBalancedNihao node = new AccGreedyBalancedNihao(0,10);
             int cnt = 0;
             List<int> slots = new List<int>();
             bool[] mark = new bool[10];

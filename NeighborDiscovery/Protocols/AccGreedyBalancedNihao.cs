@@ -14,7 +14,7 @@ namespace NeighborDiscovery.Protocols
     /// <summary>
     /// This Acc Protocol is a greedy Acc that prioritize the listening in slots where the maximum number of 2-hop neighbors are transmitting
     /// </summary>
-    public class AccBalancedNihaoGreedy : AccProtocol
+    public sealed class AccGreedyBalancedNihao : AccProtocol
     {
         public int N { get; set; }// M = N AND N => 2N
         public override int Bound => 2 * N * N;
@@ -26,7 +26,7 @@ namespace NeighborDiscovery.Protocols
         private readonly int[] _slotValue;
         private bool _slotsGainUpdatedNeeded;
         
-        public AccBalancedNihaoGreedy(int id, double dutyCyclePercentage) : base(id)
+        public AccGreedyBalancedNihao(int id, double dutyCyclePercentage) : base(id)
         {
             SetDutyCycle(dutyCyclePercentage);
             _listeningSchedule = new bool[2*N,N];
@@ -41,7 +41,7 @@ namespace NeighborDiscovery.Protocols
 
         public override IDiscoveryProtocol Clone()
         {
-            return new AccBalancedNihaoGreedy(Id, GetDutyCycle());
+            return new AccGreedyBalancedNihao(Id, GetDutyCycle());
         }
 
         public override string ToString()
@@ -202,10 +202,10 @@ namespace NeighborDiscovery.Protocols
                     UpdateViaDevice(neighbor);
                 }
 
-                foreach (var neighbor2Hop in Neighbors2Hop())
-                {
-                    UpdateViaDevice(neighbor2Hop);
-                }
+                //foreach (var neighbor2Hop in Neighbors2Hop())
+                //{
+                //    UpdateViaDevice(neighbor2Hop);
+                //}
 
                 _nextAccSlot = GetBestSlot(InternalTimeSlot + 1);
             }

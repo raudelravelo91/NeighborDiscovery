@@ -255,15 +255,15 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
-        <CheckBox Name="cbAccGossipPNihao" Content="AccGreedy (Balanced-Nihao)" IsChecked="False" Margin="5" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <CheckBox Name="cbAccGreedyBNihao" Content="AccGreedy (Balanced-Nihao)" IsChecked="False" Margin="5" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
-        <Label Margin="0" Name="lbAccGossipPNihao" Content="Avg:" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-        <TextBlock Margin="0" Name="AccGossipPNihaoAvg" Text="" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-        <Label Margin="0" Name="lbAccGossipPNihaoCnt" Content="Cnt:" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-        <TextBlock Margin="0" Name="AccGossipPNihaoCnt" Text="" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <Label Margin="0" Name="lbAccGreedyBNihao" Content="Avg:" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+        <TextBlock Margin="0" Name="AccGreedyBNihaoAvg" Text="" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <Label Margin="0" Name="lbAccGreedyBNihaoCnt" Content="Cnt:" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+        <TextBlock Margin="0" Name="AccGreedyBNihaoCnt" Text="" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
         <Grid Margin="0" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
-            <ProgressBar Minimum="0" Maximum="100" Value="0" Width="100" Height="20" Name="progressBarAccGossipPNihao" Foreground="LightBlue"/>
-            <TextBlock Text="{Binding ElementName=progressBarAccGossipPNihao, Path=Value, StringFormat={}{0:0}%}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <ProgressBar Minimum="0" Maximum="100" Value="0" Width="100" Height="20" Name="progressBarAccGreedyBNihao" Foreground="LightBlue"/>
+            <TextBlock Text="{Binding ElementName=progressBarAccGreedyBNihao, Path=Value, StringFormat={}{0:0}%}" HorizontalAlignment="Center" VerticalAlignment="Center" />
         </Grid>
     </Grid>
 

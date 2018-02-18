@@ -33,7 +33,9 @@ namespace NeighborDiscovery.Environment
                     case NodeType.AccGreedyBalancedNihao:
                         logic = CreateProtocol(data.Id, data.DutyCycle, NodeType.BalancedNihao);
                         break;
-
+                    case NodeType.AccBalancedNihao:
+                        logic = CreateProtocol(data.Id, data.DutyCycle, NodeType.BalancedNihao);
+                        break;
                     default:
                         logic = CreateProtocol(data.Id, data.DutyCycle, _protocolType);
                         break;
@@ -50,7 +52,7 @@ namespace NeighborDiscovery.Environment
             return new Event(FromDeviceDataToDiscoverableDevice(data), EventType.IncomingDevice);
         }
 
-        public BoundedProtocol CreateProtocol(int id, int dutyCycle, NodeType nodeType)
+        private BoundedProtocol CreateProtocol(int id, int dutyCycle, NodeType nodeType)
         {
             switch (nodeType)
             {
@@ -69,15 +71,15 @@ namespace NeighborDiscovery.Environment
                 case NodeType.TestAlgorithm:
                     return null;
                 case NodeType.GNihao:
-                    return null;
+                    return new BalancedNihao(id, dutyCycle);
                 case NodeType.BalancedNihao:
-                    return new BalancedNihaoTmll(id, dutyCycle);
+                    return new BalancedNihao(id, dutyCycle);
                 case NodeType.AccGossipGNihao:
                     return null;
-                case NodeType.AccGossipPNihao:
-                    return null;
+                case NodeType.AccBalancedNihao:
+                    return new AccBalancedNihao(id, dutyCycle);
                 case NodeType.AccGreedyBalancedNihao:
-                    return new AccBalancedNihaoGreedy(id, dutyCycle);
+                    return new AccGreedyBalancedNihao(id, dutyCycle);
                 default:
                 {
                     throw new ArgumentException(_protocolType.ToString() + "(protocol) not supported");

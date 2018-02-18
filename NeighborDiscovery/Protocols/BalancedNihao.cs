@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace NeighborDiscovery.Protocols
 {
-    public sealed class BalancedNihaoTmll: BoundedProtocol
+    public sealed class BalancedNihao: BoundedProtocol
     {
         public int N { get; set; }
         public override int Bound => N * N;
@@ -15,7 +15,7 @@ namespace NeighborDiscovery.Protocols
         private double DesiredDutyCycle { get; set; }
         private bool[,] _listeningSchedule;
 
-        public BalancedNihaoTmll(int id, double dutyCyclePercentage) : base(id)
+        public BalancedNihao(int id, double dutyCyclePercentage) : base(id)
         {
             SetDutyCycle(dutyCyclePercentage);
             _listeningSchedule = new bool[N, N];
@@ -53,7 +53,7 @@ namespace NeighborDiscovery.Protocols
 
         public override IDiscoveryProtocol Clone()
         {
-            return new BalancedNihaoTmll(Id, GetDutyCycle());
+            return new BalancedNihao(Id, GetDutyCycle());
         }
 
         public override string ToString()
