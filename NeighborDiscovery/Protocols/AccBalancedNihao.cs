@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using NeighborDiscovery.Statistics;
@@ -188,14 +189,68 @@ namespace NeighborDiscovery.Protocols
         {
             int myT0 = InternalTimeSlot + 1;
             int myTn = LastAccSlotAfter(myT0);
-            int t0 = neighbor.InternalTimeSlot + 1;
-            int tn = t0 + (myTn - myT0);
-            foreach (var neig2HopTran in GetDeviceNextTransmissionSlot(t0, tn, neighbor))
+            int neigT0 = neighbor.InternalTimeSlot + 1;
+            int neigTn = neigT0 + (myTn - myT0);
+            HashSet<int> neiTransmissions = new HashSet<int>(GetDeviceNextTransmissionSlot(neigT0, neigTn, neighbor));
+
+            //Spatial Similarity
+            var myNeighbors = Neighbors();
+            var neigNeighbors = Get2HopNeighborsFromDirectNeighbor(neighbor);
+            int spatialNumerator = myNeighbors.Intersect(neigNeighbors).Count();
+            double spatialDenominator = myNeighbors.Count();
+            double spatialSimilarity = spatialNumerator / spatialDenominator;
+
+
+
+            //Temporal Diversity
+            var myLSlots = GetDeviceNextListeningSlots(myT0, myTn, this).ToArray();
+            int myIdx = 0;
+            HashSet<int> myCurrentSlots = new HashSet<int>();//contains my listening slots before the currentSlot
+
+            for (int currentSlot = 0; currentSlot <= myTn - myT0; currentSlot++)
             {
-                int transmitsIn = 1 + (neig2HopTran - t0);
-                int slotToUpdate = InternalTimeSlot + transmitsIn;
-                UpdateSlot(slotToUpdate);
+                int neigcurrentSlot = neigT0 + currentSlot;
+                if (neiTransmissions.Contains(neigcurrentSlot))
+                {
+                    double currentDenominator = currentSlot + 1;
+                    int currentNumerator = 0;
+
+                    while (myIdx < myLSlots.Length)
+                    {
+                        int myNextSlot = myLSlots[myIdx] - myT0;
+                        if (myNextSlot > currentSlot)
+                            break;
+
+                        myCurrentSlots.Add(myNextSlot); //save my listening slots
+                        myIdx++;
+                    }
+
+                    //count neighbor's listening slots I do not have
+                    var neigLSlots = GetDeviceNextListeningSlots(neigT0, neigTn, neighbor).ToArray();
+                    int neigIdx = 0;
+                    while (neigIdx < neigLSlots.Length)
+                    {
+                        int neigNextSlot = neigLSlots[neigIdx] - neigT0;
+                        if (neigNextSlot > currentSlot)
+                            break;
+                        if (!myCurrentSlots.Contains(neigNextSlot))
+                            currentNumerator++;
+                        neigIdx++;
+                    }
+
+                    double temporalDiversity = currentNumerator / currentDenominator;
+
+                    //Update current slot
+                    double slotGain = temporalDiversity * spatialSimilarity;
+                    UpdateSlot(myT0 + currentSlot, slotGain);
+                }
+                else 
+                    UpdateSlot(myT0 + currentSlot, 0);
+                
             }
+
+
+            
         }
 
         private int LastAccSlotAfter(int t0)
@@ -241,14 +296,14 @@ namespace NeighborDiscovery.Protocols
             return true;
         }
 
-        private void UpdateSlot(int t0)
+        private void UpdateSlot(int myT0, double value)
         {
-            if (!IsAccSlot(t0))
+            if (!IsAccSlot(myT0))
                 throw new Exception("The given slot is not within the correct range");
-            int slot = t0 % T;
+            int slot = myT0 % T;
             int row = slot / N;
             int col = slot % N;
-            _slotValue[col]++;
+            _slotValue[col]+=value;
         }
 
         private bool AccIsReadyToListenAgain()
