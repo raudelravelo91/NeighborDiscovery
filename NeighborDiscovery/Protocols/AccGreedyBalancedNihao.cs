@@ -245,7 +245,7 @@ namespace NeighborDiscovery.Protocols
                     bestIndex = slotIndex;
                 t0++;
             }
-            return bestIndex;
+            return Shuffle.random.Next(t0);
         }
 
         private void ClearSlots()
