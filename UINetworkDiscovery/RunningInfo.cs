@@ -9,7 +9,7 @@ namespace UINetworkDiscovery
     public class RunningInfo
     {
         private int _running;
-
+        private int test;//caca
         public RunningInfo()
         {
             TotalAlgorithmsRan = 0;
