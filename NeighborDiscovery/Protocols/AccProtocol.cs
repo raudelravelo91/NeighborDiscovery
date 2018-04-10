@@ -10,14 +10,15 @@ namespace NeighborDiscovery.Protocols
     public abstract class AccProtocol:BoundedProtocol
     {
         protected Dictionary<IDiscoveryProtocol, ContactInfo2Hop> Neighbors2HopDiscovered;
-        protected int ProtocolListenedSlots;
+        protected int NumberOfListenedSlots;
+        protected int NumberOfTransmissions;
         protected int AccProtocolListenedSlots;
         public virtual int NumberOfNeighbors2Hop => Neighbors2HopDiscovered.Count;
         
 
         protected AccProtocol(int id) : base(id)
         {
-            ProtocolListenedSlots = 0;
+            NumberOfListenedSlots = 0;
             AccProtocolListenedSlots = 0;
             Neighbors2HopDiscovered = new Dictionary<IDiscoveryProtocol, ContactInfo2Hop>();
         }

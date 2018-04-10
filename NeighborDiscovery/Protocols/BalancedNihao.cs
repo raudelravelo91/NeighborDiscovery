@@ -82,8 +82,8 @@ namespace NeighborDiscovery.Protocols
             {
                 slots[i] = i;
             }
-            var shuffle = new Shuffle(N);
-            shuffle.KnuthShuffle(slots);
+            //var shuffle = new Shuffle(N);
+            //shuffle.KnuthShuffle(slots);
 
             _listeningSchedule = new bool[N, N];
             for (int i = 0; i < N; i ++)

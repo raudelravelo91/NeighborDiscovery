@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NeighborDiscovery.Protocols;
 using NeighborDiscovery.Statistics;
 using NeighborDiscovery.Utils;
@@ -77,7 +75,7 @@ namespace NeighborDiscovery.Environment
                 case NodeType.AccGossipGNihao:
                     return null;
                 case NodeType.AccBalancedNihao:
-                    return new AccBalancedNihao(id, dutyCycle);
+                    return new AccBalancedNihao(id, dutyCycle, false);
                 case NodeType.AccGreedyBalancedNihao:
                     return new AccGreedyBalancedNihao(id, dutyCycle);
                 default:

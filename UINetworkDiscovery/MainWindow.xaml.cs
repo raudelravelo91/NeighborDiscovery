@@ -647,12 +647,10 @@ namespace UINetworkDiscovery
         private void RunTwoNodesSimulation(BoundedProtocol node1, BoundedProtocol node2, NodeType type)
         {
             var environment = new TwoNodesEnvironmentTmll(node1, node2);
-            //environment.PropertyChanged +=
-            //    (sender, args) => progressBarBalancedNihao.Value = environment.PercentageCompleted;
             var testResult = environment.RunSimulation();
             var statistics = new StatisticsResult(type);
             statistics.AddStatisticTest(testResult);
-            statistics.BuildAverageFractionOfDiscovey(node1.Bound);
+            statistics.BuildAverageFractionOfDiscovey(2*node1.Bound);
             worker_RunWorkerCompleted(this, new RunWorkerCompletedEventArgs(statistics, null, false));
         }
 
@@ -672,7 +670,7 @@ namespace UINetworkDiscovery
                 var selectedAlgs = cbDisco.IsChecked.Value || cbUConnect.IsChecked.Value ||
                                    cbSearchlight.IsChecked.Value || cbBirthday.IsChecked.Value ||
                                    cbStripedSearchlight.IsChecked.Value || cbTestAlgorithm.IsChecked.Value ||
-                                   cbGNihao.IsChecked.Value || cbBalancedNihao.IsChecked.Value;
+                                   cbGNihao.IsChecked.Value || cbBalancedNihao.IsChecked.Value ||cbAccGreedyBNihao.IsChecked.Value;
 
                 if (selectedAlgs)
                 {
@@ -714,6 +712,17 @@ namespace UINetworkDiscovery
                             var node1 = new BalancedNihao(0, duties[0]);
                             var node2 = new BalancedNihao(1, duties[duties.Length - 1]);
                             RunTwoNodesSimulation(node1, node2, NodeType.BalancedNihao);
+                        }
+                    }
+
+                    if (cbGNihao.IsChecked == true)
+                    {
+                        double[] duties;
+                        if (GetDutyCycle(out duties))
+                        {
+                            var node1 = new AccBalancedNihao(0, duties[0], false);
+                            var node2 = new AccBalancedNihao(1, duties[duties.Length - 1], false);
+                            RunTwoNodesSimulation(node1, node2, NodeType.AccBalancedNihao);
                         }
                     }
 

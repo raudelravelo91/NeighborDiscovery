@@ -105,7 +105,7 @@ namespace NeighborDiscovery.Protocols
                     _lastAccSlot = InternalTimeSlot;
                 }
                 else
-                    ProtocolListenedSlots++;
+                    NumberOfListenedSlots++;
             }
 
             if (IsAccSlot(InternalTimeSlot + 1) || _slotsGainUpdatedNeeded) //update slots gain, if needed
