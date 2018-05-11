@@ -20,6 +20,7 @@ namespace NeighborDiscovery.Networks
         {
             _nodes = new HashSet<Network2DNode>();
             IsStatic = isStatic;
+            CurrentTimeSlot = 0;
             if (IsStatic)
             {
                 _neighbors = new Dictionary<Network2DNode, Dictionary<Network2DNode, int>>();

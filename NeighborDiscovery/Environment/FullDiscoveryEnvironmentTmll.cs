@@ -40,11 +40,8 @@ namespace NeighborDiscovery.Environment
 
         public FullDiscoveryEnvironmentTmll(RunningMode runningMode, int trackId = -1)
         {
-            if(trackId >= 0)
-            {
-                _trackId = trackId;
-                _trackedStatistics = new StatisticTestResult();
-            }
+            _trackedStatistics = new StatisticTestResult();
+            _trackId = trackId;
             CurrentTimeSlot = 0;
             RunningMode = runningMode;
 
@@ -222,12 +219,6 @@ namespace NeighborDiscovery.Environment
             if(listener.DeviceLogic.ContainsNeighbor(transmitter.DeviceLogic))
                 contactInfo = listener.DeviceLogic.GetContactInfo(transmitter.DeviceLogic);
             else
-            { 
-                var accLogic = listener.DeviceLogic as AccProtocol;
-                if(accLogic != null)
-                    contactInfo = accLogic.GetContactInfoFor2Hop(transmitter.DeviceLogic);
-            }
-            if (contactInfo == null)
                 throw new Exception("Devices did not discover each other");
             
             var listenerLocation = _deviceToLocation[listener];
@@ -236,7 +227,7 @@ namespace NeighborDiscovery.Environment
             //todo => fix this
             int listenedIn = ToEnviromentTime(listener.DeviceLogic, contactInfo.FirstContact);//environment time
             int gotInRange = _network.GotInRange(transmitterLocation, listenerLocation);//double check if the returned value is in environment time
-            int latency = listenedIn - gotInRange;
+            int latency = listenedIn - gotInRange + 1;
 
             //if (latency > 200)
             //{

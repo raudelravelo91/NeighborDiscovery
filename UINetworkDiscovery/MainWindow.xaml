@@ -325,9 +325,6 @@
 
                 <Label Content="Nodes Start Up TimeSlot Limit:" FontSize="12" Margin="20,2,2,2" Grid.Row="3" Grid.Column="0" HorizontalAlignment="Right"/>
                 <TextBox x:Name="tbStartUpLimit" Width="40" Margin="0,5,5,5" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Left"/>
-                
-                <Label Content="Got In Range Limit:" FontSize="12" Margin="20,2,2,2" Grid.Row="7" Grid.Column="0" HorizontalAlignment="Right"/>
-                <TextBox x:Name="tbGotInRangeLimit" Width="40" Margin="0,5,5,5" Grid.Row="7" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
 
                 <Label Content="Comm Range:" FontSize="12" Margin="20,2,2,2" Grid.Row="4" Grid.Column="0" HorizontalAlignment="Right"/>
                 <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left">

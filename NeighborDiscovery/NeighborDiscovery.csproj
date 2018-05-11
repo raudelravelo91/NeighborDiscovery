@@ -72,7 +72,6 @@
     <Compile Include="Environment\TwoNodesEnvironmentTmll.cs" />
     <Compile Include="Environment\FullDiscoveryEnvironmentTmll.cs" />
     <Compile Include="Protocols\AccBalancedNihao.cs" />
-    <Compile Include="Protocols\AccIndirectDiscovery.cs" />
     <Compile Include="Protocols\AccProtocol.cs" />
     <Compile Include="Protocols\BalancedNihao.cs" />
     <Compile Include="Protocols\ContactInfo2Hop.cs" />
@@ -86,17 +85,13 @@
     <Compile Include="Networks\Network2DNode.cs" />
     <Compile Include="Utils\ObjectCopier.cs" />
     <Compile Include="Utils\RandomGenerator.cs" />
-    <Compile Include="Protocols\AccGossipGNihao.cs" />
-    <Compile Include="Protocols\AccGossipPNihao.cs" />
-    <Compile Include="Protocols\AccGreedyBalancedNihao.cs" />
+    <Compile Include="Protocols\AccBalancedNihaoExtended.cs" />
     <Compile Include="Protocols\BirthdayNode.cs" />
     <Compile Include="Protocols\ContactInfo.cs" />
     <Compile Include="Protocols\Disco.cs" />
     <Compile Include="Environment\DiscoverableDevice.cs" />
-    <Compile Include="Protocols\B-NihaoRandomizedTmll.cs" />
     <Compile Include="Protocols\NeighborInfo.cs" />
     <Compile Include="Protocols\BoundedProtocol.cs" />
-    <Compile Include="Protocols\BNihaoTmll.cs" />
     <Compile Include="Protocols\T-Nihao.cs" />
     <Compile Include="Protocols\TestAlgorithm.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

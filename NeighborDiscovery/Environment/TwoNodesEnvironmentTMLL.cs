@@ -48,12 +48,17 @@ namespace NeighborDiscovery.Environment
             return new Tuple<int,int>(latency1, latency2);
         }
 
+        
         private Tuple<int, int> RunTwoNodesSimulationForAcc(int node1State, int node2State, int latencyLimit)
         {
             var node1 = Node1.Clone();
             var node2 = Node2.Clone();
-            node1.MoveNext(node1State);
-            node2.MoveNext(node2State);
+
+            while (node1.InternalTimeSlot < node1State)
+                node1.MoveNext();
+            while(node2.InternalTimeSlot < node2State)
+                node2.MoveNext();
+
             int latency1 = -1;
             int latency2 = -1;
             int slotCnt = 1;
@@ -96,9 +101,11 @@ namespace NeighborDiscovery.Environment
                     for (var node2State = node1State; node2State < Node2.T; node2State++)
                     {
                         var simulation =
-                            RunTwoNodesSimulationForAcc(node1State, node2State, 2*Math.Max(Node1.Bound, Node2.Bound));
+                            RunTwoNodesSimulationForAcc(node1State, node2State, Node1.Bound*2);
                         statistics.AddDiscovery(simulation.Item1);
                         statistics.AddDiscovery(simulation.Item2);
+                        
+                        //statistics.AddDiscovery(Math.Min(simulation.Item1 , simulation.Item2));
                     }
                 }
             //);

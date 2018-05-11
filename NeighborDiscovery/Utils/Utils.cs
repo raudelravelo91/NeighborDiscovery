@@ -17,11 +17,8 @@ namespace NeighborDiscovery.Utils
         StripedSearchlight,
         Hello,
         TestAlgorithm,
-        GNihao,
         BalancedNihao,
-        AccGossipGNihao,
-        AccGossipPNihao,
-        AccGreedyBalancedNihao,
-        AccBalancedNihao
+        AccBalancedNihao,
+        AccBalancedNihaoExtended
     }
 }

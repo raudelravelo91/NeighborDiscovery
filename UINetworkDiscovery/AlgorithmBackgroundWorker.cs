@@ -38,43 +38,6 @@ namespace UINetworkDiscovery
             Worker.CancelAsync();
         }
 
-        private IDiscoveryProtocol NodeFactoryFunc(int id, int dutyCycle)
-        {
-            switch (DeviceProtocol)
-            {
-                case NodeType.Disco:
-                    return new Disco(id, dutyCycle);
-                case NodeType.UConnect:
-                    return new UConnect( id, dutyCycle);
-                //case NodeType.Birthday:
-                //    n = NodeFactory.CreateNode(Type, new NodeParameters(Type, basicParameters.Id, basicParameters.DutyCyclePercentage, basicParameters.CommunicationRange));
-                //    break;
-                //case NodeType.Searchlight:
-                //    n = NodeFactory.CreateNode(Type, new NodeParameters(Type, basicParameters.Id, basicParameters.DutyCyclePercentage, basicParameters.CommunicationRange));
-                //    break;
-                //case NodeType.Hello:
-                //    n = NodeFactory.CreateNode(Type, new HelloParameters(basicParameters.Id, basicParameters.DutyCyclePercentage, basicParameters.CommunicationRange, BasicParameters.numberOfDutyCyclesToHandle == 1));
-                //    break;
-                //case NodeType.TestAlgorithm:
-                //    n = NodeFactory.CreateNode(Type, new NodeParameters(Type, basicParameters.Id, basicParameters.DutyCyclePercentage, basicParameters.CommunicationRange));
-                //    break;
-                //case NodeType.GNihao:
-                //    n = new BNihaoR(basicParameters.Id, basicParameters.DutyCyclePercentage, basicParameters.CommunicationRange, 20, basicParameters.StartUpTime);
-                //    break;
-                //case NodeType.BNihao:
-                //    n = new BNihao(basicParameters.Id, basicParameters.DutyCyclePercentage, basicParameters.CommunicationRange, 20, basicParameters.StartUpTime);
-                //    break;
-                //case NodeType.AccGossipGNihao:
-                //    n = new AccGossipGNihao(basicParameters.Id, basicParameters.DutyCyclePercentage, basicParameters.CommunicationRange, 20, basicParameters.StartUpTime);
-                //    break;
-                //case NodeType.AccGossipPNihao:
-                    //n = new AccGossipPNihao(basicParameters.Id, basicParameters.DutyCyclePercentage, basicParameters.CommunicationRange, 20, basicParameters.StartUpTime, false);
-                    //break;
-                default:
-                    throw new Exception("Can not create the given type of node");
-            }
-        }
-
         private void Start(object sender, DoWorkEventArgs e)
         {
             lock (MainWindow.RunningInfo)
@@ -102,7 +65,7 @@ namespace UINetworkDiscovery
                     return;
                 }
                 
-                var test = environment.RunSingleSimulation(n.Data, DeviceProtocol, 0);
+                var test = environment.RunSingleSimulation(n.Data, DeviceProtocol, -1);
                 statisticResults.AddStatisticTest(test);
                 cnt++;
                 Worker.ReportProgress(cnt * 100 / suite.NumberOfTests);

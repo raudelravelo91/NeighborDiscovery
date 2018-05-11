@@ -9,7 +9,7 @@ using NeighborDiscovery.Utils;
 
 namespace NeighborDiscovery.Protocols
 {
-    public sealed class AccBalancedNihao : AccProtocol
+    public sealed class AccBalancedNihaoExtended : AccProtocol
     {
         public int N { get; set; }// M = N AND N => 2N
         public override int Bound => N * N;
@@ -20,7 +20,7 @@ namespace NeighborDiscovery.Protocols
         private readonly int[,] _awakeDevices;
         private readonly HashSet<IDiscoveryProtocol> _neighborsAwaiting;
 
-        public AccBalancedNihao(int id, double dutyCyclePercentage) : base(id)
+        public AccBalancedNihaoExtended(int id, double dutyCyclePercentage) : base(id)
         {
             SetDutyCycle(dutyCyclePercentage);
             _listeningSchedule = new bool[N, N];
@@ -33,12 +33,12 @@ namespace NeighborDiscovery.Protocols
 
         public override IDiscoveryProtocol Clone()
         {
-            return new AccBalancedNihao(Id, GetDutyCycle());
+            return new AccBalancedNihaoExtended(Id, GetDutyCycle());
         }
 
         public override string ToString()
         {
-            return "Id: " + Id + " DC: " + DesiredDutyCycle + " AccBalancedNihao (" + N + ")";
+            return "Id: " + Id + " DC: " + DesiredDutyCycle + " AccBalancedNihaoExtended (" + N + ")";
         }
 
         public override bool IsListening()
@@ -52,17 +52,21 @@ namespace NeighborDiscovery.Protocols
 
         public override bool IsTransmitting()
         {
-            if (IsManualTransmission() && _neighborsAwaiting.Count > 0)
-            {
-                //check if there are neighbors awaiting listening
-                return _neighborsAwaiting.Any(node => node.IsListening());
-            }
+            return IsRegularTransmission() || IsExtraTransmission();
+        }
 
+        private bool IsRegularTransmission()
+        {
             int slot = InternalTimeSlot % T;
             int row = slot / N;
             int col = slot % N;
 
             return _transmitSchedule[row, col];
+        }
+
+        private bool IsExtraTransmission()
+        {
+            return _neighborsAwaiting.Any(node => node.IsListening());
         }
 
         public override double GetDutyCycle()
@@ -94,22 +98,22 @@ namespace NeighborDiscovery.Protocols
 
         public override void MoveNext(int slot = 1)
         {
-            if (slot < 0)
-                throw new Exception("The Device can not move a negative number of slots");
+            //if (slot < 0)
+            //    throw new Exception("The Device can not move a negative number of slots");
+            //if (slot == 0)
+            //    return;
+            
             if (IsListening())
             {
-               NumberOfListenedSlots++;
+                NumberOfListenedSlots++;
             }
-            if (IsTransmitting())
-            {
-                NumberOfTransmissions++;
-                if (IsManualTransmission())
-                {
-                    var cnt = _neighborsAwaiting.RemoveWhere(node => node.IsListening());
-                }
-            }
+            //if (IsTransmitting())
+            //{
+            //    NumberOfTransmissions++;
+            //}
+            var cnt = _neighborsAwaiting.RemoveWhere(node => node.ContainsNeighbor(this));//remove awaiting neighbors that already listened to you
 
-            InternalTimeSlot += slot;//if slot > 1 then the property ProtocolListenedSlots may not give a correct value.
+            InternalTimeSlot++;
         }
 
         protected override double SlotGain(int slot)
@@ -143,14 +147,6 @@ namespace NeighborDiscovery.Protocols
         }
 
         #region private methods
-        private bool IsManualTransmission()
-        {
-            int schedulePos = InternalTimeSlot % T;
-            //  int row = schedulePos / N;
-            int col = schedulePos % N;
-            return col == N/2;
-        }
-
         private void CheckIfNeedsAnswer(IDiscoveryProtocol neighbor)
         {
             if (neighbor.ContainsNeighbor(this) && _neighborsAwaiting.Contains(neighbor))
@@ -183,15 +179,20 @@ namespace NeighborDiscovery.Protocols
         private void GenerateListenningSchedule()
         {
             _listeningSchedule = new bool[N, N];
-            int row = 0;
-            for (int col = 0; col <= N / 2; col++)
-                _listeningSchedule[row, col] = true;
+            int col = 0;
+            for (int row = 0; row < N; row++, col++)
+            {
+                if (col == (N / 2 - 1))
+                {
+                    _listeningSchedule[row, col+1] = true;
+                }
 
-            row = N / 2;//the middle row
-            for (int col = 0; col <= N / 2; col++)
+                col %= (N / 2);
+
                 _listeningSchedule[row, col] = true;
+            }
         }
-
+        
         private void GenerateLTransmissionsSchedule()
         {
             _transmitSchedule = new bool[N, N];

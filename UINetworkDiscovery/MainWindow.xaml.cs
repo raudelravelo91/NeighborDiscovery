@@ -33,7 +33,7 @@ namespace UINetworkDiscovery
         private readonly AlgorithmBackgroundWorker _workerTestAlgorithm;
         private readonly AlgorithmBackgroundWorker _workerGNihao;
         private readonly AlgorithmBackgroundWorker _workerBalancedNihao;
-        private readonly AlgorithmBackgroundWorker _workerAccGreedyBNihao;
+        private readonly AlgorithmBackgroundWorker _workerAccBalancedBNihao;
         private List<int> _threads = new List<int>();
 
         public MainWindow()
@@ -42,7 +42,7 @@ namespace UINetworkDiscovery
 
             _fileName = "testcases.txt";
             _model = new PlotModel();
-            SetXAxes(200, 4);
+            SetXAxes(400, 8);
             SetYAxes(1, 10);
             var currentMargins = oxyplot.PlotMargins;
             _model.PlotMargins = new OxyThickness(currentMargins.Left, btClear.Height, currentMargins.Right,
@@ -77,9 +77,9 @@ namespace UINetworkDiscovery
             _workerBalancedNihao = new AlgorithmBackgroundWorker(NodeType.BalancedNihao);
             _workerBalancedNihao.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
             _workerBalancedNihao.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
-            _workerAccGreedyBNihao = new AlgorithmBackgroundWorker(NodeType.AccGreedyBalancedNihao);
-            _workerAccGreedyBNihao.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
-            _workerAccGreedyBNihao.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
+            _workerAccBalancedBNihao = new AlgorithmBackgroundWorker(NodeType.AccBalancedNihaoExtended);
+            _workerAccBalancedBNihao.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
+            _workerAccBalancedBNihao.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
 
         }
 
@@ -165,7 +165,7 @@ namespace UINetworkDiscovery
             {
                 progressBarBalancedNihao.Value = e.ProgressPercentage;
             }
-            else if (sender.Equals(_workerAccGreedyBNihao.Worker))
+            else if (sender.Equals(_workerAccBalancedBNihao.Worker))
             {
                 progressBarAccGreedyBNihao.Value = e.ProgressPercentage;
             }
@@ -249,17 +249,16 @@ namespace UINetworkDiscovery
             cb05p.IsChecked = false;
             cb1p.IsChecked = false;
             cb2p.IsChecked = false;
-            cb5p.IsChecked = false;
-            cb10p.IsChecked = true;
+            cb5p.IsChecked = true;
+            cb10p.IsChecked = false;
             tbFixAsymmetricNetwork.Text = "0";
             //generate settings
             tbNumberOfTestCases.Text = "100";
             tbnetworkSize.Text = "40";
             tbMinCommRange.Text = "20";
-            tbMaxCommRange.Text = "100";
-            tbPosRange.Text = "50";
-            tbStartUpLimit.Text = "200";
-            tbGotInRangeLimit.Text = "400";
+            tbMaxCommRange.Text = "40";
+            tbPosRange.Text = "400";
+            tbStartUpLimit.Text = "400";
         }
 
         private void btGenerate_Click(object sender, RoutedEventArgs e)
@@ -309,21 +308,28 @@ namespace UINetworkDiscovery
             _workerStripedSearchlight.CancelAsync();
             _workerTestAlgorithm.CancelAsync();
             _workerBalancedNihao.CancelAsync();
+            _workerGNihao.CancelAsync();
+            _workerAccBalancedBNihao.CancelAsync();
+            
         }
 
         private void ResetAlgorithmProperties()
         {
-            progressBarDisco.Value = 0;
-            discoAvg.Text = "";
-            discoCnt.Text = "";
+            //progressBarDisco.Value = 0;
+            //discoAvg.Text = "";
+            //discoCnt.Text = "";
 
-            progressBarUConnect.Value = 0;
-            uconnectAvg.Text = "";
-            uconnectCnt.Text = "";
+            //progressBarUConnect.Value = 0;
+            //uconnectAvg.Text = "";
+            //uconnectCnt.Text = "";
 
-            progressBarBalancedNihao.Value = 0;
-            uconnectAvg.Text = "";
-            uconnectCnt.Text = "";
+            //progressBarBalancedNihao.Value = 0;
+            //uconnectAvg.Text = "";
+            //uconnectCnt.Text = "";
+
+            //progressBarBalancedNihao.Value = 0;
+            //uconnectAvg.Text = "";
+            //uconnectCnt.Text = "";
 
             //progressBarSearchlight.Value = 0;
             //searchlightAvg.Text = "";
@@ -415,7 +421,7 @@ namespace UINetworkDiscovery
 
                         if (cbAccGreedyBNihao.IsChecked == true)
                         {
-                            _workerAccGreedyBNihao.RunWorkerAsync(TestCasesGenerator.LoadTestSuite(_fileName));
+                            _workerAccBalancedBNihao.RunWorkerAsync(TestCasesGenerator.LoadTestSuite(_fileName));
                         }
                     }
                     else
@@ -524,17 +530,6 @@ namespace UINetworkDiscovery
                     lineStyle = LineStyle.DashDashDot;
                     balanceNihaoAvg.Text = result.AverageDiscoveryLatency.ToString();
                     break;
-                case NodeType.AccGreedyBalancedNihao:
-                    markerType = MarkerType.Circle;
-                    oxyColor = OxyColors.Green;
-                    if (ModelContainsAlgorithm(NodeType.AccGossipPNihao))
-                    {
-                        oxyColor = OxyColors.DarkGreen;
-                    }
-
-                    lineStyle = LineStyle.Dot;
-                    AccGreedyBNihaoAvg.Text = result.AverageDiscoveryLatency.ToString();
-                    break;
                 case NodeType.AccBalancedNihao:
                     markerType = MarkerType.Cross;
                     oxyColor = OxyColors.Red;
@@ -545,6 +540,17 @@ namespace UINetworkDiscovery
 
                     lineStyle = LineStyle.LongDashDot;
                     gNihaoAvg.Text = result.AverageDiscoveryLatency.ToString();
+                    break;
+                case NodeType.AccBalancedNihaoExtended:
+                    markerType = MarkerType.Circle;
+                    oxyColor = OxyColors.Green;
+                    if (ModelContainsAlgorithm(NodeType.AccBalancedNihaoExtended))
+                    {
+                        oxyColor = OxyColors.DarkGreen;
+                    }
+
+                    lineStyle = LineStyle.Dot;
+                    AccGreedyBNihaoAvg.Text = result.AverageDiscoveryLatency.ToString();
                     break;
                 default:
                     oxyColor = OxyColors.Black;
@@ -648,10 +654,10 @@ namespace UINetworkDiscovery
         {
             var environment = new TwoNodesEnvironmentTmll(node1, node2);
             var testResult = environment.RunSimulation();
-            var statistics = new StatisticsResult(type);
-            statistics.AddStatisticTest(testResult);
-            statistics.BuildAverageFractionOfDiscovey(2*node1.Bound);
-            worker_RunWorkerCompleted(this, new RunWorkerCompletedEventArgs(statistics, null, false));
+            var statisticsResult = new StatisticsResult(type);
+            statisticsResult.AddStatisticTest(testResult);
+            statisticsResult.BuildAverageFractionOfDiscovey(2*node1.Bound);
+            worker_RunWorkerCompleted(this, new RunWorkerCompletedEventArgs(statisticsResult, null, false));
         }
 
         private void btTwoNodesSimulation_Click(object sender, RoutedEventArgs e)
@@ -720,9 +726,20 @@ namespace UINetworkDiscovery
                         double[] duties;
                         if (GetDutyCycle(out duties))
                         {
-                            var node1 = new AccBalancedNihao(0, duties[0], false);
-                            var node2 = new AccBalancedNihao(1, duties[duties.Length - 1], false);
+                            var node1 = new AccBalancedNihao(0, duties[0]);
+                            var node2 = new AccBalancedNihao(1, duties[duties.Length - 1]);
                             RunTwoNodesSimulation(node1, node2, NodeType.AccBalancedNihao);
+                        }
+                    }
+
+                    if (cbAccGreedyBNihao.IsChecked == true)
+                    {
+                        double[] duties;
+                        if (GetDutyCycle(out duties))
+                        {
+                            var node1 = new AccBalancedNihaoExtended(0, duties[0]);
+                            var node2 = new AccBalancedNihaoExtended(1, duties[duties.Length - 1]);
+                            RunTwoNodesSimulation(node1, node2, NodeType.AccBalancedNihaoExtended);
                         }
                     }
 
