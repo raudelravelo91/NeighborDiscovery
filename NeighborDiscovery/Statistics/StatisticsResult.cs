@@ -16,12 +16,6 @@ namespace NeighborDiscovery.Statistics
         private readonly List<StatisticTestResult> _tests;
         private double _avgContactByWakeUp;
         private double _avgDiscoveryLatency;
-        public double AverageContactByWakesUp { get { if (_avgContactByWakeUp == 0)
-                {
-                    _avgContactByWakeUp = Math.Round(_tests.Average(t => t.GetContactsByWakeUpRatio()), 2);
-                }
-                return _avgContactByWakeUp;
-            } }
         public double AverageDiscoveryLatency {
             get {
                 if (_avgDiscoveryLatency == 0)
@@ -76,5 +70,8 @@ namespace NeighborDiscovery.Statistics
             return _averageFractionOfDiscovery.Length - 1;
         }
 
+        public double AvgNoNeighbors => _tests.Average(t => t.AvgNoNeighbors);
+
+        public double AvgTransmissionsSentPerPeriod => _tests.Average(t => t.AvgTransmissionsPerPeriod);
     }
 }

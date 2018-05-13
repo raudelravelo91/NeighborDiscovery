@@ -71,13 +71,13 @@ namespace UINetworkDiscovery
             _workerTestAlgorithm = new AlgorithmBackgroundWorker(NodeType.TestAlgorithm);
             _workerTestAlgorithm.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
             _workerTestAlgorithm.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
-            _workerGNihao = new AlgorithmBackgroundWorker(NodeType.AccBalancedNihao);
+            _workerGNihao = new AlgorithmBackgroundWorker(NodeType.THL2H);
             _workerGNihao.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
             _workerGNihao.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
-            _workerBalancedNihao = new AlgorithmBackgroundWorker(NodeType.BalancedNihao);
+            _workerBalancedNihao = new AlgorithmBackgroundWorker(NodeType.GNihao);
             _workerBalancedNihao.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
             _workerBalancedNihao.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
-            _workerAccBalancedBNihao = new AlgorithmBackgroundWorker(NodeType.AccBalancedNihaoExtended);
+            _workerAccBalancedBNihao = new AlgorithmBackgroundWorker(NodeType.THL2HExtended);
             _workerAccBalancedBNihao.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
             _workerAccBalancedBNihao.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
 
@@ -151,11 +151,11 @@ namespace UINetworkDiscovery
             }
             else if (sender.Equals(_workerStripedSearchlight.Worker))
             {
-                progressBarStripedSearchlight.Value = e.ProgressPercentage;
+                //progressBarStripedSearchlight.Value = e.ProgressPercentage;
             }
             else if (sender.Equals(_workerTestAlgorithm.Worker))
             {
-                progressBarTestAlg.Value = e.ProgressPercentage;
+                //progressBarTestAlg.Value = e.ProgressPercentage;
             }
             else if (sender.Equals(_workerGNihao.Worker))
             {
@@ -207,12 +207,8 @@ namespace UINetworkDiscovery
         public bool GetDutyCycle(out double[] duties)
         {
             var dutyList = new List<double>();
-            if (cb05p.IsChecked != null && cb05p.IsChecked == true)
-                dutyList.Add(0.5);
             if (cb1p.IsChecked != null && cb1p.IsChecked == true)
                 dutyList.Add(1);
-            if (cb2p.IsChecked != null && cb2p.IsChecked == true)
-                dutyList.Add(2);
             if (cb5p.IsChecked != null && cb5p.IsChecked == true)
                 dutyList.Add(5);
             if (cb10p.IsChecked != null && cb10p.IsChecked == true)
@@ -240,15 +236,13 @@ namespace UINetworkDiscovery
             cbUConnect.IsChecked = false;
             cbSearchlight.IsChecked = false;
             cbBirthday.IsChecked = false;
-            cbStripedSearchlight.IsChecked = false;
-            cbTestAlgorithm.IsChecked = false;
+            //cbStripedSearchlight.IsChecked = false;
+            //cbTestAlgorithm.IsChecked = false;
             cbGNihao.IsChecked = false;
             cbBalancedNihao.IsChecked = true;
             cbAccGreedyBNihao.IsChecked = false;
             //duty cycle
-            cb05p.IsChecked = false;
             cb1p.IsChecked = false;
-            cb2p.IsChecked = false;
             cb5p.IsChecked = true;
             cb10p.IsChecked = false;
             tbFixAsymmetricNetwork.Text = "0";
@@ -257,7 +251,7 @@ namespace UINetworkDiscovery
             tbnetworkSize.Text = "40";
             tbMinCommRange.Text = "20";
             tbMaxCommRange.Text = "40";
-            tbPosRange.Text = "400";
+            tbPosRange.Text = "100";
             tbStartUpLimit.Text = "400";
         }
 
@@ -365,7 +359,7 @@ namespace UINetworkDiscovery
                 {
                     var selectedAlgs = cbDisco.IsChecked.Value || cbUConnect.IsChecked.Value ||
                                        cbSearchlight.IsChecked.Value || cbBirthday.IsChecked.Value ||
-                                       cbStripedSearchlight.IsChecked.Value || cbTestAlgorithm.IsChecked.Value ||
+                                       //cbStripedSearchlight.IsChecked.Value || cbTestAlgorithm.IsChecked.Value ||
                                        cbGNihao.IsChecked.Value || cbBalancedNihao.IsChecked.Value ||
                                        cbAccGreedyBNihao.IsChecked.Value;
 
@@ -399,15 +393,15 @@ namespace UINetworkDiscovery
                             _workerBirthday.RunWorkerAsync(TestCasesGenerator.LoadTestSuite(_fileName));
                         }
 
-                        if (cbStripedSearchlight.IsChecked == true)
-                        {
-                            _workerStripedSearchlight.RunWorkerAsync(TestCasesGenerator.LoadTestSuite(_fileName));
-                        }
+                        //if (cbStripedSearchlight.IsChecked == true)
+                        //{
+                        //    _workerStripedSearchlight.RunWorkerAsync(TestCasesGenerator.LoadTestSuite(_fileName));
+                        //}
 
-                        if (cbTestAlgorithm.IsChecked == true)
-                        {
-                            _workerTestAlgorithm.RunWorkerAsync(TestCasesGenerator.LoadTestSuite(_fileName));
-                        }
+                        //if (cbTestAlgorithm.IsChecked == true)
+                        //{
+                        //    _workerTestAlgorithm.RunWorkerAsync(TestCasesGenerator.LoadTestSuite(_fileName));
+                        //}
 
                         if (cbGNihao.IsChecked == true)
                         {
@@ -450,6 +444,7 @@ namespace UINetworkDiscovery
             oxyColor = OxyColors.Black;
             markerType = MarkerType.None;
             lineStyle = LineStyle.Solid;
+            avgNoNeighbors.Text =  Math.Round(result.AvgNoNeighbors,2).ToString();
 
             switch (type)
             {
@@ -506,7 +501,7 @@ namespace UINetworkDiscovery
                     }
 
                     lineStyle = LineStyle.LongDashDotDot;
-                    stripedSearchlighAvg.Text = result.AverageDiscoveryLatency.ToString();
+                    //stripedSearchlighAvg.Text = result.AverageDiscoveryLatency.ToString();
                     break;
                 case NodeType.TestAlgorithm:
                     markerType = MarkerType.Cross;
@@ -517,40 +512,43 @@ namespace UINetworkDiscovery
                     }
 
                     lineStyle = LineStyle.LongDashDotDot;
-                    testAlgAvg.Text = result.AverageDiscoveryLatency.ToString();
+                    //testAlgAvg.Text = result.AverageDiscoveryLatency.ToString();
                     break;
-                case NodeType.BalancedNihao:
+                case NodeType.GNihao:
                     markerType = MarkerType.Square;
                     oxyColor = OxyColors.Black;
-                    if (ModelContainsAlgorithm(NodeType.BalancedNihao))
+                    if (ModelContainsAlgorithm(NodeType.GNihao))
                     {
                         oxyColor = OxyColors.DarkGray;
                     }
 
                     lineStyle = LineStyle.DashDashDot;
                     balanceNihaoAvg.Text = result.AverageDiscoveryLatency.ToString();
+                    BalancedNihaoCnt.Text = Math.Round(result.AvgTransmissionsSentPerPeriod, 2).ToString();
                     break;
-                case NodeType.AccBalancedNihao:
+                case NodeType.THL2H:
                     markerType = MarkerType.Cross;
                     oxyColor = OxyColors.Red;
-                    if (ModelContainsAlgorithm(NodeType.AccBalancedNihao))
+                    if (ModelContainsAlgorithm(NodeType.THL2H))
                     {
                         oxyColor = OxyColors.DarkRed;
                     }
 
                     lineStyle = LineStyle.LongDashDot;
                     gNihaoAvg.Text = result.AverageDiscoveryLatency.ToString();
+                    gNihaoCnt.Text = Math.Round(result.AvgTransmissionsSentPerPeriod, 2).ToString();
                     break;
-                case NodeType.AccBalancedNihaoExtended:
+                case NodeType.THL2HExtended:
                     markerType = MarkerType.Circle;
-                    oxyColor = OxyColors.Green;
-                    if (ModelContainsAlgorithm(NodeType.AccBalancedNihaoExtended))
+                    oxyColor = OxyColors.Blue;
+                    if (ModelContainsAlgorithm(NodeType.THL2HExtended))
                     {
-                        oxyColor = OxyColors.DarkGreen;
+                        oxyColor = OxyColors.DarkBlue;
                     }
 
                     lineStyle = LineStyle.Dot;
                     AccGreedyBNihaoAvg.Text = result.AverageDiscoveryLatency.ToString();
+                    AccGreedyBNihaoCnt.Text = Math.Round(result.AvgTransmissionsSentPerPeriod, 2).ToString();
                     break;
                 default:
                     oxyColor = OxyColors.Black;
@@ -675,7 +673,7 @@ namespace UINetworkDiscovery
             {
                 var selectedAlgs = cbDisco.IsChecked.Value || cbUConnect.IsChecked.Value ||
                                    cbSearchlight.IsChecked.Value || cbBirthday.IsChecked.Value ||
-                                   cbStripedSearchlight.IsChecked.Value || cbTestAlgorithm.IsChecked.Value ||
+                                   //cbStripedSearchlight.IsChecked.Value || cbTestAlgorithm.IsChecked.Value ||
                                    cbGNihao.IsChecked.Value || cbBalancedNihao.IsChecked.Value ||cbAccGreedyBNihao.IsChecked.Value;
 
                 if (selectedAlgs)
@@ -717,7 +715,7 @@ namespace UINetworkDiscovery
                         {
                             var node1 = new BalancedNihao(0, duties[0]);
                             var node2 = new BalancedNihao(1, duties[duties.Length - 1]);
-                            RunTwoNodesSimulation(node1, node2, NodeType.BalancedNihao);
+                            RunTwoNodesSimulation(node1, node2, NodeType.GNihao);
                         }
                     }
 
@@ -728,7 +726,7 @@ namespace UINetworkDiscovery
                         {
                             var node1 = new AccBalancedNihao(0, duties[0]);
                             var node2 = new AccBalancedNihao(1, duties[duties.Length - 1]);
-                            RunTwoNodesSimulation(node1, node2, NodeType.AccBalancedNihao);
+                            RunTwoNodesSimulation(node1, node2, NodeType.THL2H);
                         }
                     }
 
@@ -739,7 +737,7 @@ namespace UINetworkDiscovery
                         {
                             var node1 = new AccBalancedNihaoExtended(0, duties[0]);
                             var node2 = new AccBalancedNihaoExtended(1, duties[duties.Length - 1]);
-                            RunTwoNodesSimulation(node1, node2, NodeType.AccBalancedNihaoExtended);
+                            RunTwoNodesSimulation(node1, node2, NodeType.THL2HExtended);
                         }
                     }
 
@@ -753,15 +751,15 @@ namespace UINetworkDiscovery
 
                     }
 
-                    if (cbStripedSearchlight.IsChecked == true)
-                    {
+                    //if (cbStripedSearchlight.IsChecked == true)
+                    //{
 
-                    }
+                    //}
 
-                    if (cbTestAlgorithm.IsChecked == true)
-                    {
+                    //if (cbTestAlgorithm.IsChecked == true)
+                    //{
 
-                    }
+                    //}
 
                     if (cbGNihao.IsChecked == true)
                     {

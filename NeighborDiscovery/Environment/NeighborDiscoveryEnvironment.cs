@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using NeighborDiscovery.Protocols;
 using NeighborDiscovery.Statistics;
@@ -53,11 +54,11 @@ namespace NeighborDiscovery.Environment
                     return null;
                 case NodeType.TestAlgorithm:
                     return null;
-                case NodeType.BalancedNihao:
+                case NodeType.GNihao:
                     return new BalancedNihao(id, dutyCycle);
-                case NodeType.AccBalancedNihao:
+                case NodeType.THL2H:
                     return new AccBalancedNihao(id, dutyCycle);
-                case NodeType.AccBalancedNihaoExtended:
+                case NodeType.THL2HExtended:
                     return new AccBalancedNihaoExtended(id, dutyCycle);
                 default:
                 {
@@ -73,8 +74,8 @@ namespace NeighborDiscovery.Environment
             List<DeviceData> dataList = data.ToList();
             dataList.Sort();
             Queue<DeviceData> events = new Queue<DeviceData>(dataList);
-            int maxSlot = 200;//todo, improve the way to calculate the limit
-            //int maxSlot = 1000;
+            int maxSlot = SimulationLimit(dataList);//todo, improve the way to calculate the simulation limit
+            
             int currentSlot = 0;
             FullDiscoveryEnvironmentTmll fullEnv = new FullDiscoveryEnvironmentTmll(RunningMode.StaticDevices, accId);
             while (currentSlot < maxSlot)
@@ -89,6 +90,22 @@ namespace NeighborDiscovery.Environment
             }
             
             return fullEnv.GetCurrentResult();
+        }
+
+        public int SimulationLimit(List<DeviceData> sortedData)
+        {
+            int duty = sortedData.Min(node => node.DutyCycle);
+            switch (duty)
+            {
+                case 1:
+                    return 100000;
+                case 5:
+                    return 4000;
+                case 10:
+                    return 2000;
+                default:
+                    throw new Exception("duty cycle not supported");
+            }
         }
     }
 }

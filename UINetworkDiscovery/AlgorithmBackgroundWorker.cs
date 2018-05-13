@@ -25,7 +25,7 @@ namespace UINetworkDiscovery
             Worker = new BackgroundWorker() { WorkerSupportsCancellation = true, WorkerReportsProgress = true, };
             Worker.DoWork += Start;
             IsReading = false;
-            LatencyLimit = 1000;
+            LatencyLimit = 10000;
         }
 
         public void RunWorkerAsync(TestSuite suite)

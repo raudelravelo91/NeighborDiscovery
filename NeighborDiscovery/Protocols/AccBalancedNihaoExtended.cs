@@ -19,6 +19,7 @@ namespace NeighborDiscovery.Protocols
         private bool[,] _transmitSchedule;
         private readonly int[,] _awakeDevices;
         private readonly HashSet<IDiscoveryProtocol> _neighborsAwaiting;
+        public int NumberOfListeningSlots { get; set; }
 
         public AccBalancedNihaoExtended(int id, double dutyCyclePercentage) : base(id)
         {
@@ -98,19 +99,10 @@ namespace NeighborDiscovery.Protocols
 
         public override void MoveNext(int slot = 1)
         {
-            //if (slot < 0)
-            //    throw new Exception("The Device can not move a negative number of slots");
-            //if (slot == 0)
-            //    return;
-            
             if (IsListening())
             {
                 NumberOfListenedSlots++;
             }
-            //if (IsTransmitting())
-            //{
-            //    NumberOfTransmissions++;
-            //}
             var cnt = _neighborsAwaiting.RemoveWhere(node => node.ContainsNeighbor(this));//remove awaiting neighbors that already listened to you
 
             InternalTimeSlot++;
@@ -185,11 +177,13 @@ namespace NeighborDiscovery.Protocols
                 if (col == (N / 2 - 1))
                 {
                     _listeningSchedule[row, col+1] = true;
+                    NumberOfListeningSlots++;
                 }
 
                 col %= (N / 2);
 
                 _listeningSchedule[row, col] = true;
+                NumberOfListeningSlots++;
             }
         }
         

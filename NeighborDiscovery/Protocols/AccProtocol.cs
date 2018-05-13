@@ -11,7 +11,7 @@ namespace NeighborDiscovery.Protocols
     {
         protected Dictionary<IDiscoveryProtocol, ContactInfo2Hop> Neighbors2HopDiscovered;
         protected int NumberOfListenedSlots;
-        protected int NumberOfTransmissions;
+        //protected int NumberOfTransmissions;
         protected int AccProtocolListenedSlots;
         public virtual int NumberOfNeighbors2Hop => Neighbors2HopDiscovered.Count;
         

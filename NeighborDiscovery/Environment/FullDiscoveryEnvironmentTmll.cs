@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using NeighborDiscovery.Networks;
 using NeighborDiscovery.Statistics;
 using NeighborDiscovery.Protocols;
@@ -37,6 +38,8 @@ namespace NeighborDiscovery.Environment
         public int CurrentTimeSlot { get; private set; }
         public int CurrentNumberOfDevices => _deviceToLocation.Count;
         public RunningMode RunningMode { get; }
+        public double AvgNoNeighbors => _network.AvgNoNeighbor;
+        public int TotalTransmissionsSent { get; private set; }
 
         public FullDiscoveryEnvironmentTmll(RunningMode runningMode, int trackId = -1)
         {
@@ -107,6 +110,13 @@ namespace NeighborDiscovery.Environment
                     statistics.AddDiscovery(latency);
                 }
             }
+
+            //int sumOfSlots = _deviceById.Values.Sum(x => x.DeviceLogic.InternalTimeSlot - _eventArrival[x].InitialState);
+            int sumOfSlots = _eventArrival.Sum(x => (x.Key.InternalTimeSlot - x.Value.InitialState));
+
+
+            statistics.AvgNoNeighbors = AvgNoNeighbors;
+            statistics.AvgTransmissionsPerPeriod = sumOfSlots * 1.0 / TotalTransmissionsSent;
             return statistics;
         }
 
@@ -136,7 +146,7 @@ namespace NeighborDiscovery.Environment
 
                 if (!currentDevice.DeviceLogic.IsTransmitting())
                     continue;
-
+                
                 var transmission = currentDevice.DeviceLogic.GetTransmission();
 
                 foreach (var neighborLocation in _network.NeighborsOf(currentPhysicalDevice))//neighbors in range
@@ -144,6 +154,7 @@ namespace NeighborDiscovery.Environment
                     var neighborLogic = _locationToDevice[neighborLocation].DeviceLogic;
                     neighborLogic.ListenTo(transmission);
                 }
+                TotalTransmissionsSent++;
             }
         }
 

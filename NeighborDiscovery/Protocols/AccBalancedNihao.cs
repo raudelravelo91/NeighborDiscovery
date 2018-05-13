@@ -19,6 +19,7 @@ namespace NeighborDiscovery.Protocols
         private bool[,] _transmitSchedule;
         private readonly int[,] _awakeDevices;
         private readonly HashSet<IDiscoveryProtocol> _neighborsAwaiting;
+        public int NumberOfListeningSlots { get; set; }
 
         public AccBalancedNihao(int id, double dutyCyclePercentage) : base(id)
         {
@@ -100,15 +101,7 @@ namespace NeighborDiscovery.Protocols
             {
                NumberOfListenedSlots++;
             }
-            if (IsTransmitting())
-            {
-                NumberOfTransmissions++;
-                if (IsManualTransmission())
-                {
-                    var cnt = _neighborsAwaiting.RemoveWhere(node => node.IsListening());
-                }
-            }
-
+            var cnt = _neighborsAwaiting.RemoveWhere(node => node.ContainsNeighbor(this));//remove awaiting neighbors that already listened to you
             InternalTimeSlot += slot;//if slot > 1 then the property ProtocolListenedSlots may not give a correct value.
         }
 
@@ -185,11 +178,18 @@ namespace NeighborDiscovery.Protocols
             _listeningSchedule = new bool[N, N];
             int row = 0;
             for (int col = 0; col <= N / 2; col++)
+            {
                 _listeningSchedule[row, col] = true;
+                NumberOfListeningSlots++;
+            }
+            
 
             row = N / 2;//the middle row
             for (int col = 0; col <= N / 2; col++)
+            {
                 _listeningSchedule[row, col] = true;
+                NumberOfListeningSlots++;
+            }
         }
 
         private void GenerateLTransmissionsSchedule()

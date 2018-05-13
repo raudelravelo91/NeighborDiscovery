@@ -15,7 +15,8 @@ namespace NeighborDiscovery.Networks
         public bool IsStatic { get; private set; }
         public int CurrentSize => _nodes.Count;
         public int NumberOfLinks { get; private set; }
-        
+        public double AvgNoNeighbor => NumberOfLinks * 1.0 / _nodes.Count;
+
         public Network2D(bool isStatic = true)
         {
             _nodes = new HashSet<Network2DNode>();

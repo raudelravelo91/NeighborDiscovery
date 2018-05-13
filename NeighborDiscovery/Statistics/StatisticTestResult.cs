@@ -16,7 +16,8 @@ namespace NeighborDiscovery.Statistics
         public int TotalDiscoveries { get; private set; }
         private Dictionary<int, int> DiscoveryByLatency { get; set; }
         private long _sumOfLatency;
-
+        public double AvgNoNeighbors { get; set; }
+        public double AvgTransmissionsPerPeriod { get; set; }
 
         public StatisticTestResult()
         {

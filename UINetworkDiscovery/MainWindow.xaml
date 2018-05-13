@@ -146,7 +146,7 @@
                 </Grid>
             </Grid>
 
-            <Grid x:Name="helloGrid" Margin="2">
+            <!--<Grid x:Name="helloGrid" Margin="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
@@ -168,9 +168,9 @@
                     <ProgressBar Minimum="0" Maximum="100" Value="0" Width="100" Height="20" Name="progressBarStripedSearchlight" Foreground="LightBlue"/>
                     <TextBlock Text="{Binding ElementName=progressBarStripedSearchlight, Path=Value, StringFormat={}{0:0}%}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                 </Grid>
-            </Grid>
+            </Grid>-->
 
-            <Grid x:Name="testAlgGrid" Margin="2">
+            <!--<Grid x:Name="testAlgGrid" Margin="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
@@ -193,6 +193,34 @@
                     <TextBlock Text="{Binding ElementName=progressBarTestAlg, Path=Value, StringFormat={}{0:0}%}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                 </Grid>
             </Grid>
+            -->
+
+           
+
+            <Grid x:Name="accGossipGNihaoGrid" Margin="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <CheckBox Name="cbBalancedNihao" Content="G-Nihao" IsChecked="False" Margin="5" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                <Label Margin="0" Name="lbBalancedNihao" Content="Avg:" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                <TextBlock Margin="0" Name="balanceNihaoAvg" Text="" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <Label Margin="0" Name="lbBalancedNihaoCnt" Content="COR:" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                <TextBlock Margin="0" Name="BalancedNihaoCnt" Text="" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <Grid Margin="0" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
+                    <ProgressBar Minimum="0" Maximum="100" Value="0" Width="100" Height="20" Name="progressBarBalancedNihao" Foreground="LightBlue"/>
+                    <TextBlock Text="{Binding ElementName=progressBarBalancedNihao, Path=Value, StringFormat={}{0:0}%}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Grid>
+                </Grid>
+
 
             <Grid x:Name="gNihaoGrid" Margin="2">
                 <Grid.RowDefinitions>
@@ -206,45 +234,20 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
 
-                <CheckBox Name="cbGNihao" Content="AccIndirect-Nihao" IsChecked="False" Margin="5" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <CheckBox Name="cbGNihao" Content="THL2H" IsChecked="False" Margin="5" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
                 <Label Margin="0" Name="lbGNihao" Content="Avg:" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                 <TextBlock Margin="0" Name="gNihaoAvg" Text="" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                <Label Margin="0" Name="lbgNihaoCnt" Content="Cnt:" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                <Label Margin="0" Name="lbgNihaoCnt" Content="COR:" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                 <TextBlock Margin="0" Name="gNihaoCnt" Text="" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 <Grid Margin="0" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
                     <ProgressBar Minimum="0" Maximum="100" Value="0" Width="100" Height="20" Name="progressBarGNihao" Foreground="LightBlue"/>
                     <TextBlock Text="{Binding ElementName=progressBarGNihao, Path=Value, StringFormat={}{0:0}%}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                 </Grid>
-                
-                
             </Grid>
-            <Grid x:Name="accGossipGNihaoGrid" Margin="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
 
-                <CheckBox Name="cbBalancedNihao" Content="Balanced-Nihao" IsChecked="False" Margin="5" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
-                <Label Margin="0" Name="lbBalancedNihao" Content="Avg:" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                <TextBlock Margin="0" Name="balanceNihaoAvg" Text="" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                <Label Margin="0" Name="lbBalancedNihaoCnt" Content="Cnt:" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                <TextBlock Margin="0" Name="BalancedNihaoCnt" Text="" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                <Grid Margin="0" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
-                    <ProgressBar Minimum="0" Maximum="100" Value="0" Width="100" Height="20" Name="progressBarBalancedNihao" Foreground="LightBlue"/>
-                    <TextBlock Text="{Binding ElementName=progressBarBalancedNihao, Path=Value, StringFormat={}{0:0}%}" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                </Grid>
-                </Grid>
-
-    
-    <Grid x:Name="accGossipPNihaoGrid" Margin="2">
+            <Grid x:Name="accGossipPNihaoGrid" Margin="2">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
@@ -256,11 +259,11 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
-        <CheckBox Name="cbAccGreedyBNihao" Content="AccGreedy (Balanced-Nihao)" IsChecked="False" Margin="5" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <CheckBox Name="cbAccGreedyBNihao" Content="THL2H Extended" IsChecked="False" Margin="5" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
         <Label Margin="0" Name="lbAccGreedyBNihao" Content="Avg:" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
         <TextBlock Margin="0" Name="AccGreedyBNihaoAvg" Text="" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-        <Label Margin="0" Name="lbAccGreedyBNihaoCnt" Content="Cnt:" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+        <Label Margin="0" Name="lbAccGreedyBNihaoCnt" Content="COR:" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
         <TextBlock Margin="0" Name="AccGreedyBNihaoCnt" Text="" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
         <Grid Margin="0" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
             <ProgressBar Minimum="0" Maximum="100" Value="0" Width="100" Height="20" Name="progressBarAccGreedyBNihao" Foreground="LightBlue"/>
@@ -279,9 +282,7 @@
                 <Button Name="btPlot"  Height="30" Width="60" Margin="20,2,2,2" Padding="5" Content="RunEnv" Click="btPlot_Click" />
                 <Button Name="btTwoNodesSimulation"  Height="30" Width="60" Margin="20,3,2,7" Padding="5" Content="1 vs 1" Click="btTwoNodesSimulation_Click" />
                 <Label Content="Duty Cycles:" Margin="2,2,2,2" VerticalAlignment="Center"/>
-                <CheckBox Name="cb05p" Content="0.5%" IsChecked="False" Margin="10,2,2,2" VerticalAlignment="Center"/>
                 <CheckBox Name="cb1p" Content="1%" IsChecked="False" Margin="10,2,2,2" VerticalAlignment="Center"/>
-                <CheckBox Name="cb2p" Content="2%" IsChecked="False" Margin="10,2,2,2" VerticalAlignment="Center"/>
                 <CheckBox Name="cb5p" Content="5%" IsChecked="False" Margin="10,2,2,2" VerticalAlignment="Center"/>
                 <CheckBox Name="cb10p" Content="10%" IsChecked="False" Margin="10,2,2,2" VerticalAlignment="Center"/>
                 
@@ -292,8 +293,12 @@
             <xctk:IntegerUpDown Name="CorValue" Value="20" Maximum="100" Minimum="1"/>
             </StackPanel>
 
-            <Label Content="Test Case Settings:" FontSize="16" FontWeight="Bold" Margin="20,5,5,5" HorizontalAlignment="Center"/>
-            
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Label Content="Test Case Settings:" FontSize="16" FontWeight="Bold" Margin="20,5,5,5" HorizontalAlignment="Center"/>
+                <Label Content="Avg. No. of Neighbors: " FontSize="14" Margin="20,5,5,5" HorizontalAlignment="Center"/>
+                <TextBlock Margin="0" Name="avgNoNeighbors" Text="" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            </StackPanel>
+
             <Button Name="btGenerate" Margin="5" Height="30" Width="100" Padding="5" Content="Generate" Click="btGenerate_Click"/>
             
             <Grid x:Name="gridTestCases">
@@ -334,6 +339,7 @@
                 </StackPanel>
                 <Label Content="Symmetric Percentage Allowed:" FontSize="12" Margin="20,2,2,2" Grid.Row="5" Grid.Column="0" HorizontalAlignment="Right"/>
                 <TextBox x:Name="tbFixAsymmetricNetwork" Width="40" Margin="0,5,5,5" Grid.Row="5" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+
             </Grid>
         </StackPanel>
         
