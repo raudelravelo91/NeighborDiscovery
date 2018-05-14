@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using NeighborDiscovery.Protocols;
 
-namespace NeighborDiscovery.Protocols
+namespace NeighborDiscovery.Utils
 {
     public class ContactInfo2Hop: IContact, ICloneable
     {

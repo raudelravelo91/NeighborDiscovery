@@ -64,7 +64,7 @@ namespace NeighborDiscovery.Protocols
         /// <summary>
         /// Move the internal state of the node to the next time slot (the device's InternalTimeSlot should increase by one)
         /// </summary>
-        void MoveNext(int slot = 1);
+        void MoveNext();
 
         /// <summary>
         /// get the current duty cycle the device is working at

@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NeighborDiscovery.Environment;
 using NeighborDiscovery.Statistics;
+using NeighborDiscovery.Utils;
 
 namespace NeighborDiscovery.Protocols
 {
@@ -96,11 +97,9 @@ namespace NeighborDiscovery.Protocols
             return NeighborsDiscovered.TryGetValue(device, out var value) ? value : null;
         }
 
-        public virtual void MoveNext(int slot = 1)
+        public virtual void MoveNext()
         {
-            if (slot < 0)
-             throw new Exception("The Device can not move a negative number of slots");
-            InternalTimeSlot += slot;
+            InternalTimeSlot ++;
         }
 
         public abstract double GetDutyCycle();

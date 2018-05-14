@@ -32,8 +32,8 @@ namespace UINetworkDiscovery
         private readonly AlgorithmBackgroundWorker _workerStripedSearchlight;
         private readonly AlgorithmBackgroundWorker _workerTestAlgorithm;
         private readonly AlgorithmBackgroundWorker _workerGNihao;
-        private readonly AlgorithmBackgroundWorker _workerBalancedNihao;
-        private readonly AlgorithmBackgroundWorker _workerAccBalancedBNihao;
+        private readonly AlgorithmBackgroundWorker _workerTHL2H;
+        private readonly AlgorithmBackgroundWorker _workerTHL2HExtended;
         private List<int> _threads = new List<int>();
 
         public MainWindow()
@@ -71,15 +71,15 @@ namespace UINetworkDiscovery
             _workerTestAlgorithm = new AlgorithmBackgroundWorker(NodeType.TestAlgorithm);
             _workerTestAlgorithm.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
             _workerTestAlgorithm.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
-            _workerGNihao = new AlgorithmBackgroundWorker(NodeType.THL2H);
+            _workerGNihao = new AlgorithmBackgroundWorker(NodeType.GNihao);
             _workerGNihao.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
             _workerGNihao.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
-            _workerBalancedNihao = new AlgorithmBackgroundWorker(NodeType.GNihao);
-            _workerBalancedNihao.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
-            _workerBalancedNihao.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
-            _workerAccBalancedBNihao = new AlgorithmBackgroundWorker(NodeType.THL2HExtended);
-            _workerAccBalancedBNihao.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
-            _workerAccBalancedBNihao.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
+            _workerTHL2H = new AlgorithmBackgroundWorker(NodeType.THL2H);
+            _workerTHL2H.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
+            _workerTHL2H.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
+            _workerTHL2HExtended = new AlgorithmBackgroundWorker(NodeType.THL2HExtended);
+            _workerTHL2HExtended.Worker.RunWorkerCompleted += worker_RunWorkerCompleted;
+            _workerTHL2HExtended.Worker.ProgressChanged += backgroundWorker_ProgressChanged;
 
         }
 
@@ -157,15 +157,15 @@ namespace UINetworkDiscovery
             {
                 //progressBarTestAlg.Value = e.ProgressPercentage;
             }
-            else if (sender.Equals(_workerGNihao.Worker))
+            else if (sender.Equals(_workerTHL2H.Worker))
             {
                 progressBarGNihao.Value = e.ProgressPercentage;
             }
-            else if (sender.Equals(_workerBalancedNihao.Worker))
+            else if (sender.Equals(_workerGNihao.Worker))
             {
                 progressBarBalancedNihao.Value = e.ProgressPercentage;
             }
-            else if (sender.Equals(_workerAccBalancedBNihao.Worker))
+            else if (sender.Equals(_workerTHL2HExtended.Worker))
             {
                 progressBarAccGreedyBNihao.Value = e.ProgressPercentage;
             }
@@ -253,6 +253,8 @@ namespace UINetworkDiscovery
             tbMaxCommRange.Text = "40";
             tbPosRange.Text = "100";
             tbStartUpLimit.Text = "400";
+            //COR
+            CorValue.Value = 20;
         }
 
         private void btGenerate_Click(object sender, RoutedEventArgs e)
@@ -268,6 +270,7 @@ namespace UINetworkDiscovery
                     {
                         var suite = TestCasesGenerator.GenerateTestSuite(numberOfTests, networkSize, startUpLimit, posRange,
                             minCRange, maxCRange, duties);
+                        
                         if (TestCasesGenerator.SaveTestSuite(_fileName, suite))
                         {
                             testCaseMessage.Text = "Test cases generated";
@@ -301,9 +304,9 @@ namespace UINetworkDiscovery
             _workerBirthday.CancelAsync();
             _workerStripedSearchlight.CancelAsync();
             _workerTestAlgorithm.CancelAsync();
-            _workerBalancedNihao.CancelAsync();
             _workerGNihao.CancelAsync();
-            _workerAccBalancedBNihao.CancelAsync();
+            _workerTHL2H.CancelAsync();
+            _workerTHL2HExtended.CancelAsync();
             
         }
 
@@ -372,6 +375,7 @@ namespace UINetworkDiscovery
                         testCaseMessage.Visibility = Visibility.Visible;
                         testCaseIcon.Fill = Brushes.Yellow;
                         testCaseIcon.Visibility = Visibility.Visible;
+                        DeviceData.COR = (int)CorValue.Value;
 
                         if (cbDisco.IsChecked == true)
                         {
@@ -405,17 +409,17 @@ namespace UINetworkDiscovery
 
                         if (cbGNihao.IsChecked == true)
                         {
-                            _workerGNihao.RunWorkerAsync(TestCasesGenerator.LoadTestSuite(_fileName));
+                            _workerTHL2H.RunWorkerAsync(TestCasesGenerator.LoadTestSuite(_fileName));
                         }
 
                         if (cbBalancedNihao.IsChecked == true)
                         {
-                            _workerBalancedNihao.RunWorkerAsync(TestCasesGenerator.LoadTestSuite(_fileName));
+                            _workerGNihao.RunWorkerAsync(TestCasesGenerator.LoadTestSuite(_fileName));
                         }
 
                         if (cbAccGreedyBNihao.IsChecked == true)
                         {
-                            _workerAccBalancedBNihao.RunWorkerAsync(TestCasesGenerator.LoadTestSuite(_fileName));
+                            _workerTHL2HExtended.RunWorkerAsync(TestCasesGenerator.LoadTestSuite(_fileName));
                         }
                     }
                     else
@@ -713,8 +717,8 @@ namespace UINetworkDiscovery
                         double[] duties;
                         if (GetDutyCycle(out duties))
                         {
-                            var node1 = new BalancedNihao(0, duties[0]);
-                            var node2 = new BalancedNihao(1, duties[duties.Length - 1]);
+                            var node1 = new GNihao(0, duties[0], (int)CorValue.Value);
+                            var node2 = new GNihao(1, duties[duties.Length - 1], (int)CorValue.Value);
                             RunTwoNodesSimulation(node1, node2, NodeType.GNihao);
                         }
                     }
@@ -724,8 +728,8 @@ namespace UINetworkDiscovery
                         double[] duties;
                         if (GetDutyCycle(out duties))
                         {
-                            var node1 = new AccBalancedNihao(0, duties[0]);
-                            var node2 = new AccBalancedNihao(1, duties[duties.Length - 1]);
+                            var node1 = new THL2H(0, duties[0]);
+                            var node2 = new THL2H(1, duties[duties.Length - 1]);
                             RunTwoNodesSimulation(node1, node2, NodeType.THL2H);
                         }
                     }
@@ -735,8 +739,8 @@ namespace UINetworkDiscovery
                         double[] duties;
                         if (GetDutyCycle(out duties))
                         {
-                            var node1 = new AccBalancedNihaoExtended(0, duties[0]);
-                            var node2 = new AccBalancedNihaoExtended(1, duties[duties.Length - 1]);
+                            var node1 = new THL2HExtended(0, duties[0]);
+                            var node2 = new THL2HExtended(1, duties[duties.Length - 1]);
                             RunTwoNodesSimulation(node1, node2, NodeType.THL2HExtended);
                         }
                     }

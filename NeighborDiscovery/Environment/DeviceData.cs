@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using NeighborDiscovery.Utils;
 
 namespace NeighborDiscovery.Environment
@@ -6,6 +7,7 @@ namespace NeighborDiscovery.Environment
     [Serializable]
     public class DeviceData:IComparable<DeviceData>
     {
+        public static int COR { get; set; }
         public int Id { get; }
         public int StartUpSlot { get; }
         public int DutyCycle { get; }

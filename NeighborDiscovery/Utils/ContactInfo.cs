@@ -1,6 +1,7 @@
 ﻿using System;
+using NeighborDiscovery.Protocols;
 
-namespace NeighborDiscovery.Protocols
+namespace NeighborDiscovery.Utils
 {
     public class ContactInfo:IContact, ICloneable
     {

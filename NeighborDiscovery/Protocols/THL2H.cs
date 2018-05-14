@@ -9,7 +9,7 @@ using NeighborDiscovery.Utils;
 
 namespace NeighborDiscovery.Protocols
 {
-    public sealed class AccBalancedNihaoExtended : AccProtocol
+    public sealed class THL2H : AccProtocol
     {
         public int N { get; set; }// M = N AND N => 2N
         public override int Bound => N * N;
@@ -21,7 +21,7 @@ namespace NeighborDiscovery.Protocols
         private readonly HashSet<IDiscoveryProtocol> _neighborsAwaiting;
         public int NumberOfListeningSlots { get; set; }
 
-        public AccBalancedNihaoExtended(int id, double dutyCyclePercentage) : base(id)
+        public THL2H(int id, double dutyCyclePercentage) : base(id)
         {
             SetDutyCycle(dutyCyclePercentage);
             _listeningSchedule = new bool[N, N];
@@ -34,12 +34,12 @@ namespace NeighborDiscovery.Protocols
 
         public override IDiscoveryProtocol Clone()
         {
-            return new AccBalancedNihaoExtended(Id, GetDutyCycle());
+            return new THL2H(Id, GetDutyCycle());
         }
 
         public override string ToString()
         {
-            return "Id: " + Id + " DC: " + DesiredDutyCycle + " AccBalancedNihaoExtended (" + N + ")";
+            return "Id: " + Id + " DC: " + DesiredDutyCycle + " AccBalancedNihao (" + N + ")";
         }
 
         public override bool IsListening()
@@ -53,21 +53,17 @@ namespace NeighborDiscovery.Protocols
 
         public override bool IsTransmitting()
         {
-            return IsRegularTransmission() || IsExtraTransmission();
-        }
+            if (IsManualTransmission() && _neighborsAwaiting.Count > 0)
+            {
+                //check if there are neighbors awaiting listening
+                return _neighborsAwaiting.Any(node => node.IsListening());
+            }
 
-        private bool IsRegularTransmission()
-        {
             int slot = InternalTimeSlot % T;
             int row = slot / N;
             int col = slot % N;
 
             return _transmitSchedule[row, col];
-        }
-
-        private bool IsExtraTransmission()
-        {
-            return _neighborsAwaiting.Any(node => node.IsListening());
         }
 
         public override double GetDutyCycle()
@@ -82,9 +78,6 @@ namespace NeighborDiscovery.Protocols
                 case 1:
                     N = 100;
                     break;
-                case 2:
-                    N = 50;
-                    break;
                 case 5:
                     N = 20;
                     break;
@@ -97,15 +90,14 @@ namespace NeighborDiscovery.Protocols
             DesiredDutyCycle = value;
         }
 
-        public override void MoveNext(int slot = 1)
+        public override void MoveNext()
         {
             if (IsListening())
             {
-                NumberOfListenedSlots++;
+               NumberOfListenedSlots++;
             }
             var cnt = _neighborsAwaiting.RemoveWhere(node => node.ContainsNeighbor(this));//remove awaiting neighbors that already listened to you
-
-            InternalTimeSlot++;
+            InternalTimeSlot ++;//if slot > 1 then the property ProtocolListenedSlots may not give a correct value.
         }
 
         protected override double SlotGain(int slot)
@@ -139,6 +131,14 @@ namespace NeighborDiscovery.Protocols
         }
 
         #region private methods
+        private bool IsManualTransmission()
+        {
+            int schedulePos = InternalTimeSlot % T;
+            //  int row = schedulePos / N;
+            int col = schedulePos % N;
+            return col == N/2;
+        }
+
         private void CheckIfNeedsAnswer(IDiscoveryProtocol neighbor)
         {
             if (neighbor.ContainsNeighbor(this) && _neighborsAwaiting.Contains(neighbor))
@@ -171,22 +171,22 @@ namespace NeighborDiscovery.Protocols
         private void GenerateListenningSchedule()
         {
             _listeningSchedule = new bool[N, N];
-            int col = 0;
-            for (int row = 0; row < N; row++, col++)
+            int row = 0;
+            for (int col = 0; col <= N / 2; col++)
             {
-                if (col == (N / 2 - 1))
-                {
-                    _listeningSchedule[row, col+1] = true;
-                    NumberOfListeningSlots++;
-                }
+                _listeningSchedule[row, col] = true;
+                NumberOfListeningSlots++;
+            }
+            
 
-                col %= (N / 2);
-
+            row = N / 2;//the middle row
+            for (int col = 0; col <= N / 2; col++)
+            {
                 _listeningSchedule[row, col] = true;
                 NumberOfListeningSlots++;
             }
         }
-        
+
         private void GenerateLTransmissionsSchedule()
         {
             _transmitSchedule = new bool[N, N];

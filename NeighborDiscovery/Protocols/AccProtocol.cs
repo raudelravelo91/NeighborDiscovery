@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
+using NeighborDiscovery.Utils;
 
 namespace NeighborDiscovery.Protocols
 {
@@ -72,7 +73,7 @@ namespace NeighborDiscovery.Protocols
         protected virtual IEnumerable<int> GetDeviceNextTransmissionSlot(int t0, int tn, IDiscoveryProtocol device)
         {
             var clone = device.Clone();
-            clone.MoveNext(t0);
+            clone.MoveNext();
             for (; t0 <= tn; t0++, clone.MoveNext())
             {
                 if (clone.IsTransmitting())
@@ -90,7 +91,7 @@ namespace NeighborDiscovery.Protocols
         protected virtual IEnumerable<int> GetDeviceNextListeningSlots(int t0, int tn, IDiscoveryProtocol device)
         {
             var clone = device.Clone();
-            clone.MoveNext(t0);
+            clone.MoveNext();
             for (; t0 <= tn; t0++, clone.MoveNext())
             {
                 if (clone.IsListening())

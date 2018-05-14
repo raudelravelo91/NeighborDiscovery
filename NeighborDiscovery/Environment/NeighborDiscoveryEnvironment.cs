@@ -12,7 +12,6 @@ namespace NeighborDiscovery.Environment
     {
         private NodeType _protocolType;
         private int _trackId;
-        
         private readonly Random _random = new Random();
 
         private int EndsAt(int startUpSlot, BoundedProtocol device)
@@ -23,7 +22,7 @@ namespace NeighborDiscovery.Environment
         private DiscoverableDevice FromDeviceDataToDiscoverableDevice(DeviceData data)
         {
             //if (data.Id == _trackId)
-            var logic = CreateProtocol(data.Id, data.DutyCycle, _protocolType);
+            var logic = CreateProtocol(data.Id, data.DutyCycle, _protocolType, DeviceData.COR);
             int startUpInternalState = _random.Next(logic.T);
             while(logic.InternalTimeSlot < startUpInternalState)
                 logic.MoveNext();
@@ -36,7 +35,7 @@ namespace NeighborDiscovery.Environment
             return new Event(FromDeviceDataToDiscoverableDevice(data), EventType.IncomingDevice);
         }
 
-        private BoundedProtocol CreateProtocol(int id, int dutyCycle, NodeType nodeType)
+        private BoundedProtocol CreateProtocol(int id, int dutyCycle, NodeType nodeType, int m)
         {
             switch (nodeType)
             {
@@ -55,11 +54,11 @@ namespace NeighborDiscovery.Environment
                 case NodeType.TestAlgorithm:
                     return null;
                 case NodeType.GNihao:
-                    return new BalancedNihao(id, dutyCycle);
+                    return new GNihao(id, dutyCycle, m);
                 case NodeType.THL2H:
-                    return new AccBalancedNihao(id, dutyCycle);
+                    return new THL2H(id, dutyCycle);
                 case NodeType.THL2HExtended:
-                    return new AccBalancedNihaoExtended(id, dutyCycle);
+                    return new THL2HExtended(id, dutyCycle);
                 default:
                 {
                     throw new ArgumentException(_protocolType.ToString() + "(protocol) not supported");

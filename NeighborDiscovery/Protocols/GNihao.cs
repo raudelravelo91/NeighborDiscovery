@@ -7,19 +7,22 @@ using System.Threading.Tasks;
 
 namespace NeighborDiscovery.Protocols
 {
-    public sealed class BalancedNihao: BoundedProtocol
+    public sealed class GNihao: BoundedProtocol
     {
-        public int N { get; set; }
-        public override int Bound => N * N;
-        public override int T => N * N;
+        public int N { get; private set; }
+        public int M { get; private set; }
+        public override int Bound => N * M;
+        public override int T => N * M;
         private double DesiredDutyCycle { get; set; }
         private bool[,] _listeningSchedule;
 
-        public BalancedNihao(int id, double dutyCyclePercentage) : base(id)
+        public GNihao(int id, double dutyCyclePercentage, int m) : base(id)
         {
+            M = m;
             SetDutyCycle(dutyCyclePercentage);
-            _listeningSchedule = new bool[N, N];
+            _listeningSchedule = new bool[N, M];
             GenerateListenningSchedule();
+
         }
 
         public override double GetDutyCycle()
@@ -34,9 +37,6 @@ namespace NeighborDiscovery.Protocols
                 case 1:
                     N = 100;
                     break;
-                case 2:
-                    N = 50;
-                    break;
                 case 5:
                     N = 20;
                     break;
@@ -49,45 +49,38 @@ namespace NeighborDiscovery.Protocols
             DesiredDutyCycle = value;
         }
 
-        
-
         public override IDiscoveryProtocol Clone()
         {
-            return new BalancedNihao(Id, GetDutyCycle());
+            return new GNihao(Id, GetDutyCycle(), M);
         }
 
         public override string ToString()
         {
-            return "Id: " + Id + " DC: " + DesiredDutyCycle + " BalancedNihao (" + N + ")";
+            return "Id: " + Id + " DC: " + DesiredDutyCycle + " GNihao (" + N + "," + M +")";
         }
 
         public override bool IsListening()
         {
             int slot = InternalTimeSlot % T;
-            int row = slot / N;
-            int col = slot % N;
+            int row = slot / M;
+            int col = slot % M;
 
             return _listeningSchedule[row, col];
         }
 
         public override bool IsTransmitting()
         {
-            return InternalTimeSlot % N == 0;
+            return InternalTimeSlot % M == 0;
         }
 
         private void GenerateListenningSchedule()
         {
-            var slots = new int[N];
-            for (var i = 0; i < N; i++)
+            _listeningSchedule = new bool[N, M];
+            for (int i = 0; i < M; i++)
             {
-                slots[i] = i;
+                _listeningSchedule[0, i] = true;
+                //todo number of listeningSlots++   
             }
-            //var shuffle = new Shuffle(N);
-            //shuffle.KnuthShuffle(slots);
-
-            _listeningSchedule = new bool[N, N];
-            for (int i = 0; i < N; i ++)
-                _listeningSchedule[i, slots[i]] = true;
         }
     }
 }
