@@ -11,9 +11,10 @@ namespace NeighborDiscovery.Protocols
 {
     public sealed class THL2HExtended : AccProtocol
     {
-        public int N { get; set; }// M = N AND N => 2N
-        public override int Bound => N * N;
-        public override int T => N * N;
+        public int M { get; private set; }
+        public int N { get; private set; }
+        public override int Bound => N * M;
+        public override int T => N * M;
         private double DesiredDutyCycle { get; set; }
         private bool[,] _listeningSchedule;
         private bool[,] _transmitSchedule;
@@ -21,12 +22,16 @@ namespace NeighborDiscovery.Protocols
         private readonly HashSet<IDiscoveryProtocol> _neighborsAwaiting;
         public int NumberOfListeningSlots { get; set; }
 
-        public THL2HExtended(int id, double dutyCyclePercentage) : base(id)
+        public THL2HExtended(int id, double dutyCyclePercentage, int m) : base(id)
         {
+            M = m;
             SetDutyCycle(dutyCyclePercentage);
-            _listeningSchedule = new bool[N, N];
-            _transmitSchedule = new bool[N, N];
-            _awakeDevices = new int[N, N];
+            if (M <= N && N % M != 0)
+                throw new Exception("Invalid N and M values for a proper setting of the listening schedule. Needed N % M == 0");
+
+            _listeningSchedule = new bool[N, M];
+            _transmitSchedule = new bool[N, M];
+            _awakeDevices = new int[N, M];
             _neighborsAwaiting = new HashSet<IDiscoveryProtocol>();
             GenerateListenningSchedule();
             GenerateLTransmissionsSchedule();
@@ -34,19 +39,19 @@ namespace NeighborDiscovery.Protocols
 
         public override IDiscoveryProtocol Clone()
         {
-            return new THL2HExtended(Id, GetDutyCycle());
+            return new THL2HExtended(Id, GetDutyCycle(), M);
         }
 
         public override string ToString()
         {
-            return "Id: " + Id + " DC: " + DesiredDutyCycle + " AccBalancedNihaoExtended (" + N + ")";
+            return "Id: " + Id + " DC: " + DesiredDutyCycle + " THL2HExtended (" + N + "," + M + ")";
         }
 
         public override bool IsListening()
         {
             int slot = InternalTimeSlot % T;
-            int row = slot / N;
-            int col = slot % N;
+            int row = slot / M;
+            int col = slot % M;
 
             return _listeningSchedule[row, col];
         }
@@ -59,8 +64,8 @@ namespace NeighborDiscovery.Protocols
         private bool IsRegularTransmission()
         {
             int slot = InternalTimeSlot % T;
-            int row = slot / N;
-            int col = slot % N;
+            int row = slot / M;
+            int col = slot % M;
 
             return _transmitSchedule[row, col];
         }
@@ -81,9 +86,6 @@ namespace NeighborDiscovery.Protocols
             {
                 case 1:
                     N = 100;
-                    break;
-                case 2:
-                    N = 50;
                     break;
                 case 5:
                     N = 20;
@@ -111,8 +113,8 @@ namespace NeighborDiscovery.Protocols
         protected override double SlotGain(int slot)
         {
             int schedulePos = slot % T;
-            int row = schedulePos / N;
-            int col = schedulePos % N;
+            int row = schedulePos / M;
+            int col = schedulePos % M;
             return _awakeDevices[row, col];
         }
 
@@ -170,21 +172,39 @@ namespace NeighborDiscovery.Protocols
 
         private void GenerateListenningSchedule()
         {
-            _listeningSchedule = new bool[N, N];
-            int col = 0;
-            for (int row = 0; row < N; row++, col++)
+            _listeningSchedule = new bool[N, M];
+            int slotsPerRow = N / M;
+            if (N >= M)//1 slot or less per row
             {
-                if (col == (N / 2 - 1))
+                int rowStep = N / M;
+                int row = 0;
+                for (int col = 0; col < M/2; row += rowStep, col++)
                 {
-                    _listeningSchedule[row, col+1] = true;
+                    _listeningSchedule[row, col] = true;
                     NumberOfListeningSlots++;
+                    if (col == M / 2 - 1)
+                    {
+                        _listeningSchedule[row, col + 1] = true;
+                        NumberOfListeningSlots++;
+                    }
                 }
-
-                col %= (N / 2);
-
-                _listeningSchedule[row, col] = true;
-                NumberOfListeningSlots++;
+                
+                for (int col = 0; col < M / 2; row += rowStep, col++)
+                {
+                    _listeningSchedule[row, col] = true;
+                    NumberOfListeningSlots++;
+                    if (col == M / 2 - 1)
+                    {
+                        _listeningSchedule[row, col + 1] = true;
+                        NumberOfListeningSlots++;
+                    }
+                }
             }
+            else//2 or more slots per row
+            {
+                throw new NotImplementedException();
+            }
+            
         }
         
         private void GenerateLTransmissionsSchedule()

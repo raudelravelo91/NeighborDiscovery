@@ -11,9 +11,10 @@ namespace NeighborDiscovery.Protocols
 {
     public sealed class THL2H : AccProtocol
     {
-        public int N { get; set; }// M = N AND N => 2N
-        public override int Bound => N * N;
-        public override int T => N * N;
+        public int N { get; private set; }
+        public int M { get; private set; }
+        public override int Bound => N * M;
+        public override int T => N * M;
         private double DesiredDutyCycle { get; set; }
         private bool[,] _listeningSchedule;
         private bool[,] _transmitSchedule;
@@ -21,12 +22,13 @@ namespace NeighborDiscovery.Protocols
         private readonly HashSet<IDiscoveryProtocol> _neighborsAwaiting;
         public int NumberOfListeningSlots { get; set; }
 
-        public THL2H(int id, double dutyCyclePercentage) : base(id)
+        public THL2H(int id, double dutyCyclePercentage, int m) : base(id)
         {
+            M = m;
             SetDutyCycle(dutyCyclePercentage);
-            _listeningSchedule = new bool[N, N];
-            _transmitSchedule = new bool[N, N];
-            _awakeDevices = new int[N, N];
+            _listeningSchedule = new bool[N, M];
+            _transmitSchedule = new bool[N, M];
+            _awakeDevices = new int[N, M];
             _neighborsAwaiting = new HashSet<IDiscoveryProtocol>();
             GenerateListenningSchedule();
             GenerateLTransmissionsSchedule();
@@ -34,19 +36,19 @@ namespace NeighborDiscovery.Protocols
 
         public override IDiscoveryProtocol Clone()
         {
-            return new THL2H(Id, GetDutyCycle());
+            return new THL2H(Id, GetDutyCycle(), M);
         }
 
         public override string ToString()
         {
-            return "Id: " + Id + " DC: " + DesiredDutyCycle + " AccBalancedNihao (" + N + ")";
+            return "Id: " + Id + " DC: " + DesiredDutyCycle + " THL2H (" + N +  "," + M + ")";
         }
 
         public override bool IsListening()
         {
             int slot = InternalTimeSlot % T;
-            int row = slot / N;
-            int col = slot % N;
+            int row = slot / M;
+            int col = slot % M;
 
             return _listeningSchedule[row, col];
         }
@@ -60,8 +62,8 @@ namespace NeighborDiscovery.Protocols
             }
 
             int slot = InternalTimeSlot % T;
-            int row = slot / N;
-            int col = slot % N;
+            int row = slot / M;
+            int col = slot % M;
 
             return _transmitSchedule[row, col];
         }
@@ -135,8 +137,8 @@ namespace NeighborDiscovery.Protocols
         {
             int schedulePos = InternalTimeSlot % T;
             //  int row = schedulePos / N;
-            int col = schedulePos % N;
-            return col == N/2;
+            int col = schedulePos % M;
+            return col == M/2;
         }
 
         private void CheckIfNeedsAnswer(IDiscoveryProtocol neighbor)
@@ -170,9 +172,9 @@ namespace NeighborDiscovery.Protocols
 
         private void GenerateListenningSchedule()
         {
-            _listeningSchedule = new bool[N, N];
+            _listeningSchedule = new bool[N, M];
             int row = 0;
-            for (int col = 0; col <= N / 2; col++)
+            for (int col = 0; col <= M / 2; col++)
             {
                 _listeningSchedule[row, col] = true;
                 NumberOfListeningSlots++;
@@ -180,7 +182,7 @@ namespace NeighborDiscovery.Protocols
             
 
             row = N / 2;//the middle row
-            for (int col = 0; col <= N / 2; col++)
+            for (int col = 0; col <= M / 2; col++)
             {
                 _listeningSchedule[row, col] = true;
                 NumberOfListeningSlots++;
@@ -189,7 +191,7 @@ namespace NeighborDiscovery.Protocols
 
         private void GenerateLTransmissionsSchedule()
         {
-            _transmitSchedule = new bool[N, N];
+            _transmitSchedule = new bool[N, M];
             for (int i = 0; i < N; i++)
             {
                 int row = i;

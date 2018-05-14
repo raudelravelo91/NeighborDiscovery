@@ -56,9 +56,9 @@ namespace NeighborDiscovery.Environment
                 case NodeType.GNihao:
                     return new GNihao(id, dutyCycle, m);
                 case NodeType.THL2H:
-                    return new THL2H(id, dutyCycle);
+                    return new THL2H(id, dutyCycle, m);
                 case NodeType.THL2HExtended:
-                    return new THL2HExtended(id, dutyCycle);
+                    return new THL2HExtended(id, dutyCycle, m);
                 default:
                 {
                     throw new ArgumentException(_protocolType.ToString() + "(protocol) not supported");

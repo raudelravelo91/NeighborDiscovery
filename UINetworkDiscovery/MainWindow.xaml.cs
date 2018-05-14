@@ -689,6 +689,7 @@ namespace UINetworkDiscovery
                     testCaseMessage.Visibility = Visibility.Visible;
                     testCaseIcon.Fill = Brushes.Yellow;
                     testCaseIcon.Visibility = Visibility.Visible;
+                    int COR = (int) CorValue.Value;
 
                     if (cbDisco.IsChecked == true)
                     {
@@ -717,8 +718,8 @@ namespace UINetworkDiscovery
                         double[] duties;
                         if (GetDutyCycle(out duties))
                         {
-                            var node1 = new GNihao(0, duties[0], (int)CorValue.Value);
-                            var node2 = new GNihao(1, duties[duties.Length - 1], (int)CorValue.Value);
+                            var node1 = new GNihao(0, duties[0], COR);
+                            var node2 = new GNihao(1, duties[duties.Length - 1], COR);
                             RunTwoNodesSimulation(node1, node2, NodeType.GNihao);
                         }
                     }
@@ -728,8 +729,8 @@ namespace UINetworkDiscovery
                         double[] duties;
                         if (GetDutyCycle(out duties))
                         {
-                            var node1 = new THL2H(0, duties[0]);
-                            var node2 = new THL2H(1, duties[duties.Length - 1]);
+                            var node1 = new THL2H(0, duties[0], COR);
+                            var node2 = new THL2H(1, duties[duties.Length - 1], COR);
                             RunTwoNodesSimulation(node1, node2, NodeType.THL2H);
                         }
                     }
@@ -739,8 +740,8 @@ namespace UINetworkDiscovery
                         double[] duties;
                         if (GetDutyCycle(out duties))
                         {
-                            var node1 = new THL2HExtended(0, duties[0]);
-                            var node2 = new THL2HExtended(1, duties[duties.Length - 1]);
+                            var node1 = new THL2HExtended(0, duties[0], COR);
+                            var node2 = new THL2HExtended(1, duties[duties.Length - 1], COR);
                             RunTwoNodesSimulation(node1, node2, NodeType.THL2HExtended);
                         }
                     }
