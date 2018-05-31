@@ -159,7 +159,7 @@ namespace UINetworkDiscovery
             }
             else if (sender.Equals(_workerTHL2H.Worker))
             {
-                progressBarGNihao.Value = e.ProgressPercentage;
+                progressBarTHL2H.Value = e.ProgressPercentage;
             }
             else if (sender.Equals(_workerGNihao.Worker))
             {
@@ -177,7 +177,7 @@ namespace UINetworkDiscovery
             {
                 if (e.Result is StatisticsResult results)
                 {
-                    Plot(results);
+                    PlotFractionOfDiscoveries(results);
                 }
                 else throw new ArgumentException("Invalid result");
 
@@ -238,7 +238,7 @@ namespace UINetworkDiscovery
             cbBirthday.IsChecked = false;
             //cbStripedSearchlight.IsChecked = false;
             //cbTestAlgorithm.IsChecked = false;
-            cbGNihao.IsChecked = false;
+            cbTHL2H.IsChecked = false;
             cbBalancedNihao.IsChecked = true;
             cbAccGreedyBNihao.IsChecked = false;
             //duty cycle
@@ -248,11 +248,11 @@ namespace UINetworkDiscovery
             tbFixAsymmetricNetwork.Text = "0";
             //generate settings
             tbNumberOfTestCases.Text = "100";
-            tbnetworkSize.Text = "40";
+            tbnetworkSize.Text = "400";
             tbMinCommRange.Text = "20";
-            tbMaxCommRange.Text = "40";
+            tbMaxCommRange.Text = "50";
             tbPosRange.Text = "100";
-            tbStartUpLimit.Text = "400";
+            tbStartUpLimit.Text = "4000";
             //COR
             CorValue.Value = 20;
         }
@@ -363,7 +363,7 @@ namespace UINetworkDiscovery
                     var selectedAlgs = cbDisco.IsChecked.Value || cbUConnect.IsChecked.Value ||
                                        cbSearchlight.IsChecked.Value || cbBirthday.IsChecked.Value ||
                                        //cbStripedSearchlight.IsChecked.Value || cbTestAlgorithm.IsChecked.Value ||
-                                       cbGNihao.IsChecked.Value || cbBalancedNihao.IsChecked.Value ||
+                                       cbTHL2H.IsChecked.Value || cbBalancedNihao.IsChecked.Value ||
                                        cbAccGreedyBNihao.IsChecked.Value;
 
                     if (selectedAlgs)
@@ -407,7 +407,7 @@ namespace UINetworkDiscovery
                         //    _workerTestAlgorithm.RunWorkerAsync(TestCasesGenerator.LoadTestSuite(_fileName));
                         //}
 
-                        if (cbGNihao.IsChecked == true)
+                        if (cbTHL2H.IsChecked == true)
                         {
                             _workerTHL2H.RunWorkerAsync(TestCasesGenerator.LoadTestSuite(_fileName));
                         }
@@ -438,154 +438,106 @@ namespace UINetworkDiscovery
             return (v.Any());
         }
 
-        private void Plot(StatisticsResult result)
+        private OxyColor GetColorByNodeType(NodeType type)
         {
-            var max = result.GetMaxLatency();
-            var type = result.NodeType;
-            OxyColor oxyColor;
-            MarkerType markerType;
-            LineStyle lineStyle;
-            oxyColor = OxyColors.Black;
-            markerType = MarkerType.None;
-            lineStyle = LineStyle.Solid;
-            avgNoNeighbors.Text =  Math.Round(result.AvgNoNeighbors,2).ToString();
-
             switch (type)
             {
                 case NodeType.Birthday:
-                    markerType = MarkerType.None;
-                    oxyColor = OxyColors.Gray;
                     if (ModelContainsAlgorithm(NodeType.Birthday))
-                    {
-                        oxyColor = OxyColors.DarkGray;
-                    }
-
-                    lineStyle = LineStyle.Solid;
-                    birthdayAvg.Text = result.AverageDiscoveryLatency.ToString();
-                    break;
+                        return OxyColors.DarkGray;
+                    return OxyColors.Gray;
                 case NodeType.Disco:
-                    markerType = MarkerType.Triangle;
-                    oxyColor = OxyColors.Magenta;
                     if (ModelContainsAlgorithm(NodeType.Disco))
-                    {
-                        oxyColor = OxyColors.DeepPink;
-                    }
-
-                    lineStyle = LineStyle.Dash;
-                    discoAvg.Text = result.AverageDiscoveryLatency.ToString();
-                    break;
+                        return OxyColors.DeepPink;
+                    return OxyColors.Magenta;
                 case NodeType.UConnect:
-                    markerType = MarkerType.Square;
-                    oxyColor = OxyColors.Blue;
                     if (ModelContainsAlgorithm(NodeType.UConnect))
-                    {
-                        oxyColor = OxyColors.DarkBlue;
-                    }
-
-                    lineStyle = LineStyle.Dot;
-                    uconnectAvg.Text = result.AverageDiscoveryLatency.ToString();
-                    break;
+                        return OxyColors.DarkGreen;
+                    return OxyColors.Green;
                 case NodeType.Searchlight:
-                    markerType = MarkerType.Star;
-                    oxyColor = OxyColors.LimeGreen;
                     if (ModelContainsAlgorithm(NodeType.Searchlight))
-                    {
-                        oxyColor = OxyColors.Green;
-                    }
-
-                    lineStyle = LineStyle.DashDot;
-                    searchlightAvg.Text = result.AverageDiscoveryLatency.ToString();
-                    break;
+                        return OxyColors.DarkOrange;
+                    return OxyColors.Orange;
                 case NodeType.StripedSearchlight:
-                    markerType = MarkerType.Star;
-                    oxyColor = OxyColors.Blue;
-                    if (ModelContainsAlgorithm(NodeType.StripedSearchlight))
-                    {
-                        oxyColor = OxyColors.DarkBlue;
-                    }
-
-                    lineStyle = LineStyle.LongDashDotDot;
-                    //stripedSearchlighAvg.Text = result.AverageDiscoveryLatency.ToString();
                     break;
                 case NodeType.TestAlgorithm:
-                    markerType = MarkerType.Cross;
-                    oxyColor = OxyColors.Pink;
-                    if (ModelContainsAlgorithm(NodeType.TestAlgorithm))
-                    {
-                        oxyColor = OxyColors.Magenta;
-                    }
-
-                    lineStyle = LineStyle.LongDashDotDot;
-                    //testAlgAvg.Text = result.AverageDiscoveryLatency.ToString();
                     break;
                 case NodeType.GNihao:
-                    markerType = MarkerType.Square;
-                    oxyColor = OxyColors.Black;
                     if (ModelContainsAlgorithm(NodeType.GNihao))
-                    {
-                        oxyColor = OxyColors.DarkGray;
-                    }
+                        return OxyColors.DarkGray;
+                    return OxyColors.Black;
+                case NodeType.THL2H:
+                    if (ModelContainsAlgorithm(NodeType.THL2H))
+                        return OxyColors.DarkRed;
+                    return OxyColors.Red;
+                case NodeType.THL2HExtended:
+                    if (ModelContainsAlgorithm(NodeType.THL2HExtended))
+                        return OxyColors.DarkBlue;
+                    return OxyColors.Blue;
+                //default:
+                    //return OxyColors.Black;
+            }
+            return OxyColors.Black;
+        }
 
-                    lineStyle = LineStyle.DashDashDot;
-                    balanceNihaoAvg.Text = result.AverageDiscoveryLatency.ToString();
-                    BalancedNihaoCnt.Text = Math.Round(result.AvgTransmissionsSentPerPeriod, 2).ToString();
+        private void SetAvgCaseByNodeType(NodeType type, StatisticsResult result)
+        {
+            switch (type)
+            {
+                case NodeType.Birthday:
+                    break;
+                case NodeType.Disco:
+                    break;
+                case NodeType.UConnect:
+                    uconnectAvg.Text = result.AverageDiscoveryLatency.ToString("f2");
+                    break;
+                case NodeType.Searchlight:
+                    break;
+                case NodeType.StripedSearchlight:
+                    break;
+                case NodeType.TestAlgorithm:
+                    break;
+                case NodeType.GNihao:
+                    balanceNihaoAvg.Text = result.AverageDiscoveryLatency.ToString("f2");
                     break;
                 case NodeType.THL2H:
-                    markerType = MarkerType.Cross;
-                    oxyColor = OxyColors.Red;
-                    if (ModelContainsAlgorithm(NodeType.THL2H))
-                    {
-                        oxyColor = OxyColors.DarkRed;
-                    }
-
-                    lineStyle = LineStyle.LongDashDot;
-                    gNihaoAvg.Text = result.AverageDiscoveryLatency.ToString();
-                    gNihaoCnt.Text = Math.Round(result.AvgTransmissionsSentPerPeriod, 2).ToString();
+                    THL2HAvg.Text = result.AverageDiscoveryLatency.ToString("f2");
                     break;
                 case NodeType.THL2HExtended:
-                    markerType = MarkerType.Circle;
-                    oxyColor = OxyColors.Blue;
-                    if (ModelContainsAlgorithm(NodeType.THL2HExtended))
-                    {
-                        oxyColor = OxyColors.DarkBlue;
-                    }
-
-                    lineStyle = LineStyle.Dot;
-                    AccGreedyBNihaoAvg.Text = result.AverageDiscoveryLatency.ToString();
-                    AccGreedyBNihaoCnt.Text = Math.Round(result.AvgTransmissionsSentPerPeriod, 2).ToString();
+                    AccGreedyBNihaoAvg.Text = result.AverageDiscoveryLatency.ToString("f2");
                     break;
                 default:
-                    oxyColor = OxyColors.Black;
-                    markerType = MarkerType.None;
-                    lineStyle = LineStyle.Solid;
-                    break;
+                    throw new NotImplementedException("Not showing AvgDiscoveryLatency for NodeType " + type);
             }
+        }
 
+        private void PlotFractionOfDiscoveries(StatisticsResult result)
+        {
+            var max = result.GetMaxLatency();
+            avgNoNeighbors.Text =  Math.Round(result.AvgNoNeighbors,2).ToString();
+            SetAvgCaseByNodeType(result.NodeType, result);
 
             var points = new List<DataPoint>();
-            var x = 0;
+            double x = 0;
             double y = 0;
             while (x <= result.GetMaxLatency() && (y = result.GetAverageFractionOfDiscoveryAtLatency(x)) < 1)
             {
                 points.Add(new DataPoint(x, y));
                 x++;
             }
-
             points.Add(new DataPoint(x, y));
-            //var serie = new FunctionSeries(result.GetAverageFractionOfDiscoveryAtLatency, 1, max, max, type.ToString());
-            //model.Series.Add(serie);
 
             var lineserie = new LineSeries
             {
-                Title = type.ToString(),
+                Title = result.NodeType.ToString(),
                 ItemsSource = points,
                 DataFieldX = "X",
                 DataFieldY = "Y",
                 StrokeThickness = 2,
                 MarkerSize = 0,
-                LineStyle = lineStyle,
-                Color = oxyColor,
-                MarkerType = markerType
+                LineStyle = LineStyle.Dot,
+                Color = GetColorByNodeType(result.NodeType),
+                MarkerType = MarkerType.Circle
             };
 
             lock (_model)
@@ -597,8 +549,6 @@ namespace UINetworkDiscovery
                     oxyplot.RefreshPlot(true);
                 }
             }
-
-
         }
 
         private void btClear_Click(object sender, RoutedEventArgs e)
@@ -678,7 +628,7 @@ namespace UINetworkDiscovery
                 var selectedAlgs = cbDisco.IsChecked.Value || cbUConnect.IsChecked.Value ||
                                    cbSearchlight.IsChecked.Value || cbBirthday.IsChecked.Value ||
                                    //cbStripedSearchlight.IsChecked.Value || cbTestAlgorithm.IsChecked.Value ||
-                                   cbGNihao.IsChecked.Value || cbBalancedNihao.IsChecked.Value ||cbAccGreedyBNihao.IsChecked.Value;
+                                   cbTHL2H.IsChecked.Value || cbBalancedNihao.IsChecked.Value ||cbAccGreedyBNihao.IsChecked.Value;
 
                 if (selectedAlgs)
                 {
@@ -690,6 +640,16 @@ namespace UINetworkDiscovery
                     testCaseIcon.Fill = Brushes.Yellow;
                     testCaseIcon.Visibility = Visibility.Visible;
                     int COR = (int) CorValue.Value;
+
+                    if (cbBirthday.IsChecked == true)
+                    {
+
+                    }
+
+                    if (cbSearchlight.IsChecked == true)
+                    {
+
+                    }
 
                     if (cbDisco.IsChecked == true)
                     {
@@ -724,7 +684,7 @@ namespace UINetworkDiscovery
                         }
                     }
 
-                    if (cbGNihao.IsChecked == true)
+                    if (cbTHL2H.IsChecked == true)
                     {
                         double[] duties;
                         if (GetDutyCycle(out duties))
@@ -744,31 +704,6 @@ namespace UINetworkDiscovery
                             var node2 = new THL2HExtended(1, duties[duties.Length - 1], COR);
                             RunTwoNodesSimulation(node1, node2, NodeType.THL2HExtended);
                         }
-                    }
-
-                    if (cbSearchlight.IsChecked == true)
-                    {
-
-                    }
-
-                    if (cbBirthday.IsChecked == true)
-                    {
-
-                    }
-
-                    //if (cbStripedSearchlight.IsChecked == true)
-                    //{
-
-                    //}
-
-                    //if (cbTestAlgorithm.IsChecked == true)
-                    //{
-
-                    //}
-
-                    if (cbGNihao.IsChecked == true)
-                    {
-
                     }
                 }
                 else

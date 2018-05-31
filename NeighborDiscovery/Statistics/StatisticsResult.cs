@@ -14,7 +14,7 @@ namespace NeighborDiscovery.Statistics
         public NodeType NodeType { get; }
         private double[] _averageFractionOfDiscovery;
         private readonly List<StatisticTestResult> _tests;
-        private double _avgContactByWakeUp;
+        //private double _avgContactByWakeUp;
         private double _avgDiscoveryLatency;
         public double AverageDiscoveryLatency {
             get {

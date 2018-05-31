@@ -19,7 +19,7 @@ namespace NeighborDiscovery.Environment
             Node2 = node2;
         }
 
-        private Tuple<int, int> RunTwoNodesSimulationForAcc(int node1State, int node2State, int latencyLimit)
+        private Tuple<int, int> RunTwoNodesSimulation(int node1State, int node2State, int latencyLimit)
         {
             var node1 = Node1.Clone();
             var node2 = Node2.Clone();
@@ -68,10 +68,10 @@ namespace NeighborDiscovery.Environment
                 //(node1State) =>
                 for (int node1State = 0; node1State < Node1.T; node1State++)//node2 hyper period is offset slots relative to node1 (node2 always starts at the same time or after node1 but never before)
                 {
-                    for (var node2State = node1State; node2State < Node2.T; node2State++)
+                    for (var node2State = 0; node2State < Node2.T; node2State++)
                     {
                         var simulation =
-                            RunTwoNodesSimulationForAcc(node1State, node2State, Node1.Bound*2);
+                            RunTwoNodesSimulation(node1State, node2State, Node1.Bound*2);
                         statistics.AddDiscovery(simulation.Item1);
                         statistics.AddDiscovery(simulation.Item2);
                         

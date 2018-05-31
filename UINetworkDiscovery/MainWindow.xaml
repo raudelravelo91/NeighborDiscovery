@@ -38,7 +38,7 @@
 
         <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="1" Grid.RowSpan="2">
             <StackPanel Orientation="Horizontal" Margin="20,2,2,2" HorizontalAlignment="Center">
-                <Button Name="btClear" Height="30" Width="100" Margin="5" Padding="5" Content="Clear Plot" HorizontalAlignment="Left" Click="btClear_Click"/>
+                <Button Name="btClear" Height="30" Width="100" Margin="5" Padding="5" Content="Clear PlotFractionOfDiscoveries" HorizontalAlignment="Left" Click="btClear_Click"/>
             </StackPanel>
         </StackPanel>
 
@@ -234,15 +234,15 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
 
-                <CheckBox Name="cbGNihao" Content="THL2H" IsChecked="False" Margin="5" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <CheckBox Name="cbTHL2H" Content="THL2H" IsChecked="False" Margin="5" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
-                <Label Margin="0" Name="lbGNihao" Content="Avg:" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                <TextBlock Margin="0" Name="gNihaoAvg" Text="" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                <Label Margin="0" Name="lbgNihaoCnt" Content="COR:" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                <TextBlock Margin="0" Name="gNihaoCnt" Text="" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <Label Margin="0" Name="lbTHL2H" Content="Avg:" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                <TextBlock Margin="0" Name="THL2HAvg" Text="" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <Label Margin="0" Name="lbTHL2HCnt" Content="COR:" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                <TextBlock Margin="0" Name="THL2HCnt" Text="" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 <Grid Margin="0" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
-                    <ProgressBar Minimum="0" Maximum="100" Value="0" Width="100" Height="20" Name="progressBarGNihao" Foreground="LightBlue"/>
-                    <TextBlock Text="{Binding ElementName=progressBarGNihao, Path=Value, StringFormat={}{0:0}%}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <ProgressBar Minimum="0" Maximum="100" Value="0" Width="100" Height="20" Name="progressBarTHL2H" Foreground="LightBlue"/>
+                    <TextBlock Text="{Binding ElementName=progressBarTHL2H, Path=Value, StringFormat={}{0:0}%}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                 </Grid>
             </Grid>
 
