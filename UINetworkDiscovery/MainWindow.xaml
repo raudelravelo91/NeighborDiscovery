@@ -27,7 +27,7 @@
             <ColumnDefinition Width="2*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
 
-        <oxy:Plot Title="" x:Name="oxyplot" Grid.Row="1"  Grid.Column="1" Margin="20">
+        <oxy:Plot Title="" x:Name="oxyplot" Grid.Row="1"  Grid.Column="1" Margin="30">
             <oxy:Plot.Axes>
                 <oxy:LinearAxis Title="Discovery latency (slots)" TitleFontSize="14" MinorTickSize="0" Position="Bottom" Minimum="0" Maximum="400" MajorStep="50" MajorGridlineThickness="1" MajorGridlineStyle="Dot" TickStyle="Inside"/>
                 <oxy:LinearAxis Title="Fraction of Discoveries" TitleFontSize="14" MinorTickSize="0" Position="Left" Minimum="0" Maximum="1" Name="Y" MajorStep=".1" MajorGridlineThickness="1" MajorGridlineStyle="Dot" TickStyle="Inside"/>
@@ -38,7 +38,8 @@
 
         <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="1" Grid.RowSpan="2">
             <StackPanel Orientation="Horizontal" Margin="20,2,2,2" HorizontalAlignment="Center">
-                <Button Name="btClear" Height="30" Width="100" Margin="5" Padding="5" Content="Clear PlotFractionOfDiscoveries" HorizontalAlignment="Left" Click="btClear_Click"/>
+                <Button Name="btClear" Height="30" Width="100" Margin="5" Padding="5" Content="Clear" HorizontalAlignment="Left" Click="btClear_Click"/>
+                <Button Name="btPlotAvg" Height="30" Width="100" Margin="5" Padding="5" Content="Plot Avg." HorizontalAlignment="Left" Click="btPlotAvg_Click"/>
             </StackPanel>
         </StackPanel>
 

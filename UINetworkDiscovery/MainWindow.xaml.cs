@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -13,6 +14,7 @@ using NeighborDiscovery.Utils;
 using NeighborDiscovery.Environment;
 using NeighborDiscovery.Protocols;
 using OxyPlot;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace UINetworkDiscovery
 {
@@ -480,7 +482,7 @@ namespace UINetworkDiscovery
             return OxyColors.Black;
         }
 
-        private void SetAvgCaseByNodeType(NodeType type, StatisticsResult result)
+        private void SetInfoByNodeType(NodeType type, StatisticsResult result)
         {
             switch (type)
             {
@@ -499,12 +501,15 @@ namespace UINetworkDiscovery
                     break;
                 case NodeType.GNihao:
                     balanceNihaoAvg.Text = result.AverageDiscoveryLatency.ToString("f2");
+                    BalancedNihaoCnt.Text = result.AvgTransmissionsSentPerPeriod.ToString("f2");
                     break;
                 case NodeType.THL2H:
                     THL2HAvg.Text = result.AverageDiscoveryLatency.ToString("f2");
+                    THL2HCnt.Text = result.AvgTransmissionsSentPerPeriod.ToString("f2");
                     break;
                 case NodeType.THL2HExtended:
                     AccGreedyBNihaoAvg.Text = result.AverageDiscoveryLatency.ToString("f2");
+                    AccGreedyBNihaoCnt.Text = result.AvgTransmissionsSentPerPeriod.ToString("f2");
                     break;
                 default:
                     throw new NotImplementedException("Not showing AvgDiscoveryLatency for NodeType " + type);
@@ -515,7 +520,8 @@ namespace UINetworkDiscovery
         {
             var max = result.GetMaxLatency();
             avgNoNeighbors.Text =  Math.Round(result.AvgNoNeighbors,2).ToString();
-            SetAvgCaseByNodeType(result.NodeType, result);
+            
+            SetInfoByNodeType(result.NodeType, result);
 
             var points = new List<DataPoint>();
             double x = 0;
@@ -533,7 +539,7 @@ namespace UINetworkDiscovery
                 ItemsSource = points,
                 DataFieldX = "X",
                 DataFieldY = "Y",
-                StrokeThickness = 2,
+                StrokeThickness = 3,
                 MarkerSize = 0,
                 LineStyle = LineStyle.Dot,
                 Color = GetColorByNodeType(result.NodeType),
@@ -549,6 +555,38 @@ namespace UINetworkDiscovery
                     oxyplot.RefreshPlot(true);
                 }
             }
+        }
+
+        private void PlotAvgDiscoveryLatency()
+        {
+            var model = new PlotModel
+            {
+                Title = "",//title here
+                LegendPlacement = LegendPlacement.Inside,
+                LegendPosition = LegendPosition.RightTop,
+                LegendOrientation = LegendOrientation.Vertical,
+                LegendBorderThickness = 0//no border
+            };
+            var s1 = new ColumnSeries { Title = "G-Nihao", StrokeColor = OxyColors.Black, StrokeThickness = 1, FillColor = OxyColors.Black};
+            s1.Items.Add(new ColumnItem { Value = double.Parse(balanceNihaoAvg.Text), Color = OxyColors.Black});
+
+            var s2 = new ColumnSeries { Title = "THL2H", StrokeColor = OxyColors.Black, StrokeThickness = 1, FillColor = OxyColors.Red };
+            s2.Items.Add(new ColumnItem { Value = double.Parse(THL2HAvg.Text), Color = OxyColors.Red });
+
+            var s3 = new ColumnSeries { Title = "THL2H Extended", StrokeColor = OxyColors.Black, StrokeThickness = 1, FillColor = OxyColors.Blue };
+            s3.Items.Add(new ColumnItem { Value = double.Parse(AccGreedyBNihaoAvg.Text), Color = OxyColors.Blue });
+
+            var categoryAxis = new CategoryAxis();
+            categoryAxis.Labels.Add("Avg. Discovery Latency");
+            var valueAxis = new LinearAxis { MinimumPadding = 0, MaximumPadding = 0.25, AbsoluteMinimum = 0 };
+            model.Axes.Add(categoryAxis);
+            model.Axes.Add(valueAxis);
+            model.Series.Add(s1);
+            model.Series.Add(s2);
+            model.Series.Add(s3);
+
+            oxyplot.Model = model;
+            oxyplot.RefreshPlot(true);
         }
 
         private void btClear_Click(object sender, RoutedEventArgs e)
@@ -710,6 +748,11 @@ namespace UINetworkDiscovery
                     MessageBox.Show("No algorithm has been selected!", "Select Algorithms to Run", MessageBoxButton.OK,
                         MessageBoxImage.Information);
             }
+        }
+
+        private void btPlotAvg_Click(object sender, RoutedEventArgs e)
+        {
+            PlotAvgDiscoveryLatency();
         }
     }
 }
