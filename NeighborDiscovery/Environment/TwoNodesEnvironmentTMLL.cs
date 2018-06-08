@@ -63,6 +63,8 @@ namespace NeighborDiscovery.Environment
         {
             var statistics = new StatisticTestResult();
             //_totalSimulations = Node1.T * (Node1.T - 1) / 2;
+            //int cnt1, cnt2, cnt3;
+            //cnt1 = cnt2 = cnt3 = 0;
 
             //Parallel.For(0, Node1.T,
                 //(node1State) =>
@@ -71,15 +73,48 @@ namespace NeighborDiscovery.Environment
                     for (var node2State = 0; node2State < Node2.T; node2State++)
                     {
                         var simulation =
-                            RunTwoNodesSimulation(node1State, node2State, Node1.Bound*2);
+                            RunTwoNodesSimulation(node1State, node2State, Math.Max(Node1.Bound, Node2.Bound));
                         statistics.AddDiscovery(simulation.Item1);
                         statistics.AddDiscovery(simulation.Item2);
-                        
+
+                        //if (simulation.Item1 < simulation.Item2)
+                        //{
+                        //    cnt1++;
+                        //    if (simulation.Item1 > Node1.T / 2 || (simulation.Item2 - simulation.Item1) > Node2.T / 2)
+                        //    {
+                        //        throw new Exception("this should not happen");
+                        //    }
+                        //}
+                        //else
+                        //if (simulation.Item1 <= Node2.T / 2)
+                        //    cnt2++;
+                        //if (simulation.Item2 <= Node2.T/2)
+                        //{
+                        //    cnt2++;
+                        //    //if (simulation.Item2 > Node2.T/2 || (simulation.Item1 - simulation.Item2) > Node1.T / 2)
+                        //    //{
+                        //    //    throw new Exception("this should not happen");
+                        //    //}
+                        //}
+
+                        //if (simulation.Item2 < simulation.Item1)
+                        //{
+                        //    cnt3++;
+                        //}
+
+
+                        //cnt1+=2;
                         //statistics.AddDiscovery(Math.Min(simulation.Item1 , simulation.Item2));
                     }
                 }
             //);
-            
+            //if (cnt1 != cnt2)
+            //{
+            //    double fraction = cnt2*1.0 / cnt1;
+            //    double fraction2 = cnt3 * 1.0 / cnt1;
+            //    Console.WriteLine("check this out " + fraction);
+            //}
+
             return statistics;
         }
     }

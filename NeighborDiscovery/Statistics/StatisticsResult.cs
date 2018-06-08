@@ -25,6 +25,9 @@ namespace NeighborDiscovery.Statistics
                 return _avgDiscoveryLatency;
             }
         }
+        public double AvgNoNeighbors => _tests.Average(t => t.AvgNoNeighbors);
+        public double AvgNoNeihborsPerSlot => _tests.Average(t => t.AvgNoNeighborsPerSlot);
+        public double AvgTransmissionsSentPerPeriod => _tests.Average(t => t.AvgTransmissionsPerPeriod);
 
         public StatisticsResult(NodeType nodeType)
         {
@@ -70,8 +73,6 @@ namespace NeighborDiscovery.Statistics
             return _averageFractionOfDiscovery.Length - 1;
         }
 
-        public double AvgNoNeighbors => _tests.Average(t => t.AvgNoNeighbors);
-
-        public double AvgTransmissionsSentPerPeriod => _tests.Average(t => t.AvgTransmissionsPerPeriod);
+        
     }
 }

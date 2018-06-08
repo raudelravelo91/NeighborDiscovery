@@ -65,7 +65,7 @@ namespace UINetworkDiscovery
                     return;
                 }
                 
-                var test = environment.RunSingleSimulation(n.Data, DeviceProtocol, -1);
+                var test = environment.RunSingleSimulation(n.Data, DeviceProtocol);
                 statisticResults.AddStatisticTest(test);
                 cnt++;
                 Worker.ReportProgress(cnt * 100 / suite.NumberOfTests);

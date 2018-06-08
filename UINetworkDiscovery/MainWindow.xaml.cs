@@ -519,7 +519,7 @@ namespace UINetworkDiscovery
         private void PlotFractionOfDiscoveries(StatisticsResult result)
         {
             var max = result.GetMaxLatency();
-            avgNoNeighbors.Text =  Math.Round(result.AvgNoNeighbors,2).ToString();
+            avgNoNeighbors.Text =  result.AvgNoNeighbors.ToString("f2") +"(" + result.AvgNoNeihborsPerSlot.ToString("f4") +"/slot)";
             
             SetInfoByNodeType(result.NodeType, result);
 
