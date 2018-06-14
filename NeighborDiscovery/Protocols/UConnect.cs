@@ -60,14 +60,7 @@ namespace NeighborDiscovery.Protocols
             DesiredDutyCycle = value;
         }
 
-        public override int Bound => P * P;
-        
         public override int T => P * P;
-
-        public override IDiscoveryProtocol Clone()
-        {
-            return new UConnect(Id, GetDutyCycle());
-        }
 
         public override string ToString()
         {

@@ -45,14 +45,8 @@ namespace NeighborDiscovery.Protocols
             
         }
 
-        public override int Bound => P1 * P2;
 
         public override int T => P1 * P2;
-
-        public override IDiscoveryProtocol Clone()
-        {
-            return new Disco(Id, GetDutyCycle());
-        }
 
         public override string ToString()
         {

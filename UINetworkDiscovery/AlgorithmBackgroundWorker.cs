@@ -55,7 +55,7 @@ namespace UINetworkDiscovery
             var cnt = 0;
             foreach (var n in suite.Tests)
             {
-                if (Worker.CancellationPending == true)
+                if (Worker.CancellationPending)
                 {
                     e.Cancel = true;
                     lock (MainWindow.RunningInfo)

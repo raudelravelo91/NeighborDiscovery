@@ -69,11 +69,12 @@
     <Compile Include="DataGeneration\TestCase.cs" />
     <Compile Include="DataGeneration\TestCasesGenerator.cs" />
     <Compile Include="DataGeneration\TestSuite.cs" />
-    <Compile Include="Environment\TwoNodesEnvironmentTmll.cs" />
+    <Compile Include="Environment\PairwiseEnvironmentTmll.cs" />
     <Compile Include="Environment\FullDiscoveryEnvironmentTmll.cs" />
     <Compile Include="Protocols\THL2H.cs" />
     <Compile Include="Protocols\AccProtocol.cs" />
     <Compile Include="Protocols\GNihao.cs" />
+    <Compile Include="Statistics\DiscoveryLatencyTuple.cs" />
     <Compile Include="Utils\ContactInfo2Hop.cs" />
     <Compile Include="Protocols\IContact.cs" />
     <Compile Include="Protocols\IDiscoveryProtocol.cs" />
@@ -84,6 +85,7 @@
     <Compile Include="Networks\Network2D.cs" />
     <Compile Include="Networks\Network2DNode.cs" />
     <Compile Include="Utils\ObjectCopier.cs" />
+    <Compile Include="Utils\ProtocolController.cs" />
     <Compile Include="Utils\RandomGenerator.cs" />
     <Compile Include="Protocols\THL2HExtended.cs" />
     <Compile Include="Protocols\BirthdayNode.cs" />

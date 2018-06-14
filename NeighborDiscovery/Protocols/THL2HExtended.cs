@@ -13,7 +13,6 @@ namespace NeighborDiscovery.Protocols
     {
         public int M { get; private set; }
         public int N { get; private set; }
-        public override int Bound => N * M;
         public override int T => N * M;
         private double DesiredDutyCycle { get; set; }
         private bool[,] _listeningSchedule;
@@ -35,11 +34,6 @@ namespace NeighborDiscovery.Protocols
             _neighborsAwaiting = new HashSet<IDiscoveryProtocol>();
             GenerateListenningSchedule();
             GenerateLTransmissionsSchedule();
-        }
-
-        public override IDiscoveryProtocol Clone()
-        {
-            return new THL2HExtended(Id, GetDutyCycle(), M);
         }
 
         public override string ToString()

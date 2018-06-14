@@ -13,11 +13,6 @@ namespace NeighborDiscovery.Environment
         private NodeType _protocolType;
         private readonly Random _random = new Random();
 
-        private int EndsAt(int startUpSlot, BoundedProtocol device)
-        {
-            return startUpSlot + device.Bound;
-        }
-        
         private DiscoverableDevice FromDeviceDataToDiscoverableDevice(DeviceData data)
         {
             //if (data.Id == _trackId)
@@ -74,7 +69,7 @@ namespace NeighborDiscovery.Environment
             int maxSlot = SimulationLimit(dataList);//todo, improve the way to calculate the simulation limit
             
             int currentSlot = 0;
-            FullDiscoveryEnvironmentTmll fullEnv = new FullDiscoveryEnvironmentTmll(RunningMode.StaticDevices);//parameter trackFirst = true by default
+            FullDiscoveryEnvironmentTmll fullEnv = new FullDiscoveryEnvironmentTmll(RunningMode.StaticDevices);
             while (currentSlot < maxSlot)
             {
                 while (events.Count > 0 && events.Peek().StartUpSlot == currentSlot)

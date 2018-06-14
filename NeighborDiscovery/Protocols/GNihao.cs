@@ -9,9 +9,10 @@ namespace NeighborDiscovery.Protocols
 {
     public sealed class GNihao: BoundedProtocol
     {
+        
+
         public int N { get; private set; }
         public int M { get; private set; }
-        public override int Bound => N * M;
         public override int T => N * M;
         private double DesiredDutyCycle { get; set; }
         private bool[,] _listeningSchedule;
@@ -47,11 +48,6 @@ namespace NeighborDiscovery.Protocols
                     throw new Exception("duty cycle not possible to set.");
             }
             DesiredDutyCycle = value;
-        }
-
-        public override IDiscoveryProtocol Clone()
-        {
-            return new GNihao(Id, GetDutyCycle(), M);
         }
 
         public override string ToString()

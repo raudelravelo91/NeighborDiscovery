@@ -72,7 +72,7 @@ namespace NeighborDiscovery.Protocols
         /// <returns></returns>
         protected virtual IEnumerable<int> GetDeviceNextTransmissionSlot(int t0, int tn, IDiscoveryProtocol device)
         {
-            var clone = device.Clone();
+            var clone = device.Clone();//shallow copy
             clone.MoveNext();
             for (; t0 <= tn; t0++, clone.MoveNext())
             {

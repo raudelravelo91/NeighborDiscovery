@@ -209,9 +209,9 @@ namespace UINetworkDiscovery
         public bool GetDutyCycle(out double[] duties)
         {
             var dutyList = new List<double>();
-            if (cb1p.IsChecked != null && cb1p.IsChecked == true)
+            if (cb1p.IsChecked ?? false)
                 dutyList.Add(1);
-            if (cb5p.IsChecked != null && cb5p.IsChecked == true)
+            if (cb5p.IsChecked.HasValue && cb5p.IsChecked.Value)
                 dutyList.Add(5);
             if (cb10p.IsChecked != null && cb10p.IsChecked == true)
                 dutyList.Add(10);
@@ -642,11 +642,11 @@ namespace UINetworkDiscovery
 
         private void RunTwoNodesSimulation(BoundedProtocol node1, BoundedProtocol node2, NodeType type)
         {
-            var environment = new TwoNodesEnvironmentTmll(node1, node2);
-            var testResult = environment.RunSimulation();
+            var environment = new PairwiseEnvironmentTmll();
+            var testResult = environment.RunPairwiseSimulation(node1, node2, Math.Max(node1.T, node2.T));
             var statisticsResult = new StatisticsResult(type);
             statisticsResult.AddStatisticTest(testResult);
-            statisticsResult.BuildAverageFractionOfDiscovey(2*node1.Bound);
+            statisticsResult.BuildAverageFractionOfDiscovey(2*node1.T);
             worker_RunWorkerCompleted(this, new RunWorkerCompletedEventArgs(statisticsResult, null, false));
         }
 

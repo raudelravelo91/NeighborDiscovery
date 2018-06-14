@@ -33,8 +33,8 @@ namespace NeighborDiscovery.Environment
         private readonly Dictionary<Network2DNode, DiscoverableDevice> _locationToDevice;
         private readonly Dictionary<int, DiscoverableDevice> _deviceById;
         private readonly Dictionary<IDiscoveryProtocol, DeviceInfo> _eventArrival;
-        private readonly StatisticTestResult _trackedStatistics;
-        private readonly bool _trackFirst;
+        //private readonly StatisticTestResult _trackedStatistics;
+        //private readonly bool _trackFirst;
         private DiscoverableDevice _trakedDevice;
         public int CurrentTimeSlot { get; private set; }
         public int CurrentNumberOfDevices => _deviceToLocation.Count;
@@ -44,11 +44,11 @@ namespace NeighborDiscovery.Environment
         public int TotalTransmissionsSent { get; private set; }
         public int TotalTransmissionsSentTracked { get; private set; }
 
-        public FullDiscoveryEnvironmentTmll(RunningMode runningMode, bool trackFirst = true)
+        public FullDiscoveryEnvironmentTmll(RunningMode runningMode, bool trackFirst = false)
         {
-            _trackedStatistics = new StatisticTestResult();
-            _trakedDevice = null;
-            _trackFirst = trackFirst;
+            //_trackedStatistics = new StatisticTestResult();
+            //_trakedDevice = null;
+            //_trackFirst = trackFirst;
             CurrentTimeSlot = 0;
             RunningMode = runningMode;
 
@@ -92,24 +92,24 @@ namespace NeighborDiscovery.Environment
             var logic = newEvent.Device.DeviceLogic;
             _eventArrival.Add(logic, new DeviceInfo(logic.InternalTimeSlot, CurrentTimeSlot));
 
-            if(_trackFirst && _trakedDevice == null)
-            {
-                _trakedDevice = newEvent.Device;
-                logic.OnDeviceDiscovered += Logic_OnDeviceDiscovered;
-            }
+            //if(_trackFirst && _trakedDevice == null)
+            //{
+            //    _trakedDevice = newEvent.Device;
+            //    logic.OnDeviceDiscovered += Logic_OnDeviceDiscovered;
+            //}
         }
 
         public StatisticTestResult GetCurrentResult()
         {
-            if (_trakedDevice != null)
-            {
-                //_eventArrival.Sum(x => (x.Key.InternalTimeSlot - x.Value.InitialState));
-                int sumOfSlotsTracked = _trakedDevice.DeviceLogic.InternalTimeSlot - _eventArrival[_trakedDevice.DeviceLogic].InitialState + 1;
-                _trackedStatistics.AvgTransmissionsPerPeriod = sumOfSlotsTracked * 1.0 / TotalTransmissionsSentTracked;
-                _trackedStatistics.AvgNoNeighbors = AvgNoNeighborsTracked;
-                _trackedStatistics.AvgNoNeighborsPerSlot = AvgNoNeighborsTracked / sumOfSlotsTracked;
-                return _trackedStatistics;
-            }
+            //if (_trakedDevice != null)
+            //{
+            //    //_eventArrival.Sum(x => (x.Key.InternalTimeSlot - x.Value.InitialState));
+            //    int sumOfSlotsTracked = _trakedDevice.DeviceLogic.InternalTimeSlot - _eventArrival[_trakedDevice.DeviceLogic].InitialState + 1;
+            //    _trackedStatistics.AvgTransmissionsPerPeriod = sumOfSlotsTracked * 1.0 / TotalTransmissionsSentTracked;
+            //    _trackedStatistics.AvgNoNeighbors = AvgNoNeighborsTracked;
+            //    _trackedStatistics.AvgNoNeighborsPerSlot = AvgNoNeighborsTracked / sumOfSlotsTracked;
+            //    return _trackedStatistics;
+            //}
 
             var statistics = new StatisticTestResult();
             foreach (var kvPair in _locationToDevice)
@@ -125,8 +125,11 @@ namespace NeighborDiscovery.Environment
 
             //int sumOfSlots = _deviceById.Values.Sum(x => x.DeviceLogic.InternalTimeSlot - _eventArrival[x].InitialState);
             var sumOfSlots = _eventArrival.Sum(x => (x.Key.InternalTimeSlot - x.Value.InitialState));
+            var avgSumOfSlots = sumOfSlots * 1.0 / _network.CurrentSize;
             statistics.AvgNoNeighbors = AvgNoNeighbors;
             statistics.AvgTransmissionsPerPeriod = sumOfSlots * 1.0 / TotalTransmissionsSent;
+            statistics.AvgNoNeighborsPerSlot = AvgNoNeighbors / avgSumOfSlots;
+            
             return statistics;
         }
 
@@ -135,6 +138,8 @@ namespace NeighborDiscovery.Environment
         private void Logic_OnDeviceDiscovered(object sender, INodeResult e)
         {
             IDiscoveryProtocol deviceSender = sender as IDiscoveryProtocol;
+            if(deviceSender == null)
+                throw  new Exception("Null sender!");
             var device = _deviceById[deviceSender.Id];
             foreach (var neighbor in e.NewDiscoveries)
             {
@@ -146,7 +151,7 @@ namespace NeighborDiscovery.Environment
                 }
 
                 var latency = GetDiscoveryLatencyInStaticNetwork(device, neighborDevice);
-                _trackedStatistics.AddDiscovery(latency);
+                //_trackedStatistics.AddDiscovery(latency);
             }
         }
 
@@ -168,7 +173,7 @@ namespace NeighborDiscovery.Environment
                     neighborLogic.ListenTo(transmission);
                 }
                 TotalTransmissionsSent++;
-                if (_trakedDevice.DeviceLogic.Equals(currentDevice.DeviceLogic))
+                if (_trakedDevice!= null && _trakedDevice.DeviceLogic.Equals(currentDevice.DeviceLogic))
                     TotalTransmissionsSentTracked++;
             }
         }
@@ -250,21 +255,19 @@ namespace NeighborDiscovery.Environment
             var listenerLocation = _deviceToLocation[listener];
             var transmitterLocation = _deviceToLocation[transmitter];
 
-            return this.CurrentTimeSlot - _eventArrival[transmitter.DeviceLogic].EnviromentState;
-
             ////todo => fix this
-            //int listenedIn = ToEnviromentTime(listener.DeviceLogic, contactInfo.FirstContact);//in environment time
-            //int gotInRange = _network.GotInRange(transmitterLocation, listenerLocation);//in environment time
-            //int latency = listenedIn - gotInRange + 1;
+            int listenedIn = ToEnviromentTime(listener.DeviceLogic, contactInfo.FirstContact);//in environment time
+            int gotInRange = _network.GotInRange(transmitterLocation, listenerLocation);//in environment time
+            int latency = listenedIn - gotInRange + 1;
 
-            //if (latency > 200)
+            //if (latency > 400)
             //{
             //    Console.WriteLine("Something wrong");
             //    ToEnviromentTime(listener.DeviceLogic, contactInfo.FirstContact);
             //    _network.GotInRange(transmitterLocation, listenerLocation);
             //}
 
-            //return latency;
+            return latency;
         }
         #endregion
     }

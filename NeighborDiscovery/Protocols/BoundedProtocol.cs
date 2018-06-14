@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using NeighborDiscovery.Environment;
@@ -18,7 +19,6 @@ namespace NeighborDiscovery.Protocols
         public int InternalTimeSlot { get; protected set; }
         public int NoOfTransmissionsSent { get; protected set; }
         public virtual int NumberOfNeighbors => NeighborsDiscovered.Count;
-        public abstract int Bound { get; }
         public abstract int T { get; }
         public event EventHandler<INodeResult> OnDeviceDiscovered;
 
@@ -70,7 +70,10 @@ namespace NeighborDiscovery.Protocols
             return NeighborsDiscovered.ContainsKey(device);
         }
 
-        public abstract IDiscoveryProtocol Clone();
+        public IDiscoveryProtocol Clone()
+        {
+            return MemberwiseClone() as BoundedProtocol;
+        }
 
         public abstract override string ToString();
 
@@ -109,6 +112,7 @@ namespace NeighborDiscovery.Protocols
         public void Reset()
         {
             NeighborsDiscovered.Clear();
+            NoOfTransmissionsSent = 0;
             InternalTimeSlot = 0;
         }
 
