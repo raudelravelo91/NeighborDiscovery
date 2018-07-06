@@ -29,8 +29,8 @@
 
         <oxy:Plot Title="" x:Name="oxyplot" Grid.Row="1"  Grid.Column="1" Margin="30">
             <oxy:Plot.Axes>
-                <oxy:LinearAxis Title="Discovery latency (slots)" TitleFontSize="14" MinorTickSize="0" Position="Bottom" Minimum="0" Maximum="400" MajorStep="50" MajorGridlineThickness="1" MajorGridlineStyle="Dot" TickStyle="Inside"/>
-                <oxy:LinearAxis Title="Fraction of Discoveries" TitleFontSize="14" MinorTickSize="0" Position="Left" Minimum="0" Maximum="1" Name="Y" MajorStep=".1" MajorGridlineThickness="1" MajorGridlineStyle="Dot" TickStyle="Inside"/>
+                <oxy:LinearAxis Title="Discovery latency (slots)" TitleFontSize="20" MinorTickSize="0" Position="Bottom" Minimum="0" Maximum="400" MajorStep="50" MajorGridlineThickness="1" MajorGridlineStyle="Dot" TickStyle="Inside"/>
+                <oxy:LinearAxis Title="Fraction of Discoveries" TitleFontSize="20" MinorTickSize="0" Position="Left" Minimum="0" Maximum="1" Name="Y" MajorStep=".1" MajorGridlineThickness="1" MajorGridlineStyle="Dot" TickStyle="Inside"/>
             </oxy:Plot.Axes>
         </oxy:Plot>
 

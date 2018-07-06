@@ -95,7 +95,7 @@ namespace UINetworkDiscovery
                     MajorGridlineThickness = 1,
                     MajorGridlineStyle = LineStyle.Dot,
                     MinorTickSize = 0,
-                    TitleFontSize = 14,
+                    TitleFontSize = 20,
                     TickStyle = TickStyle.Inside
                 };
                 if (_model.Axes.Count > 0)
@@ -117,7 +117,7 @@ namespace UINetworkDiscovery
                     MajorGridlineThickness = 1,
                     MajorGridlineStyle = LineStyle.Dot,
                     MinorTickSize = 0,
-                    TitleFontSize = 14,
+                    TitleFontSize = 20,
                     TickStyle = TickStyle.Inside
                 };
                 if (_model.Axes.Count > 1)
@@ -436,7 +436,7 @@ namespace UINetworkDiscovery
 
         private bool ModelContainsAlgorithm(NodeType type)
         {
-            var v = _model.Series.Where(s => s.Title.Equals(type.ToString()));
+            var v = _model.Series.Where(s => s.Title.Contains(type.ToString()));
             return (v.Any());
         }
 
@@ -533,13 +533,20 @@ namespace UINetworkDiscovery
             }
             points.Add(new DataPoint(x, y));
 
+            //string dcs = result.GetDutyCyclesUsed().First() + "%";
+            //foreach (var dc in result.GetDutyCyclesUsed().Skip(1))
+            //{
+            //    dcs += "," + dc + "%";
+            //}
+
             var lineserie = new LineSeries
             {
-                Title = result.NodeType.ToString(),
+                Title = result.NodeType.ToString() + " (DC: "   + "5%)"  ,
+                FontSize = 20,
                 ItemsSource = points,
                 DataFieldX = "X",
                 DataFieldY = "Y",
-                StrokeThickness = 3,
+                StrokeThickness = 4,
                 MarkerSize = 0,
                 LineStyle = LineStyle.Dot,
                 Color = GetColorByNodeType(result.NodeType),
@@ -548,7 +555,13 @@ namespace UINetworkDiscovery
 
             lock (_model)
             {
+                lineserie.FontSize = 20;
                 _model.Series.Add(lineserie);
+                _model.LegendPlacement = LegendPlacement.Outside;
+                _model.LegendFontSize = 20;
+                _model.TitleFontSize = 20;
+                _model.SubtitleFontSize = 20;
+                _model.DefaultFontSize = 20;
                 lock (oxyplot)
                 {
                     oxyplot.Model = _model;
@@ -562,11 +575,15 @@ namespace UINetworkDiscovery
             var model = new PlotModel
             {
                 Title = "",//title here
-                LegendPlacement = LegendPlacement.Inside,
+                LegendPlacement = LegendPlacement.Outside,
                 LegendPosition = LegendPosition.RightTop,
                 LegendOrientation = LegendOrientation.Vertical,
-                LegendBorderThickness = 0//no border
-            };
+                LegendBorderThickness = 0,//no border
+                LegendFontSize = 20,
+                TitleFontSize = 20,
+                SubtitleFontSize = 20,
+                DefaultFontSize = 20,
+        };
             var s1 = new ColumnSeries { Title = "G-Nihao", StrokeColor = OxyColors.Black, StrokeThickness = 1, FillColor = OxyColors.Black};
             s1.Items.Add(new ColumnItem { Value = double.Parse(balanceNihaoAvg.Text), Color = OxyColors.Black});
 
@@ -578,7 +595,7 @@ namespace UINetworkDiscovery
 
             var categoryAxis = new CategoryAxis();
             categoryAxis.Labels.Add("Avg. Discovery Latency");
-            var valueAxis = new LinearAxis { MinimumPadding = 0, MaximumPadding = 0.25, AbsoluteMinimum = 0 };
+            var valueAxis = new LinearAxis { MinimumPadding = 0, MaximumPadding = 0.25, AbsoluteMinimum = 0};
             model.Axes.Add(categoryAxis);
             model.Axes.Add(valueAxis);
             model.Series.Add(s1);
@@ -645,6 +662,8 @@ namespace UINetworkDiscovery
             var environment = new PairwiseEnvironmentTmll();
             var testResult = environment.RunPairwiseSimulation(node1, node2, Math.Max(node1.T, node2.T));
             var statisticsResult = new StatisticsResult(type);
+            statisticsResult.AddDutyCycleUsed(node1.GetDutyCycle().ToString());
+            statisticsResult.AddDutyCycleUsed(node2.GetDutyCycle().ToString());
             statisticsResult.AddStatisticTest(testResult);
             statisticsResult.BuildAverageFractionOfDiscovey(2*node1.T);
             worker_RunWorkerCompleted(this, new RunWorkerCompletedEventArgs(statisticsResult, null, false));

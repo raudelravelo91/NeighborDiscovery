@@ -14,14 +14,14 @@ namespace UINetworkDiscovery
 {
     public class AlgorithmBackgroundWorker
     {
-        public NodeType DeviceProtocol { get; private set; }
+        public NodeType Type { get; private set; }
         public BackgroundWorker Worker { get; private set; }
         public bool IsReading { get; private set; }
         public int LatencyLimit{ get;set;}
 
         public AlgorithmBackgroundWorker(NodeType type)
         {
-            DeviceProtocol = type;
+            Type = type;
             Worker = new BackgroundWorker() { WorkerSupportsCancellation = true, WorkerReportsProgress = true, };
             Worker.DoWork += Start;
             IsReading = false;
@@ -50,7 +50,7 @@ namespace UINetworkDiscovery
                 throw new Exception("Wrong parameter argument, expected TestSuite");
             
             var environment = new NeighborDiscoveryEnvironment();
-            var statisticResults = new StatisticsResult(DeviceProtocol);
+            var statisticResults = new StatisticsResult(Type);
             
             var cnt = 0;
             foreach (var n in suite.Tests)
@@ -65,7 +65,7 @@ namespace UINetworkDiscovery
                     return;
                 }
                 
-                var test = environment.RunSingleSimulation(n.Data, DeviceProtocol);
+                var test = environment.RunSingleSimulation(n.Data, Type);
                 statisticResults.AddStatisticTest(test);
                 cnt++;
                 Worker.ReportProgress(cnt * 100 / suite.NumberOfTests);

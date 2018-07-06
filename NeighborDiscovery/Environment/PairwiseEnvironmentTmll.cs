@@ -22,8 +22,16 @@ namespace NeighborDiscovery.Environment
                     protocolController.SetToState(node2, node2State);
                     var simulation =
                         RunSimulation(node1, node2, latencyLimit);
-                    statistics.AddDiscovery(simulation.Node1Latency);
-                    statistics.AddDiscovery(simulation.Node2Latency);
+                    statistics.AddDiscovery(Math.Abs(simulation.Node1Latency - simulation.Node2Latency));
+                    //statistics.AddDiscovery(Math.Min(simulation.Node1Latency, simulation.Node2Latency));
+
+                    //if (Math.Abs(simulation.Node1Latency - simulation.Node2Latency) == 200)
+                    //{
+                    //    Console.WriteLine("here");
+                    //}
+
+                    //statistics.AddDiscovery(simulation.Node1Latency);
+                    //statistics.AddDiscovery(simulation.Node2Latency);
                 }
             }
 

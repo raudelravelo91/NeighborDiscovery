@@ -172,7 +172,7 @@ namespace NeighborDiscovery.Protocols
             {
                 int rowStep = N / M;
                 int row = 0;
-                for (int col = 0; col < M/2; row += rowStep, col++)
+                for (int col = 0; col < M / 2; row += rowStep, col++)
                 {
                     _listeningSchedule[row, col] = true;
                     NumberOfListeningSlots++;
