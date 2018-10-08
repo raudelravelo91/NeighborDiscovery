@@ -10,7 +10,7 @@ namespace NeighborDiscovery.Environment
     public class PairwiseEnvironmentTmll
     {
 
-        public async Task<StatisticTestResult> RunPairwiseSimulation(BoundedProtocol node1, BoundedProtocol node2, int latencyLimit, CancellationToken cancellationToken)
+        public async Task<StatisticTestResult> RunPairwiseSimulation(BoundedProtocol node1, BoundedProtocol node2, int latencyLimit, CancellationToken cancellationToken, IProgress<int> progress)
         {
             var statistics = new StatisticTestResult();
 
@@ -35,6 +35,7 @@ namespace NeighborDiscovery.Environment
                             cancellationToken.ThrowIfCancellationRequested();
                         }
                     }
+                    progress.Report((node1State+1)*100/node1.T);
                 }
             });
 

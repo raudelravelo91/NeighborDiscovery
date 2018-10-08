@@ -687,24 +687,24 @@ namespace UINetworkDiscovery
                 {
                     if (cbDisco.IsChecked == true)
                     {
-                        await RunTwoNodesSimulation(NodeType.Disco, _cts.Token);
+                        await RunTwoNodesSimulation(NodeType.Disco);
                     }
                     if (cbUConnect.IsChecked == true)
                     {
-                        await RunTwoNodesSimulation(NodeType.UConnect, _cts.Token);
+                        await RunTwoNodesSimulation(NodeType.UConnect);
                     }
 
                     if (cbBalancedNihao.IsChecked == true)
                     {
-                        await RunTwoNodesSimulation(NodeType.GNihao, _cts.Token);
+                        await RunTwoNodesSimulation(NodeType.GNihao);
                     }
                     if (cbTHL2H.IsChecked == true)
                     {
-                        await RunTwoNodesSimulation(NodeType.THL2H, _cts.Token);
+                        await RunTwoNodesSimulation(NodeType.THL2H);
                     }
                     if (cbAccGreedyBNihao.IsChecked == true)
                     {
-                        await RunTwoNodesSimulation(NodeType.THL2HExtended, _cts.Token);
+                        await RunTwoNodesSimulation(NodeType.THL2HExtended);
                     }
                 }
                 else
@@ -713,7 +713,7 @@ namespace UINetworkDiscovery
             }
         }
 
-        private async Task RunTwoNodesSimulation(NodeType type, CancellationToken cancelSourceToken)
+        private async Task RunTwoNodesSimulation(NodeType type)
         {
             ResetAlgorithmProperties();
             btTwoNodesSimulation.Content = "Cancel";
@@ -730,7 +730,9 @@ namespace UINetworkDiscovery
             var environment = new PairwiseEnvironmentTmll();
             try
             {
-                testResult = await environment.RunPairwiseSimulation(node1, node2, Math.Max(node1.T, node2.T), _cts.Token);
+                var progress = new Progress<int>();
+                progress.ProgressChanged += ReportProgress;
+                testResult = await environment.RunPairwiseSimulation(node1, node2, Math.Max(node1.T, node2.T), _cts.Token, progress);
             }
             catch (OperationCanceledException exception)
             {
@@ -753,6 +755,11 @@ namespace UINetworkDiscovery
             _infoBar.ShowMessage("All done.", Brushes.Lime);
             _isRunning = false;
 
+        }
+
+        private void ReportProgress(object sender, int e)
+        {
+            progressBarAccGreedyBNihao.Value = e;
         }
 
         private void btPlotAvg_Click(object sender, RoutedEventArgs e)
