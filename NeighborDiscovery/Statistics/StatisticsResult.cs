@@ -12,8 +12,6 @@ namespace NeighborDiscovery.Statistics
     public class StatisticsResult
     {
         public NodeType NodeType { get; }
-        public bool IsSymmetricEnvironment => _dutyCyclesUsed.Count == 0;
-        private readonly HashSet<string> _dutyCyclesUsed;
         private double[] _averageFractionOfDiscovery;
         private readonly List<StatisticTestResult> _tests;
         //private double _avgContactByWakeUp;
@@ -35,18 +33,6 @@ namespace NeighborDiscovery.Statistics
         {
             _tests = new List<StatisticTestResult>();
             NodeType = nodeType;
-            _dutyCyclesUsed = new HashSet<string>();
-        }
-
-        public void AddDutyCycleUsed(string dc)
-        {
-            if(!_dutyCyclesUsed.Contains(dc))
-                _dutyCyclesUsed.Add(dc);
-        }
-
-        public IEnumerable<string> GetDutyCyclesUsed()
-        {
-            return _dutyCyclesUsed;
         }
 
         public void AddStatisticTest(StatisticTestResult test)

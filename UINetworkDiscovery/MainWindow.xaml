@@ -348,8 +348,8 @@
 
             <StatusBarItem>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Ellipse Margin="2" Name="testCaseIcon" Visibility="Hidden" Fill="Lime" Width="10" Height="10" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <TextBlock Name="testCaseMessage" Text="Test Cases generated." Visibility="Hidden" HorizontalAlignment="Center"/>
+                    <Ellipse Margin="2" Name="infoIcon" Visibility="Hidden" Fill="Lime" Width="10" Height="10" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <TextBlock Name="infoMessage" Text="info bar." Visibility="Hidden" HorizontalAlignment="Center"/>
                 </StackPanel>
             </StatusBarItem>
         </StatusBar>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using NeighborDiscovery.Protocols;
 using NeighborDiscovery.Statistics;
@@ -9,31 +10,33 @@ namespace NeighborDiscovery.Environment
     public class PairwiseEnvironmentTmll
     {
 
-        public StatisticTestResult RunPairwiseSimulation(BoundedProtocol node1, BoundedProtocol node2, int latencyLimit)
+        public async Task<StatisticTestResult> RunPairwiseSimulation(BoundedProtocol node1, BoundedProtocol node2, int latencyLimit, CancellationToken cancellationToken)
         {
             var statistics = new StatisticTestResult();
-            var protocolController = new ProtocolController();
 
-            for (int node1State = 0; node1State < node1.T; node1State++)
+            await Task.Run(() =>
             {
-                for (var node2State = 0; node2State < node2.T; node2State++)
+                //Parallel.For(0, node1.T,
+                //    new ParallelOptions() {MaxDegreeOfParallelism = System.Environment.ProcessorCount}, node1State =>
+
+                for (int node1State = 0; node1State < node1.T; node1State++)
                 {
-                    protocolController.SetToState(node1, node1State);
-                    protocolController.SetToState(node2, node2State);
-                    var simulation =
-                        RunSimulation(node1, node2, latencyLimit);
-                    statistics.AddDiscovery(Math.Abs(simulation.Node1Latency - simulation.Node2Latency));
-                    //statistics.AddDiscovery(Math.Min(simulation.Node1Latency, simulation.Node2Latency));
-
-                    //if (Math.Abs(simulation.Node1Latency - simulation.Node2Latency) == 200)
-                    //{
-                    //    Console.WriteLine("here");
-                    //}
-
-                    //statistics.AddDiscovery(simulation.Node1Latency);
-                    //statistics.AddDiscovery(simulation.Node2Latency);
+                    for (var node2State = 0; node2State < node2.T; node2State++)
+                    {
+                        ProtocolController.SetToState(node1, node1State);
+                        ProtocolController.SetToState(node2, node2State);
+                        var simulation =
+                            RunSimulation(node1, node2, latencyLimit);
+                        statistics.AddDiscovery(simulation.Node1Latency);
+                        statistics.AddDiscovery(simulation.Node2Latency);
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            Thread.Sleep(2000);
+                            cancellationToken.ThrowIfCancellationRequested();
+                        }
+                    }
                 }
-            }
+            });
 
             return statistics;
         }
@@ -69,7 +72,5 @@ namespace NeighborDiscovery.Environment
 
             return new DiscoveryLatencyTuple(latency1, latency2);
         }
-
-        
     }
 }

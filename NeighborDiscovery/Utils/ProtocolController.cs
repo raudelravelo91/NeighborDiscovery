@@ -9,7 +9,7 @@ namespace NeighborDiscovery.Utils
 {
     public class ProtocolController
     {
-        public void SetToState(IDiscoveryProtocol protocol, int state)
+        public static void SetToState(IDiscoveryProtocol protocol, int state)
         {
             protocol.Reset();
             int i = 0;

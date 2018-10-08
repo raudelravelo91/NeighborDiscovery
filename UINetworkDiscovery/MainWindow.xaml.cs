@@ -7,6 +7,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.IO;
 using System.ComponentModel;
+using System.Threading;
+using System.Threading.Tasks;
 using NeighborDiscovery.DataGeneration;
 using NeighborDiscovery.Networks;
 using NeighborDiscovery.Statistics;
@@ -36,7 +38,9 @@ namespace UINetworkDiscovery
         private readonly AlgorithmBackgroundWorker _workerGNihao;
         private readonly AlgorithmBackgroundWorker _workerTHL2H;
         private readonly AlgorithmBackgroundWorker _workerTHL2HExtended;
-        private List<int> _threads = new List<int>();
+        private CancellationTokenSource _cts;
+        private bool _isRunning;
+        private InfoBarController _infoBar;
 
         public MainWindow()
         {
@@ -52,7 +56,9 @@ namespace UINetworkDiscovery
             oxyplot.PlotMargins = new System.Windows.Thickness(currentMargins.Left, btClear.Height,
                 currentMargins.Right, currentMargins.Bottom);
             RunningInfo = new RunningInfo();
-            
+            _infoBar = new InfoBarController(infoMessage, infoIcon);
+            _cts = new CancellationTokenSource();
+
             SetDefaultSettings();
 
             _workerDisco = new AlgorithmBackgroundWorker(NodeType.Disco);
@@ -187,10 +193,10 @@ namespace UINetworkDiscovery
                 {
                     btGenerate.IsEnabled = true;
                     btPlot.Content = "Run";
-                    testCaseMessage.Text = "All done.";
-                    testCaseMessage.Visibility = Visibility.Visible;
-                    testCaseIcon.Fill = Brushes.Lime;
-                    testCaseIcon.Visibility = Visibility.Visible;
+                    infoMessage.Text = "All done.";
+                    infoMessage.Visibility = Visibility.Visible;
+                    infoIcon.Fill = Brushes.Lime;
+                    infoIcon.Visibility = Visibility.Visible;
                 }
             }
             else //was canceled
@@ -200,8 +206,8 @@ namespace UINetworkDiscovery
                     RunningInfo.CancelationPending = false;
                     btGenerate.IsEnabled = true;
                     btPlot.Content = "Run";
-                    testCaseIcon.Fill = Brushes.Red;
-                    testCaseMessage.Text = "Cancelled by User.";
+                    infoIcon.Fill = Brushes.Red;
+                    infoMessage.Text = "Cancelled by User.";
                 }
             }
         }
@@ -275,17 +281,17 @@ namespace UINetworkDiscovery
                         
                         if (TestCasesGenerator.SaveTestSuite(_fileName, suite))
                         {
-                            testCaseMessage.Text = "Test cases generated";
-                            testCaseMessage.Visibility = Visibility.Visible;
-                            testCaseIcon.Fill = Brushes.Lime;
-                            testCaseIcon.Visibility = Visibility.Visible;
+                            infoMessage.Text = "Test cases generated";
+                            infoMessage.Visibility = Visibility.Visible;
+                            infoIcon.Fill = Brushes.Lime;
+                            infoIcon.Visibility = Visibility.Visible;
                         }
                         else
                         {
-                            testCaseMessage.Text = "An error ocurred while generating the test cases";
-                            testCaseMessage.Visibility = Visibility.Visible;
-                            testCaseIcon.Fill = Brushes.Red;
-                            testCaseIcon.Visibility = Visibility.Visible;
+                            infoMessage.Text = "An error ocurred while generating the test cases";
+                            infoMessage.Visibility = Visibility.Visible;
+                            infoIcon.Fill = Brushes.Red;
+                            infoIcon.Visibility = Visibility.Visible;
                         }
                     }
                     else
@@ -300,16 +306,16 @@ namespace UINetworkDiscovery
 
         private void CancellAll()
         {
-            _workerDisco.CancelAsync();
-            _workerUConnect.CancelAsync();
-            _workerSearchLight.CancelAsync();
-            _workerBirthday.CancelAsync();
-            _workerStripedSearchlight.CancelAsync();
-            _workerTestAlgorithm.CancelAsync();
-            _workerGNihao.CancelAsync();
-            _workerTHL2H.CancelAsync();
-            _workerTHL2HExtended.CancelAsync();
-            
+            //_workerDisco.CancelAsync();
+            //_workerUConnect.CancelAsync();
+            //_workerSearchLight.CancelAsync();
+            //_workerBirthday.CancelAsync();
+            //_workerStripedSearchlight.CancelAsync();
+            //_workerTestAlgorithm.CancelAsync();
+            //_workerGNihao.CancelAsync();
+            //_workerTHL2H.CancelAsync();
+            //_workerTHL2HExtended.CancelAsync();
+            _cts.Cancel();
         }
 
         private void ResetAlgorithmProperties()
@@ -373,10 +379,10 @@ namespace UINetworkDiscovery
                         ResetAlgorithmProperties();
                         btPlot.Content = "Cancel";
                         btGenerate.IsEnabled = false;
-                        testCaseMessage.Text = "Running Algorithm(s)...";
-                        testCaseMessage.Visibility = Visibility.Visible;
-                        testCaseIcon.Fill = Brushes.Yellow;
-                        testCaseIcon.Visibility = Visibility.Visible;
+                        infoMessage.Text = "Running Algorithm(s)...";
+                        infoMessage.Visibility = Visibility.Visible;
+                        infoIcon.Fill = Brushes.Yellow;
+                        infoIcon.Visibility = Visibility.Visible;
                         DeviceData.COR = (int)CorValue.Value;
 
                         if (cbDisco.IsChecked == true)
@@ -657,110 +663,48 @@ namespace UINetworkDiscovery
             }
         }
 
-        private void RunTwoNodesSimulation(BoundedProtocol node1, BoundedProtocol node2, NodeType type)
+        private async void btTwoNodesSimulation_Click(object sender, RoutedEventArgs e)
         {
-            var environment = new PairwiseEnvironmentTmll();
-            var testResult = environment.RunPairwiseSimulation(node1, node2, Math.Max(node1.T, node2.T));
-            var statisticsResult = new StatisticsResult(type);
-            statisticsResult.AddDutyCycleUsed(node1.GetDutyCycle().ToString());
-            statisticsResult.AddDutyCycleUsed(node2.GetDutyCycle().ToString());
-            statisticsResult.AddStatisticTest(testResult);
-            statisticsResult.BuildAverageFractionOfDiscovey(2*node1.T);
-            worker_RunWorkerCompleted(this, new RunWorkerCompletedEventArgs(statisticsResult, null, false));
-        }
-
-        private void btTwoNodesSimulation_Click(object sender, RoutedEventArgs e)
-        {
-            if (RunningInfo.IsRunning)
+            if (_isRunning)
             {
                 var result = MessageBox.Show("Do you want to cancel?", "Cancel", MessageBoxButton.YesNo,
                     MessageBoxImage.Question);
                 if (result == MessageBoxResult.Yes)
                 {
-                    CancellAll();
+                    btTwoNodesSimulation.IsEnabled = false;
+                    _infoBar.ShowMessage("Cancelling...", Brushes.Yellow);
+                    _cts.Cancel();
                 }
             }
             else
             {
+                _isRunning = true;
                 var selectedAlgs = cbDisco.IsChecked.Value || cbUConnect.IsChecked.Value ||
                                    cbSearchlight.IsChecked.Value || cbBirthday.IsChecked.Value ||
-                                   //cbStripedSearchlight.IsChecked.Value || cbTestAlgorithm.IsChecked.Value ||
                                    cbTHL2H.IsChecked.Value || cbBalancedNihao.IsChecked.Value ||cbAccGreedyBNihao.IsChecked.Value;
 
                 if (selectedAlgs)
                 {
-                    ResetAlgorithmProperties();
-                    btPlot.Content = "Cancel";
-                    btGenerate.IsEnabled = false;
-                    testCaseMessage.Text = "Running Algorithm(s)...";
-                    testCaseMessage.Visibility = Visibility.Visible;
-                    testCaseIcon.Fill = Brushes.Yellow;
-                    testCaseIcon.Visibility = Visibility.Visible;
-                    int COR = (int) CorValue.Value;
-
-                    if (cbBirthday.IsChecked == true)
-                    {
-
-                    }
-
-                    if (cbSearchlight.IsChecked == true)
-                    {
-
-                    }
-
                     if (cbDisco.IsChecked == true)
                     {
-                        double[] duties;
-                        if (GetDutyCycle(out duties))
-                        {
-                            var node1 = new Disco(0, duties[0]);
-                            var node2 = new Disco(1, duties[duties.Length - 1]);
-                            RunTwoNodesSimulation(node1, node2, NodeType.Disco);
-                        }
+                        await RunTwoNodesSimulation(NodeType.Disco, _cts.Token);
                     }
-
                     if (cbUConnect.IsChecked == true)
                     {
-                        double[] duties;
-                        if (GetDutyCycle(out duties))
-                        {
-                            var node1 = new UConnect(0, duties[0]);
-                            var node2 = new UConnect(1, duties[duties.Length - 1]);
-                            RunTwoNodesSimulation(node1, node2, NodeType.UConnect);
-                        }
+                        await RunTwoNodesSimulation(NodeType.UConnect, _cts.Token);
                     }
 
                     if (cbBalancedNihao.IsChecked == true)
                     {
-                        double[] duties;
-                        if (GetDutyCycle(out duties))
-                        {
-                            var node1 = new GNihao(0, duties[0], COR);
-                            var node2 = new GNihao(1, duties[duties.Length - 1], COR);
-                            RunTwoNodesSimulation(node1, node2, NodeType.GNihao);
-                        }
+                        await RunTwoNodesSimulation(NodeType.GNihao, _cts.Token);
                     }
-
                     if (cbTHL2H.IsChecked == true)
                     {
-                        double[] duties;
-                        if (GetDutyCycle(out duties))
-                        {
-                            var node1 = new THL2H(0, duties[0], COR);
-                            var node2 = new THL2H(1, duties[duties.Length - 1], COR);
-                            RunTwoNodesSimulation(node1, node2, NodeType.THL2H);
-                        }
+                        await RunTwoNodesSimulation(NodeType.THL2H, _cts.Token);
                     }
-
                     if (cbAccGreedyBNihao.IsChecked == true)
                     {
-                        double[] duties;
-                        if (GetDutyCycle(out duties))
-                        {
-                            var node1 = new THL2HExtended(0, duties[0], COR);
-                            var node2 = new THL2HExtended(1, duties[duties.Length - 1], COR);
-                            RunTwoNodesSimulation(node1, node2, NodeType.THL2HExtended);
-                        }
+                        await RunTwoNodesSimulation(NodeType.THL2HExtended, _cts.Token);
                     }
                 }
                 else
@@ -769,9 +713,54 @@ namespace UINetworkDiscovery
             }
         }
 
+        private async Task RunTwoNodesSimulation(NodeType type, CancellationToken cancelSourceToken)
+        {
+            ResetAlgorithmProperties();
+            btTwoNodesSimulation.Content = "Cancel";
+            btGenerate.IsEnabled = false;
+            _infoBar.ShowMessage("Running Algorithm(s)...", Brushes.Yellow);
+
+            _cts = new CancellationTokenSource();
+            int COR = (int)CorValue.Value;
+            double[] duties;
+            GetDutyCycle(out duties);
+            var node1 = new THL2HExtended(0, duties[0], COR);
+            var node2 = new THL2HExtended(1, duties[duties.Length - 1], COR);
+            StatisticTestResult testResult = null;
+            var environment = new PairwiseEnvironmentTmll();
+            try
+            {
+                testResult = await environment.RunPairwiseSimulation(node1, node2, Math.Max(node1.T, node2.T), _cts.Token);
+            }
+            catch (OperationCanceledException exception)
+            {
+                btTwoNodesSimulation.Content = "1 vs 1";
+                btTwoNodesSimulation.IsEnabled = true;
+                btGenerate.IsEnabled = true;
+                _infoBar.ShowMessage("Operation was cancelled.", Brushes.Red);
+                _isRunning = false;
+                return;
+            }
+
+            var statisticsResult = new StatisticsResult(NodeType.THL2H);
+            statisticsResult.AddStatisticTest(testResult);
+            statisticsResult.BuildAverageFractionOfDiscovey(2 * node1.T);
+
+            PlotFractionOfDiscoveries(statisticsResult);
+
+            btTwoNodesSimulation.Content = "1 vs 1";
+            btGenerate.IsEnabled = true;
+            _infoBar.ShowMessage("All done.", Brushes.Lime);
+            _isRunning = false;
+
+        }
+
         private void btPlotAvg_Click(object sender, RoutedEventArgs e)
         {
             PlotAvgDiscoveryLatency();
         }
+
+
+
     }
 }
