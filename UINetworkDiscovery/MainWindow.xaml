@@ -70,7 +70,6 @@
                 <Label Margin="0" Name="lbDiscoCnt" Content="Cnt:" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                 <TextBlock Margin="0" Name="discoCnt" Text="" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 <Grid Margin="0" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
-                    <ProgressBar Minimum="0" Maximum="100" Value="0" Width="100" Height="20" Name="progressBarDisco" Foreground="LightBlue"/>
                     <TextBlock Text="{Binding ElementName=progressBarDisco, Path=Value, StringFormat={}{0:0}%}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                 </Grid>    
             </Grid>
@@ -94,7 +93,6 @@
                 <Label Margin="0" Name="lbSearchlightCnt" Content="Cnt:" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                 <TextBlock Margin="0" Name="searchlightCnt" Text="" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 <Grid Margin="0" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
-                    <ProgressBar Minimum="0" Maximum="100" Value="0" Width="100" Height="20" Name="progressBarSearchlight" Foreground="LightBlue"/>
                     <TextBlock Text="{Binding ElementName=progressBarSearchlight, Path=Value, StringFormat={}{0:0}%}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                 </Grid>
             </Grid>
@@ -118,7 +116,6 @@
                 <Label Margin="0" Name="lbuconnectCnt" Content="Cnt:" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                 <TextBlock Margin="0" Name="uconnectCnt" Text="" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 <Grid Margin="0" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
-                    <ProgressBar Minimum="0" Maximum="100" Value="0" Width="100" Height="20" Name="progressBarUConnect" Foreground="LightBlue"/>
                     <TextBlock Text="{Binding ElementName=progressBarUConnect, Path=Value, StringFormat={}{0:0}%}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                 </Grid>
             </Grid>
@@ -142,7 +139,6 @@
                 <Label Margin="0" Name="lbBirthdayCnt" Content="Cnt:" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                 <TextBlock Margin="0" Name="birthdayCnt" Text="" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 <Grid Margin="0" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
-                    <ProgressBar Minimum="0" Maximum="100" Value="0" Width="100" Height="20" Name="progressBarBirthday" Foreground="LightBlue"/>
                     <TextBlock Text="{Binding ElementName=progressBarBirthday, Path=Value, StringFormat={}{0:0}%}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                 </Grid>
             </Grid>
@@ -217,7 +213,6 @@
                 <Label Margin="0" Name="lbBalancedNihaoCnt" Content="COR:" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                 <TextBlock Margin="0" Name="BalancedNihaoCnt" Text="" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 <Grid Margin="0" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
-                    <ProgressBar Minimum="0" Maximum="100" Value="0" Width="100" Height="20" Name="progressBarBalancedNihao" Foreground="LightBlue"/>
                     <TextBlock Text="{Binding ElementName=progressBarBalancedNihao, Path=Value, StringFormat={}{0:0}%}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                 </Grid>
                 </Grid>
@@ -242,7 +237,6 @@
                 <Label Margin="0" Name="lbTHL2HCnt" Content="COR:" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                 <TextBlock Margin="0" Name="THL2HCnt" Text="" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 <Grid Margin="0" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
-                    <ProgressBar Minimum="0" Maximum="100" Value="0" Width="100" Height="20" Name="progressBarTHL2H" Foreground="LightBlue"/>
                     <TextBlock Text="{Binding ElementName=progressBarTHL2H, Path=Value, StringFormat={}{0:0}%}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                 </Grid>
             </Grid>
@@ -266,10 +260,7 @@
         <TextBlock Margin="0" Name="AccGreedyBNihaoAvg" Text="" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
         <Label Margin="0" Name="lbAccGreedyBNihaoCnt" Content="COR:" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
         <TextBlock Margin="0" Name="AccGreedyBNihaoCnt" Text="" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-        <Grid Margin="0" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
-            <ProgressBar Minimum="0" Maximum="100" Value="0" Width="100" Height="20" Name="progressBarAccGreedyBNihao" Foreground="LightBlue"/>
-            <TextBlock Text="{Binding ElementName=progressBarAccGreedyBNihao, Path=Value, StringFormat={}{0:0}%}" HorizontalAlignment="Center" VerticalAlignment="Center" />
-        </Grid>
+       
     </Grid>
 
 
@@ -348,6 +339,11 @@
 
             <StatusBarItem>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+
+                    <Grid Margin="0" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
+                        <ProgressBar Minimum="0" Maximum="100" Value="0" Width="100" Height="20" Name="progressBar" Foreground="LightBlue"/>
+                        <TextBlock Text="{Binding ElementName=progressBar, Path=Value, StringFormat={}{0:0}%}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Grid>
                     <Ellipse Margin="2" Name="infoIcon" Visibility="Hidden" Fill="Lime" Width="10" Height="10" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     <TextBlock Name="infoMessage" Text="info bar." Visibility="Hidden" HorizontalAlignment="Center"/>
                 </StackPanel>

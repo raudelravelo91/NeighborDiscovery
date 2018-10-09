@@ -71,6 +71,7 @@
     <Compile Include="DataGeneration\TestSuite.cs" />
     <Compile Include="Environment\PairwiseEnvironmentTmll.cs" />
     <Compile Include="Environment\FullDiscoveryEnvironmentTmll.cs" />
+    <Compile Include="Protocols\NodeFactory.cs" />
     <Compile Include="Protocols\THL2H.cs" />
     <Compile Include="Protocols\AccProtocol.cs" />
     <Compile Include="Protocols\GNihao.cs" />
