@@ -191,41 +191,6 @@ namespace UINetworkDiscovery
             }
         }
 
-        private void ResetAlgorithmProperties()
-        {
-            //progressBarDisco.Value = 0;
-            //discoAvg.Text = "";
-            //discoCnt.Text = "";
-
-            //progressBarUConnect.Value = 0;
-            //uconnectAvg.Text = "";
-            //uconnectCnt.Text = "";
-
-            //progressBarBalancedNihao.Value = 0;
-            //uconnectAvg.Text = "";
-            //uconnectCnt.Text = "";
-
-            //progressBarBalancedNihao.Value = 0;
-            //uconnectAvg.Text = "";
-            //uconnectCnt.Text = "";
-
-            //progressBarSearchlight.Value = 0;
-            //searchlightAvg.Text = "";
-            //searchlightCnt.Text = "";
-
-            //progressBarBirthday.Value = 0;
-            //birthdayAvg.Text = "";
-            //birthdayCnt.Text = "";
-
-            //progressBarHello.Value = 0;
-            //stripedSearchlighAvg.Text = "";
-            //stripedSearchlighCnt.Text = "";
-
-            //progressBarTestAlg.Value = 0;
-            //testAlgAvg.Text = "";
-            //testAlgCnt.Text = "";
-        }
-
         private async void btPlot_Click(object sender, RoutedEventArgs e)
         {
             if (_isRunning)
@@ -450,11 +415,7 @@ namespace UINetworkDiscovery
 
         private void btClear_Click(object sender, RoutedEventArgs e)
         {
-            if (_model.Series.Count > 0)
-            {
-                oxyplot.Model.Series.Clear();
-                oxyplot.RefreshPlot(true);
-            }
+            ClearChart();
         }
 
         private void tbXAxes_KeyUp(object sender, KeyEventArgs e)
@@ -510,80 +471,31 @@ namespace UINetworkDiscovery
             else
             {
                 _isRunning = true;
-                _cts = new CancellationTokenSource();
-                _progress = new Progress<int>();
+                
                 var selectedAlgs = cbDisco.IsChecked.Value || cbUConnect.IsChecked.Value ||
                                    cbSearchlight.IsChecked.Value || cbBirthday.IsChecked.Value ||
                                    cbTHL2H.IsChecked.Value || cbBalancedNihao.IsChecked.Value ||cbAccGreedyBNihao.IsChecked.Value;
                 if (selectedAlgs)
                 {
-                    _progress.ProgressChanged += ReportProgress;
-                    _cts = new CancellationTokenSource();
-                    if (cbDisco.IsChecked == true)
+                    foreach (var protocolType in GetProtocolsToRun())
                     {
+                        UpdateViewToRunningAlgorithm(protocolType);
                         try
                         {
-                            await RunTwoNodesSimulation(NodeType.Disco);
+                            _cts = new CancellationTokenSource();
+                            _progress = new Progress<int>();
+                            _progress.ProgressChanged += ReportProgress;
+                            await RunTwoNodesSimulation(protocolType, _cts, _progress);
                         }
                         catch (OperationCanceledException)
                         {
-                            CancelAll();
-                            return;
-                        }
-                    }
-                    if (cbUConnect.IsChecked == true)
-                    {
-                        try
-                        {
-                            await RunTwoNodesSimulation(NodeType.UConnect);
-                        }
-                        catch (OperationCanceledException)
-                        {
-                            CancelAll();
-                            return;
-                        }
-                    }
-                    if (cbBalancedNihao.IsChecked == true)
-                    {
-                        try
-                        {
-                            await RunTwoNodesSimulation(NodeType.GNihao);
-                        }
-                        catch (OperationCanceledException)
-                        {
-                            CancelAll();
-                            return;
-                        }
-                    }
-                    if (cbTHL2H.IsChecked == true)
-                    {
-                        try
-                        {
-                            await RunTwoNodesSimulation(NodeType.THL2H);
-                        }
-                        catch (OperationCanceledException)
-                        {
-                            CancelAll();
-                            return;
-                        }
-                    }
-                    if (cbAccGreedyBNihao.IsChecked == true)
-                    {
-                        try
-                        {
-                            await RunTwoNodesSimulation(NodeType.THL2HExtended);
-                        }
-                        catch (OperationCanceledException)
-                        {
-                            CancelAll();
+                            UpdateViewToOperationCanceled();
+                            ClearChart();
                             return;
                         }
                     }
 
-                    btTwoNodesSimulation.Content = "1 vs 1";
-                    btGenerate.IsEnabled = true;
-                    _infoBar.ShowMessage("All done.", Brushes.Lime);
-                    _isRunning = false;
+                    UpdateViewToAllDone();
                 }
                 else
                     MessageBox.Show("No algorithm has been selected!", "Select Algorithms to Run", MessageBoxButton.OK,
@@ -591,22 +503,43 @@ namespace UINetworkDiscovery
             }
         }
 
-        private async Task RunTwoNodesSimulation(NodeType type)
+        public List<NodeType> GetProtocolsToRun()
         {
-            ResetAlgorithmProperties();
-            btTwoNodesSimulation.Content = "Cancel";
-            btGenerate.IsEnabled = false;
-            _infoBar.ShowMessage("Running Algorithm(s)...", Brushes.Yellow);
+            var protocolsToRun = new List<NodeType>();
 
+            if (cbDisco.IsChecked == true)
+            {
+                protocolsToRun.Add(NodeType.Disco);
+            }
+            if (cbUConnect.IsChecked == true)
+            {
+                protocolsToRun.Add(NodeType.UConnect);
+            }
+            if (cbBalancedNihao.IsChecked == true)
+            {
+                protocolsToRun.Add(NodeType.GNihao);
+            }
+            if (cbTHL2H.IsChecked == true)
+            {
+                protocolsToRun.Add(NodeType.THL2H);
+            }
+            if (cbAccGreedyBNihao.IsChecked == true)
+            {
+                protocolsToRun.Add(NodeType.THL2HExtended);
+            }
+
+            return protocolsToRun;
+        }
+
+        private async Task RunTwoNodesSimulation(NodeType type, CancellationTokenSource cts, Progress<int> progress)
+        {
             int COR = (int)CorValue.Value;
             double[] duties;
             GetDutyCycle(out duties);
             var node1 = NodeFactory.CreateNew(type,0, (int)duties[0], COR);
             var node2 = NodeFactory.CreateNew(type, 1, (int)duties[duties.Length - 1], COR);
-            StatisticTestResult testResult = null;
             var environment = new PairwiseEnvironmentTmll();
-            
-            testResult = await environment.RunPairwiseSimulation(node1, node2, Math.Max(node1.T, node2.T), _cts.Token, _progress);
+            var testResult = await environment.RunPairwiseSimulation(node1, node2, Math.Max(node1.T, node2.T), _cts.Token, _progress);
             
             var statisticsResult = new StatisticsResult(type);
             statisticsResult.AddStatisticTest(testResult);
@@ -625,13 +558,43 @@ namespace UINetworkDiscovery
             PlotAvgDiscoveryLatency();
         }
 
-        private void CancelAll()
+        private void UpdateViewToOperationCanceled()
         {
             btTwoNodesSimulation.Content = "1 vs 1";
             btTwoNodesSimulation.IsEnabled = true;
             btGenerate.IsEnabled = true;
             _infoBar.ShowMessage("Operation was cancelled.", Brushes.Red);
             _isRunning = false;
+        }
+
+        private void UpdateViewToAllDone()
+        {
+            btTwoNodesSimulation.Content = "1 vs 1";
+            btGenerate.IsEnabled = true;
+            _infoBar.ShowMessage("All done.", Brushes.Lime);
+            _isRunning = false;
+        }
+
+        private void UpdateViewToRunningAlgorithm(NodeType type)
+        {
+            btTwoNodesSimulation.Content = "Cancel";
+            btGenerate.IsEnabled = false;
+            _infoBar.ShowMessage($"Running {type.ToString()}...", Brushes.Yellow);
+        }
+
+        private void ClearChart()
+        {
+            if (_model.Series.Count > 0)
+            {
+                oxyplot.Model.Series.Clear();
+                oxyplot.RefreshPlot(true);
+            }
+
+            THL2HAvg.Text = "";
+            AccGreedyBNihaoAvg.Text = "";
+            balanceNihaoAvg.Text = "";
+            uconnectAvg.Text = "";
+            discoAvg.Text = "";
         }
 
     }

@@ -32,7 +32,7 @@ namespace NeighborDiscovery.Environment
                         statistics.AddDiscovery(simulation.Node2Latency);
                         if (cancellationToken.IsCancellationRequested)
                         {
-                            //Thread.Sleep(2000);
+                            Thread.Sleep(2000);
                             cancellationToken.ThrowIfCancellationRequested();
                         }
                     }
